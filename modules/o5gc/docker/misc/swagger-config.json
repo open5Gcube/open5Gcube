@@ -1,0 +1,12 @@
+{
+    "urls": [
+        { 
+            "name": "NRF: NFManagement Service",
+            "url": "./5GC_APIs/TS29510_Nnrf_NFManagement.yaml"
+        },
+        { 
+            "name": "NRF: NFDiscovery Service",
+            "url": "./5GC_APIs/TS29510_Nnrf_NFDiscovery.yaml"
+        }
+    ]
+}

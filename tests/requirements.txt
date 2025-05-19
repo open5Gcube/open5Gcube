@@ -1,0 +1,2 @@
+robotframework>=5,<6
+robotframework-robocop

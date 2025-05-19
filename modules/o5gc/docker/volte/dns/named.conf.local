@@ -1,0 +1,22 @@
+//
+// Do any local configuration here
+//
+
+// Consider adding the 1918 zones here, if they are not used in your
+// organization
+//include "/etc/bind/zones.rfc1918";
+
+zone "ims.mnc${MNC03}.mcc${MCC}.3gppnetwork.org" {
+        type master;
+        file "/etc/bind/ims.mnc${MNC03}.mcc${MCC}.3gppnetwork.org";
+};
+
+zone "epc.mnc${MNC03}.mcc${MCC}.3gppnetwork.org" {
+        type master;
+        file "/etc/bind/epc.mnc${MNC03}.mcc${MCC}.3gppnetwork.org";
+};
+
+zone "e164.arpa" {
+        type master;
+        file "/etc/bind/e164.arpa";
+};

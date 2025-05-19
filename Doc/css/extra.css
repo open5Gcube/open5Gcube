@@ -1,0 +1,7 @@
+.md-typeset ol:not([hidden]),.md-typeset ul:not([hidden]) {
+    display: block;
+}
+
+table thead tr th:empty {
+    display: none;
+}

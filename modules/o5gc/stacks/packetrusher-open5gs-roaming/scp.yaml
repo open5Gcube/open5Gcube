@@ -1,0 +1,21 @@
+logger:
+    file: /open5gs/install/var/log/open5gs/scp.log
+
+sbi:
+    server:
+      no_tls: true
+    client:
+      no_tls: true
+
+global:
+  max:
+    ue: 1024
+
+scp:
+    sbi:
+      server:
+        - address: ${SCP_IP_ADDR}
+          port: 7777
+      client:
+        nrf:
+          - uri: http://nrf.5gc.mnc${MNC03}.mcc${MCC}.3gppnetwork.org

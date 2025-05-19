@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: 'To cite package "open5Gcube" in publications use:'
+title: "open5Gcube: A Modular Framework for Mobile Network Laboratories."
+authors:
+  - given-names: Thorsten
+    family-names: Horstmann
+repository-code: 'https://github.com/open5Gcube/open5Gcube'
+url: 'https://open5gcube.de'
+preferred-citation:
+  type: proceedings
+  authors:
+  - family-names: "Horstmann"
+    given-names: "Thorsten"
+    orcid: "https://orcid.org/0009-0000-2880-9838"
+  journal: "Mobilkommunikation; 29. ITG-Fachtagung"
+  title: "A Modular and Usable Framework for Mobile Network Laboratories."
+  month: 5
+  year: 2025
+keywords:
+  - 5G
+  - open-source

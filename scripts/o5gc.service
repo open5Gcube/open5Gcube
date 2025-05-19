@@ -1,0 +1,10 @@
+[Unit]
+Description=open5Gcube Host Configuration Service
+After=syslog.target network.target docker.service
+
+[Service]
+ExecStart=bash -c "exec $(dirname $(readlink -f /etc/systemd/system/o5gc.service))/startup.sh"
+SyslogIdentifier=o5gc
+
+[Install]
+WantedBy=multi-user.target

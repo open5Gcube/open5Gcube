@@ -1,0 +1,12 @@
+db_uri: ${DB_URI}
+
+logger:
+    file: /open5gs/install/var/log/open5gs/pcrf.log
+    level: info
+
+global:
+  max:
+    ue: 1024
+
+pcrf:
+    freeDiameter: /open5gs/install/etc/freeDiameter/pcrf.conf

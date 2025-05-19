@@ -1,0 +1,10 @@
+// app global css in SCSS form
+
+html, body, #q-app {
+    height: 100%;
+}
+
+@font-face {
+    font-family: SourceSans3;
+    src: url(./fonts/SourceSans3-Regular.ttf);
+}

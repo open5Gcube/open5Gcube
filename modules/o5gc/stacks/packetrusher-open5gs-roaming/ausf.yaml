@@ -1,0 +1,23 @@
+logger:
+    file: /open5gs/install/var/log/open5gs/ausf.log
+
+sbi:
+    server:
+      no_tls: true
+    client:
+      no_tls: true
+
+global:
+  max:
+    ue: 1024
+
+ausf:
+    sbi:
+      server:
+        - address: ausf.5gc.mnc${MNC03}.mcc${MCC}.3gppnetwork.org
+#          port: 7777
+      client:
+#        nrf:
+#          - uri: http://nrf.5gc.mnc${MNC03}.mcc${MCC}.3gppnetwork.org:7777
+        scp:
+          - uri: http://scp.5gc.mnc${MNC03}.mcc${MCC}.3gppnetwork.org:7777

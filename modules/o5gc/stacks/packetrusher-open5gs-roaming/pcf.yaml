@@ -1,0 +1,53 @@
+db_uri: ${DB_URI}
+
+logger:
+    file: /open5gs/install/var/log/open5gs/pcf.log
+
+sbi:
+    server:
+      no_tls: true
+    client:
+      no_tls: true
+
+global:
+  max:
+    ue: 1024
+
+pcf:
+    sbi:
+      server:
+        - address: ${PCF_IP_ADDR}
+          port: 7777
+      client:
+        nrf:
+          - uri: http://nrf.5gc.mnc${MNC03}.mcc${MCC}.3gppnetwork.org:7777
+        scp:
+          - uri: http://scp.5gc.mnc${MNC03}.mcc${MCC}.3gppnetwork.org:7777
+    policy:
+      - plmn_id:
+          mcc: ${MCC}
+          mnc: ${MNC}
+        slice:
+          - sst: ${NSSAI_SST}  # 1,2,3,4
+            sd: ${NSSAI_SD}
+            default_indicator: true
+            session:
+              - name: ${APN}
+                type: 3  # 1:IPv4, 2:IPv6, 3:IPv4v6
+                ambr:
+                  downlink:
+                    value: 1
+                    unit: 3  # 0:bps, 1:Kbps, 2:Mbps, 3:Gbps, 4:Tbps
+                  uplink:
+                    value: 1
+                    unit: 3
+                qos:
+                  index: 9  # 1, 2, 3, 4, 65, 66, 67, 75, 71, 72, 73, 74, 76, 5, 6, 7, 8, 9, 69, 70, 79, 80, 82, 83, 84, 85, 86
+                  arp:
+                    priority_level: 8  # 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+                    pre_emption_vulnerability: 1  # 1: Disabled, 2:Enabled
+                    pre_emption_capability: 1  # 1: Disabled, 2:Enabled
+    metrics:
+      server:
+        - address: ${PCF_IP_ADDR}
+          port: 9091

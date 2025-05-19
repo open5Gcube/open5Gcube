@@ -1,0 +1,45 @@
+gnodeb:
+  controlif:
+    ip: "${GNB_IP_ADDR}"
+    port: 9487
+  dataif:
+    ip: "${GNB_IP_ADDR}"
+    port: 2152
+  plmnlist:
+    mcc: "${GNB_MCC}"
+    mnc: "${GNB_MNC}"
+    tac: "${TAC}"
+    gnbid: "000008"
+  slicesupportlist:
+    sst: "${NSSAI_SST}"
+    sd: "${NSSAI_SD}" # optional, can be removed if not used
+
+ue:
+  msin: "${UE_SOFT_MSIN}"
+  key: "${UE_SOFT_KEY}"
+  opc: "${UE_SOFT_OPC}"
+  amf: "8000"
+  sqn: "00000000"
+  dnn: "internet"
+  routingindicator: "0000"
+  hplmn:
+    mcc: "${UE_MCC}"
+    mnc: "${UE_MNC}"
+  snssai:
+    sst: ${NSSAI_SST}
+    sd: "${NSSAI_SD}" # optional, can be removed if not used
+  integrity:
+    nia0: false
+    nia1: false
+    nia2: true
+    nia3: false
+  ciphering:
+    nea0: true
+    nea1: false
+    nea2: true
+    nea3: false
+amfif:
+  - ip: "${AMF_IP_ADDR}"
+    port: 38412
+logs:
+  level: 4

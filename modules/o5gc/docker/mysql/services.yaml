@@ -1,0 +1,31 @@
+services:
+    mysql:
+        container_name: "mysql"
+        image: o5gc/mysql
+        env_file: ["${ENV_FILE}"]
+        labels:
+            o5gc.stack: ${O5GC_STACK}
+        volumes:
+            - ${DOCKER}/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
+        networks:
+            corenet:
+                ipv4_address: ${MYSQL_IP_ADDR}
+
+    phpmyadmin:
+        profiles: ["phpmyadmin"]
+        image: phpmyadmin/phpmyadmin:5.1
+        container_name: phpmyadmin
+        labels:
+            o5gc.stack: ${O5GC_STACK}
+            o5gc.webui.hide: true
+            o5gc.link.title: "phpMyAdmin"
+            o5gc.link.url: "http://{{host}}:${PHPMYADMIN_HOST_PORT}/"
+        networks:
+            - corenet
+            - o5gc
+        ports:
+            - ${PHPMYADMIN_HOST_PORT}:80
+        environment:
+            - PMA_HOST=${MYSQL_IP_ADDR}
+            - PMA_USER=root
+            - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD}

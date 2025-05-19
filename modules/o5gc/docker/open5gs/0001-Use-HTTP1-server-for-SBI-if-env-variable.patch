@@ -1,0 +1,59 @@
+From fffb02bf053304bb4156d21f8ca54b13487c38d5 Mon Sep 17 00:00:00 2001
+From: Thorsten Horstmann <Thorsten.Horstmann@h-brs.de>
+Date: Fri, 8 Mar 2024 14:25:27 +0100
+Subject: [PATCH] Use HTTP-1 based server for SBI if environment variable
+ 'OPEN5GS_USE_HTTP1' is set
+
+---
+ lib/sbi/client.c     | 2 ++
+ lib/sbi/mhd-server.c | 1 +
+ lib/sbi/server.c     | 8 +++++---
+ 3 files changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/lib/sbi/client.c b/lib/sbi/client.c
+index 16ec19515..62c2310df 100644
+--- a/lib/sbi/client.c
++++ b/lib/sbi/client.c
+@@ -503,6 +503,8 @@ static connection_t *connection_add(
+     curl_easy_setopt(conn->easy, CURLOPT_HTTPHEADER, conn->header_list);
+ 
+ #if 1 /* Use HTTP2 */
++    const char* use_http1 = getenv("OPEN5GS_USE_HTTP1");
++    if (use_http1 == NULL || (strcasecmp(use_http1, "true") && strcasecmp(use_http1, "yes") && strcasecmp(use_http1, "1")))
+     curl_easy_setopt(conn->easy,
+             CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2_PRIOR_KNOWLEDGE);
+ #endif
+diff --git a/lib/sbi/mhd-server.c b/lib/sbi/mhd-server.c
+index 913d0f931..920cc1dd7 100644
+--- a/lib/sbi/mhd-server.c
++++ b/lib/sbi/mhd-server.c
+@@ -522,6 +522,7 @@ static _MHD_Result access_handler(
+         ogs_assert(request->h.uri);
+ 
+         if (ogs_sbi_header_get(request->http.headers, "Content-Length") ||
++            ogs_sbi_header_get(request->http.headers, "content-length") ||
+             ogs_sbi_header_get(request->http.headers, "Transfer-Encoding")) {
+ 
+             // FIXME : check if POST_DATA is on MHD_POSTDATA_KIND
+diff --git a/lib/sbi/server.c b/lib/sbi/server.c
+index 151bcf033..b999ea180 100644
+--- a/lib/sbi/server.c
++++ b/lib/sbi/server.c
+@@ -31,9 +31,11 @@ void ogs_sbi_server_init(int num_of_session_pool, int num_of_stream_pool)
+ {
+     if (ogs_sbi_server_actions_initialized == false) {
+ #if 1 /* Use HTTP2 */
+-        ogs_sbi_server_actions = ogs_nghttp2_server_actions;
+-#else
+-        ogs_sbi_server_actions = ogs_mhd_server_actions;
++        const char* use_http1 = getenv("OPEN5GS_USE_HTTP1");
++        if (use_http1 == NULL || (strcasecmp(use_http1, "true") && strcasecmp(use_http1, "yes") && strcasecmp(use_http1, "1")))
++            ogs_sbi_server_actions = ogs_nghttp2_server_actions;
++        else
++            ogs_sbi_server_actions = ogs_mhd_server_actions;
+ #endif
+     }
+ 
+-- 
+2.34.1
+

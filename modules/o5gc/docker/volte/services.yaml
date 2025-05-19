@@ -1,0 +1,124 @@
+services:
+    base:
+        profiles: ["volte"]
+        env_file: ["${ENV_FILE}"]
+        labels:
+            o5gc.stack: ${O5GC_STACK}
+            o5gc.webui.priority: ${WEBUI_PRIO_VOLTE}
+        volumes:
+            - ${DOCKER}/volte:/mnt/volte:ro
+        environment:
+            - IMS_DOMAIN=ims.mnc${MNC03}.mcc${MCC}.3gppnetwork.org
+            - EPC_DOMAIN=epc.mnc${MNC03}.mcc${MCC}.3gppnetwork.org
+        privileged: true
+        init: true
+
+    kamailio:
+        extends:
+            service: base
+        image: o5gc/volte-kamailio
+        entrypoint: ["/mnt/volte/kamailio/entrypoint.sh"]
+        dns: ${VOLTE_DNS_IP_ADDR}
+        healthcheck:
+            test: /bin/bash -c "TERM=dumb kamctl monitor 1 | grep -q up_since || exit 1"
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+    dns:
+        extends:
+            service: base
+        image: o5gc/volte-dns
+        container_name: volte-dns
+        labels:
+            o5gc.stack: ${O5GC_STACK}
+        networks:
+            corenet:
+                ipv4_address: ${VOLTE_DNS_IP_ADDR}
+        entrypoint: ["/mnt/volte/dns/entrypoint.sh"]
+
+    icscf:
+        extends:
+            service: kamailio
+        container_name: icscf
+        command: icscf
+        depends_on: [volte-dns, mysql, fhoss]
+        networks:
+            corenet:
+                ipv4_address: ${ICSCF_IP_ADDR}
+
+    pcscf:
+        extends:
+            service: kamailio
+        container_name: pcscf
+        command: pcscf
+        depends_on: [volte-dns, mysql, rtpengine, icscf, scscf]
+        networks:
+            corenet:
+                ipv4_address: ${PCSCF_IP_ADDR}
+
+    scscf:
+        extends:
+            service: kamailio
+        container_name: scscf
+        command: scscf
+        depends_on: [volte-dns, mysql, fhoss]
+        networks:
+            corenet:
+                ipv4_address: ${SCSCF_IP_ADDR}
+
+    smsc:
+        extends:
+            service: kamailio
+        profiles: ["smsc"]
+        container_name: smsc
+        command: smsc
+        depends_on: [volte-dns, mysql]
+        networks:
+            corenet:
+                ipv4_address: ${SMSC_IP_ADDR}
+        dns: ${VOLTE_DNS_IP_ADDR}
+
+    rtpengine:
+        extends:
+            service: base
+        image: o5gc/volte-rtpengine
+        container_name: rtpengine
+        entrypoint: ["/mnt/volte/rtpengine/entrypoint.sh"]
+        networks:
+            corenet:
+                ipv4_address: ${RTPENGINE_IP_ADDR}
+        dns: ${VOLTE_DNS_IP_ADDR}
+
+    fhoss:
+        extends:
+            service: base
+        image: o5gc/volte-fhoss
+        container_name: fhoss
+        depends_on: [volte-dns, mysql]
+        labels:
+            o5gc.link.title: "FHOSS"
+            o5gc.link.url: "http://{{host}}:${FHOSS_HOST_PORT}/"
+        networks:
+            corenet:
+                ipv4_address: ${VOLTE_HSS_IP_ADDR}
+            o5gc:
+        ports:
+            - ${FHOSS_HOST_PORT}:8080
+        environment:
+            - SMS_DOMAIN=${SMS_DOMAIN:-SMS-over-IMS}
+        entrypoint: ["/mnt/volte/fhoss/entrypoint.sh"]
+        dns: ${VOLTE_DNS_IP_ADDR}
+
+    pyhss:
+        extends:
+            service: base
+        image: o5gc/volte-pyhss
+        container_name: pyhss
+        depends_on: [volte-dns, mysql]
+        networks:
+            corenet:
+                ipv4_address: ${VOLTE_HSS_IP_ADDR}
+            o5gc:
+        entrypoint: ["/mnt/volte/pyhss/entrypoint.sh"]
+        dns: ${VOLTE_DNS_IP_ADDR}

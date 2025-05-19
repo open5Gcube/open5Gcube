@@ -1,0 +1,19 @@
+logger:
+    file:
+      path: /var/log/open5gs/sgwc.log
+    level: ${OPEN5GS_LOGLEVEL}
+
+global:
+  max:
+    ue: 1024
+
+sgwc:
+    gtpc:
+      server:
+        - address: ${SPGWC_IP_ADDR}
+    pfcp:
+      server:
+        - address: ${SPGWC_IP_ADDR}
+      client:
+        sgwu:
+          - address: ${SPGWU_IP_ADDR}

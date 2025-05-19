@@ -1,0 +1,307 @@
+services:
+    base:
+        image: o5gc/open5gs:${OPEN5GS_VERSION:-latest}
+        profiles: ["open5gs"]
+        entrypoint: ["/mnt/open5gs/entrypoint.sh"]
+        env_file: ["${ENV_FILE}"]
+        labels:
+            o5gc.corenetwork-function: true
+            o5gc.stack: ${O5GC_STACK}
+            o5gc.webui.priority: ${WEBUI_PRIO_CORE_DEFAULT}
+        volumes:
+            - ${DOCKER}/open5gs/:/mnt/open5gs/:ro
+            - ${DEVELOP_VOLUME_OPEN5GS:-${BASE}/var/empty:/var/empty}
+        environment:
+            - OPEN5GS_USE_HTTP1=${OPEN5GS_USE_HTTP1:-yes}
+            - OPEN5GS_LOGLEVEL=${OPEN5GS_LOGLEVEL:-info}
+            - LI_XPDU_DEBUG_TRACE=${CORENET_HOST_IP_ADDR}:12012
+        privileged: true
+        init: true
+        healthcheck:
+            test: /bin/bash -c "pgrep 'open5gs-[a-z]+d'"
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+    mongo:
+        image: mongo:6.0
+        container_name: mongo
+        command: --bind_ip 0.0.0.0
+        profiles: ["core"]
+        networks:
+            corenet:
+                ipv4_address: ${MONGO_IP_ADDR}
+
+    mongo-express:
+        profiles: ["core"]
+        image: mongo-express:1.0.0-20
+        container_name: mongo-express
+        volumes:
+            - ${MODULES}/base/docker/o5gc/wait-for-it.sh:/wait-for-it.sh:ro
+        labels:
+            o5gc.stack: ${O5GC_STACK}
+            o5gc.webui.hide: true
+            o5gc.link.title: "Mongo Express"
+            o5gc.link.url: "http://{{host}}:${MONGO_EXPRESS_HOST_PORT}/"
+        entrypoint: >
+            bash -c "/wait-for-it.sh ${MONGO_IP_ADDR}:27017 &&
+            /sbin/tini -- /docker-entrypoint.sh mongo-express"
+        networks:
+            - corenet
+            - o5gc
+        ports:
+            - ${MONGO_EXPRESS_HOST_PORT}:8081
+        environment:
+            - ME_CONFIG_BASICAUTH=false
+            - ME_CONFIG_BASICAUTH_USERNAME=
+            - ME_CONFIG_MONGODB_URL=mongodb://${MONGO_IP_ADDR}:27017
+
+    init:
+        extends:
+            service: base
+        container_name: open5gs-init
+        profiles: ["core"]
+        labels:
+            o5gc.initialisation: true
+            o5gc.webui.priority: ${WEBUI_PRIO_INIT}
+        entrypoint: /mnt/open5gs/init-subscribers.sh
+        networks:
+            - corenet
+
+    webui:
+        extends:
+            service: base
+        container_name: open5gs-webui
+        profiles: ["core"]
+        command: webui
+        labels:
+            o5gc.link.title: "Open5GS WebUI"
+            o5gc.link.url: "http://{{host}}:${OPEN5GS_WEBUI_HOST_PORT}/"
+            o5gc.webui.priority: 0
+        environment:
+            - DB_URI=mongodb://${MONGO_IP_ADDR}/open5gs
+        networks:
+            corenet:
+                ipv4_address: ${OPEN5GS_WEBUI_IP_ADDR}
+            o5gc:
+        ports:
+            - ${OPEN5GS_WEBUI_HOST_PORT}:3000
+        healthcheck:
+            test: /bin/bash -c "curl --fail http://${OPEN5GS_WEBUI_IP_ADDR}:3000 || exit 1"
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+    nrf:
+        extends:
+            service: base
+        container_name: nrf
+        profiles: ["core"]
+        command: nrf
+        networks:
+            corenet:
+                ipv4_address: ${NRF_IP_ADDR}
+
+    ausf:
+        extends:
+            service: base
+        container_name: ausf
+        profiles: ["core"]
+        command: ausf
+        networks:
+            corenet:
+                ipv4_address: ${AUSF_IP_ADDR}
+
+    udr:
+        extends:
+            service: base
+        container_name: udr
+        profiles: ["core"]
+        command: udr
+        environment:
+            - DB_URI=mongodb://${MONGO_IP_ADDR}/open5gs
+        networks:
+            corenet:
+                ipv4_address: ${UDR_IP_ADDR}
+
+    udm:
+        extends:
+            service: base
+        container_name: udm
+        profiles: ["core"]
+        command: udm
+        networks:
+            corenet:
+                ipv4_address: ${UDM_IP_ADDR}
+
+    pcf:
+        extends:
+            service: base
+        container_name: pcf
+        profiles: ["core"]
+        command: pcf
+        environment:
+            - DB_URI=mongodb://${MONGO_IP_ADDR}/open5gs
+        networks:
+            corenet:
+                ipv4_address: ${PCF_IP_ADDR}
+
+    bsf:
+        extends:
+            service: base
+        container_name: bsf
+        profiles: ["core"]
+        command: bsf
+        environment:
+            - DB_URI=mongodb://${MONGO_IP_ADDR}/open5gs
+        networks:
+            corenet:
+                ipv4_address: ${BSF_IP_ADDR}
+
+    nssf:
+        extends:
+            service: base
+        container_name: nssf
+        profiles: ["core"]
+        command: nssf
+        networks:
+            corenet:
+                ipv4_address: ${NSSF_IP_ADDR}
+
+    hss:
+        extends:
+            service: base
+        container_name: hss
+        profiles: ["core"]
+        labels:
+            o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
+        command: hss
+        environment:
+            - EPC_DOMAIN=epc.mnc${MNC03}.mcc${MCC}.3gppnetwork.org
+            - DB_URI=mongodb://${MONGO_IP_ADDR}/open5gs
+        networks:
+            corenet:
+                ipv4_address: ${HSS_IP_ADDR}
+
+    sgwc:
+        extends:
+            service: base
+        container_name: sgwc
+        profiles: ["core"]
+        command: sgwc
+        networks:
+            corenet:
+                ipv4_address: ${SPGWC_IP_ADDR}
+
+    sgwu:
+        extends:
+            service: base
+        container_name: sgwu
+        profiles: ["core"]
+        command: sgwu
+        environment:
+            - SGWU_ADVERTISE_IP=${SPGWU_IP_ADDR}
+        networks:
+            corenet:
+                ipv4_address: ${SPGWU_IP_ADDR}
+
+    smf:
+        extends:
+            service: base
+        container_name: smf
+        profiles: ["core"]
+        command: smf
+        labels:
+            o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
+        environment:
+            - EPC_DOMAIN=epc.mnc${MNC03}.mcc${MCC}.3gppnetwork.org
+        networks:
+            corenet:
+                ipv4_address: ${SMF_IP_ADDR}
+
+    upf:
+        extends:
+            service: base
+        container_name: upf
+        profiles: ["core"]
+        command: upf
+        environment:
+            - UPF_ADVERTISE_IP=${UPF_IP_ADDR}
+            - CAPTURE_INTERFACE=ogstun
+        labels:
+            o5gc.webui.priority: ${WEBUI_PRIO_CORE_DEFAULT}
+        cap_add:
+            - NET_ADMIN
+        sysctls:
+            - net.ipv4.ip_forward=1
+        networks:
+            corenet:
+                ipv4_address: ${UPF_IP_ADDR}
+                aliases:
+                    - monitor-capture-host
+            extnet:
+                ipv4_address: ${UPF_EXT_IP_ADDR}
+
+    amf:
+        extends:
+            service: base
+        container_name: amf
+        profiles: ["core"]
+        command: amf
+        labels:
+            o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
+        environment:
+            - UPF_ADVERTISE_IP=${UPF_IP_ADDR}
+        networks:
+            corenet:
+                ipv4_address: ${AMF_IP_ADDR}
+
+    mme:
+        extends:
+            service: base
+        container_name: mme
+        profiles: ["core"]
+        labels:
+            o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
+        command: mme
+        environment:
+            - EPC_DOMAIN=epc.mnc${MNC03}.mcc${MCC}.3gppnetwork.org
+            - SMS_DOMAIN=${SMS_DOMAIN:-SMS-over-IMS}
+            - MME_IF=eth0
+        networks:
+            corenet:
+                ipv4_address: ${MME_IP_ADDR}
+
+    pcrf:
+        extends:
+            service: base
+        container_name: pcrf
+        profiles: ["core"]
+        command: pcrf
+        environment:
+            - EPC_DOMAIN=epc.mnc${MNC03}.mcc${MCC}.3gppnetwork.org
+            - IMS_DOMAIN=ims.mnc${MNC03}.mcc${MCC}.3gppnetwork.org
+            - DB_URI=mongodb://${MONGO_IP_ADDR}/open5gs
+        networks:
+            corenet:
+                ipv4_address: ${PCRF_IP_ADDR}
+
+    scp:
+        extends:
+            service: base
+        container_name: scp
+        profiles: ["core"]
+        command: scp
+        networks:
+            corenet:
+                ipv4_address: ${SCP_IP_ADDR}
+
+    develop:
+        extends:
+            file: ${DOCKER}/o5gc/services.yaml
+            service: develop
+        image: o5gc/open5gs:develop
+        container_name: open5gs-develop
+        hostname: open5gs-develop
+        volumes:
+            - ${DOCKER}/open5gs/:/mnt/open5gs/

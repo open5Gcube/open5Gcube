@@ -1,0 +1,19 @@
+global:
+  max:
+    ue: 1024
+
+sepp:
+  sbi:
+    server:
+      - address: ${SEPP_IP_ADDR}
+        port: 7777
+    client:
+      scp:
+        - uri: http://scp.5gc.mnc${MNC03}.mcc${MCC}.3gppnetwork.org:7777
+  n32:
+    server:
+      - sender: sepp.5gc.mnc${HOME_MNC03}.mcc${HOME_MCC}.3gppnetwork.org
+    client:
+      sepp:
+        - receiver: sepp.5gc.mnc${VISITED_MNC03}.mcc${VISITED_MCC}.3gppnetwork.org
+          uri: http://sepp.5gc.mnc${VISITED_MNC03}.mcc${VISITED_MCC}.3gppnetwork.org:7777

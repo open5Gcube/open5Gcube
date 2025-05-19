@@ -1,0 +1,100 @@
+services:
+    gnb:
+        extends:
+            file: ${DOCKER}/srsran/project/services.yaml
+            service: gnb
+        environment:
+            - RF_DEVICE_NAME=uhd
+            - RF_DEVICE_ARGS=type=b200,num_recv_frames=64,num_send_frames=64
+
+    mongo:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: mongo
+    mongo-express:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: mongo-express
+        depends_on: [mongo]
+
+    open5gs-webui:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: webui
+        depends_on: [mongo]
+
+    open5gs-init:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: init
+        depends_on: [open5gs-webui]
+
+    nrf:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: nrf
+
+    ausf:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: ausf
+        depends_on: [nrf]
+
+    udr:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: udr
+        depends_on: [mongo, nrf]
+
+    udm:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: udm
+        depends_on: [nrf]
+
+    pcf:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: pcf
+        depends_on: [mongo, nrf]
+
+    bsf:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: bsf
+        depends_on: [mongo, nrf]
+
+    nssf:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: nssf
+        depends_on: [nrf]
+
+    smf:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: smf
+        depends_on: [nrf]
+
+    upf:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: upf
+        depends_on: [nrf, smf]
+
+    amf:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: amf
+        depends_on: [smf, upf, nrf, ausf, udm, udr, pcf, bsf]
+
+    pcrf:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: pcrf
+        depends_on: [mongo]
+
+    scp:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: scp

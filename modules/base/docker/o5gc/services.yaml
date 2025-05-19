@@ -1,0 +1,96 @@
+services:
+    build-cacher:
+        image: o5gc/build-cacher
+        container_name: o5gc-build-cacher
+        profiles: ["build-cacher"]
+        network_mode: bridge
+        ports:
+            - 40862:8123
+            - 40861:3142
+            - 40860:873
+        volumes:
+            - ${BASE_DIR}/var/cache:/var/cache
+        user: ${HOST_USER_GROUP_ID}
+        restart: always
+
+    docker-etc-hosts-updater:
+        profiles: ["docker-etc-hosts-updater"]
+        image: dvdarias/docker-hoster
+        container_name: docker-etc-hosts-updater
+        volumes:
+            - /var/run/docker.sock:/tmp/docker.sock
+            - /etc/hosts:/tmp/hosts
+        network_mode: none
+        restart: always
+
+    webui:
+        image: o5gc/o5gc-webui
+        container_name: o5gc-webui
+        profiles: ["webui"]
+        entrypoint: ["/mnt/webui/entrypoint.sh"]
+        # No env-file, because this would override the settings when calling run-* inside the container
+        # env_file:
+        networks:
+            - o5gc
+        ports:
+            - ${O5GC_WEBUI_HOST_PORT}:80
+        volumes:
+            - ${DOCKER}/o5gc/webui:/mnt/webui:ro
+            - ${BASE}/Doc/html:/mnt/doc/html:ro
+            - ${BASE}:${BASE}
+            - ${HOME}/.ssh:/mnt/.ssh:ro
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+        environment:
+            - BASE=${BASE}
+            - HOST_HOME=${HOME}
+            - HOST_USER=${HOST_USER}
+            - ENB_HOSTNAME=${ENB_HOSTNAME}
+            - GNB_HOSTNAME=${GNB_HOSTNAME}
+        privileged: true
+        init: true
+        restart: always
+
+    documentation:
+        image: o5gc/o5gc-mkdocs
+        container_name: o5gc-docu
+        profiles: ["docu"]
+        working_dir: /Doc
+        entrypoint: mkdocs
+        command: serve -a 0.0.0.0:8000
+        volumes:
+            - ${BASE}/Doc:/Doc/docs
+            - ${BASE}/Doc/mkdocs.yml:/Doc/mkdocs.yml
+            - ${BASE}/Doc/html:/Doc/html
+            - ${BASE}/Doc/pdf:/Doc/pdf
+        networks:
+            - o5gc
+        ports:
+            - ${DOCUMENTATION_SERVE_HOST_PORT}:8000
+        user: ${HOST_USER_GROUP_ID}
+
+    coredns:
+        image: coredns/coredns:1.11.3
+        profiles: ["coredns"]
+        container_name: coredns
+        volumes:
+            - ./coredns.cfg:/home/nonroot/Corefile:ro
+        networks:
+            - corenet
+
+    develop:
+        profiles: ["develop"]
+        image: o5gc/o5gc-base:jammy
+        volumes:
+            - ${DOCKER}/o5gc/develop-entrypoint.sh:/entrypoint.sh:ro
+            - ${VAR}/ssh/:/var/run/ssh/
+            - develop:/o5gc/
+        env_file: ["${ENV_FILE}"]
+        entrypoint: /entrypoint.sh
+        init: true
+        privileged: true
+        networks:
+            - corenet
+            - rfnet
+            - extnet
+        extra_hosts:
+            - "o5gc-build-cacher:${DOCKER_HOST_BRIDGE}"

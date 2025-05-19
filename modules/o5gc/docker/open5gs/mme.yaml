@@ -1,0 +1,46 @@
+logger:
+    file:
+      path: /var/log/open5gs/mme.log
+      level: ${OPEN5GS_LOGLEVEL}
+
+global:
+  max:
+    ue: 1024
+
+mme:
+    freeDiameter: /open5gs/install/etc/freeDiameter/mme.conf
+    s1ap:
+      server:
+        - dev: ${MME_IF}
+    gtpc:
+      server:
+        - dev: ${MME_IF}
+      client:
+        sgwc:
+          - address: ${SPGWC_IP_ADDR}
+        smf:
+          - address: ${SMF_IP_ADDR}
+    gummei: 
+      - plmn_id:
+          mcc: ${MCC}
+          mnc: ${MNC}
+        mme_gid: 2
+        mme_code: 1
+    tai:
+      - plmn_id:
+          mcc: ${MCC}
+          mnc: ${MNC}
+        tac: ${TAC}
+    security:
+        integrity_order : [ EIA2, EIA1, EIA0 ]
+        ciphering_order : [ EEA0, EEA1, EEA2 ]
+    network_name:
+        full: Open5GS
+    mme_name: open5gs-mme0
+    metrics:
+      server:
+        - address: ${MME_IP_ADDR}
+          port: 9091
+    time:
+      t3412:
+        value: 540

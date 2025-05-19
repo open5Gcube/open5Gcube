@@ -1,0 +1,55 @@
+services:
+    osmo-bts-trx:
+        extends:
+            file: ${DOCKER}/osmocom/services.yaml
+            service: osmo-bts-trx
+
+    osmo-trx-uhd:
+        extends:
+            file: ${DOCKER}/osmocom/services.yaml
+            service: osmo-trx-uhd
+
+    osmo-bsc:
+        extends:
+            file: ${DOCKER}/osmocom/services.yaml
+            service: osmo-bsc
+
+    osmo-msc:
+        extends:
+            file: ${DOCKER}/osmocom/services.yaml
+            service: osmo-msc
+
+    osmo-mgw:
+        extends:
+            file: ${DOCKER}/osmocom/services.yaml
+            service: osmo-mgw
+
+    osmo-hlr:
+        extends:
+            file: ${DOCKER}/osmocom/services.yaml
+            service: osmo-hlr
+
+    osmo-stp:
+        extends:
+            file: ${DOCKER}/osmocom/services.yaml
+            service: osmo-stp
+
+    osmo-pcu:
+        extends:
+            file: ${DOCKER}/osmocom/services.yaml
+            service: osmo-pcu
+
+    osmo-cbc:
+        extends:
+            file: ${DOCKER}/osmocom/services.yaml
+            service: osmo-cbc
+
+    osmo-sgsn:
+        extends:
+            file: ${DOCKER}/osmocom/services.yaml
+            service: osmo-sgsn
+
+    osmo-ggsn:
+        extends:
+            file: ${DOCKER}/osmocom/services.yaml
+            service: osmo-ggsn

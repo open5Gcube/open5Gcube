@@ -1,0 +1,2 @@
+--exclude missing-doc-keyword
+--exclude missing-doc-test-case

@@ -1,0 +1,176 @@
+services:
+    base:
+        profiles: ["osmocom"]
+        entrypoint: ["/mnt/osmocom/entrypoint.sh"]
+        env_file: ["${ENV_FILE}", "${DOCKER}/osmocom/ports.env"]
+        labels:
+            o5gc.stack: ${O5GC_STACK}
+        volumes:
+            - ${DOCKER}/osmocom/:/mnt/osmocom/:ro
+        privileged: true
+        init: true
+        healthcheck:
+            test: /bin/bash -c "/mnt/osmocom/healthcheck.sh"
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+    osmo-bts-trx:
+        extends:
+            service: base
+        image: o5gc/osmocom-bts
+        container_name: osmo-bts
+        hostname: osmo-bts
+        command: osmo-bts-trx
+        environment:
+            - OSMO_PCU_SOCKET=/var/run/share/pcu_bts
+        volumes:
+            - ${VAR}/share/:/var/run/share/
+        networks:
+            corenet:
+                ipv4_address: ${OSMO_BTS_IP_ADDR}
+
+    osmo-trx-uhd:
+        extends:
+            service: base
+        image: o5gc/osmocom-trx
+        profiles:
+            - osmo-trx-uhd
+        container_name: osmo-trx
+        hostname: osmo-trx
+        command: osmo-trx-uhd
+        volumes:
+            - ${BASE}/scripts/docker-remote.sh:/docker-remote.sh:ro
+            - ${BASE}:/tmp/o5gc:ro
+            - ${HOME}/.ssh:/mnt/.ssh:ro
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+            - /dev/bus/usb:/dev/bus/usb
+        environment:
+            - DOCKER_TARGET_HOSTNAME=${ENB_HOSTNAME}
+            - UHD_IMAGE_LOADER
+        networks:
+            corenet:
+                ipv4_address: ${OSMO_TRX_IP_ADDR}
+            rfnet:
+                ipv4_address: ${OSMO_TRX_RF_IP_ADDR}
+
+    osmo-pcu:
+        extends:
+            service: base
+        image: o5gc/osmocom-pcu
+        container_name: osmo-pcu
+        hostname: osmo-pcu
+        command: osmo-pcu
+        environment:
+            - OSMO_PCU_SOCKET=/var/run/share/pcu_bts
+        volumes:
+            - ${VAR}/share/:/var/run/share/
+        networks:
+            corenet:
+                ipv4_address: ${OSMO_PCU_IP_ADDR}
+
+
+    osmo-bsc:
+        extends:
+            service: base
+        image: o5gc/osmocom-bsc
+        container_name: osmo-bsc
+        hostname: osmo-bsc
+        command: osmo-bsc
+        networks:
+            corenet:
+                ipv4_address: ${OSMO_BSC_IP_ADDR}
+
+    osmo-msc:
+        extends:
+            service: base
+        image: o5gc/osmocom-msc
+        container_name: osmo-msc
+        hostname: osmo-msc
+        command: osmo-msc
+        environment:
+            - MS_AUTHENTICATION=${MS_AUTHENTICATION:-required}
+        networks:
+            corenet:
+                ipv4_address: ${OSMO_MSC_IP_ADDR}
+
+    osmo-mgw:
+        extends:
+            service: base
+        image: o5gc/osmocom-mgw
+        container_name: osmo-mgw
+        hostname: osmo-mgw
+        command: osmo-mgw
+        networks:
+            corenet:
+                ipv4_address: ${OSMO_MGW_IP_ADDR}
+
+    osmo-hlr:
+        extends:
+            service: base
+        image: o5gc/osmocom-hlr
+        container_name: osmo-hlr
+        hostname: osmo-hlr
+        command: osmo-hlr
+        networks:
+            corenet:
+                ipv4_address: ${OSMO_HLR_IP_ADDR}
+            o5gc:
+        labels:
+            o5gc.link.title: "OsmoHLR DB"
+            o5gc.link.url: "http://{{host}}:${OSMO_HLR_DB_HOST_PORT}/"
+        ports:
+            - ${OSMO_HLR_DB_HOST_PORT}:8080
+
+    osmo-cbc:
+        extends:
+            service: base
+        image: o5gc/osmocom-cbc
+        container_name: osmo-cbc
+        hostname: osmo-cbc
+        command: osmo-cbc
+        networks:
+            corenet:
+                ipv4_address: ${OSMO_CBC_IP_ADDR}
+
+    osmo-stp:
+        extends:
+            service: base
+        image: o5gc/osmocom-stp
+        container_name: osmo-stp
+        hostname: osmo-stp
+        command: osmo-stp
+        networks:
+            corenet:
+                ipv4_address: ${OSMO_STP_IP_ADDR}
+
+    osmo-sgsn:
+        extends:
+            service: base
+        image: o5gc/osmocom-sgsn
+        container_name: osmo-sgsn
+        hostname: osmo-sgsn
+        command: osmo-sgsn
+        environment:
+            - MS_AUTHENTICATION=${MS_AUTHENTICATION:-required}
+            - SGNS_AUTH_POLICY=${SGNS_AUTH_POLICY:-remote}
+        networks:
+            corenet:
+                ipv4_address: ${OSMO_SGSN_IP_ADDR}
+
+    osmo-ggsn:
+        extends:
+            service: base
+        image: o5gc/osmocom-ggsn
+        container_name: osmo-ggsn
+        hostname: osmo-ggsn
+        command: osmo-ggsn
+        networks:
+            corenet:
+                ipv4_address: ${OSMO_GGSN_IP_ADDR}
+                aliases:
+                    - monitor-capture-host
+            extnet:
+                ipv4_address: ${OSMO_GGSN_EXT_IP_ADDR}
+        environment:
+            - CAPTURE_INTERFACE=tun4

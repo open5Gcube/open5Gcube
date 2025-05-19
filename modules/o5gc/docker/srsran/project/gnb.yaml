@@ -1,0 +1,46 @@
+cu_cp:
+  amf:
+    addr: ${AMF_IP_ADDR}
+    port: 38412
+    bind_addr: ${GNB_IP_ADDR}
+    supported_tracking_areas:
+      - tac: ${TAC}
+        plmn_list:
+          - plmn: "${MCC}${MNC}"
+            tai_slice_support_list:
+              - sst: ${NSSAI_SST}
+                sd: ${NSSAI_SD}
+
+  security:
+    integrity: not_needed
+    confidentiality: required
+    nea_pref_list: nea2,nea1,nea0
+    nia_pref_list: nia2,nia1
+
+ru_sdr:
+  device_driver: uhd
+  device_args: type=b200,num_recv_frames=64,num_send_frames=64
+  srate: 46.08
+  otw_format: sc12
+  tx_gain: 80
+  rx_gain: 40
+
+cell_cfg:
+  dl_arfcn: 632628
+  band: 78
+  channel_bandwidth_MHz: 20
+  common_scs: 30
+  plmn: "${MCC}${MNC}"
+  tac: ${TAC} 
+  pci: 0
+
+log:
+  filename: stdout
+  all_level: warning
+  metrics_level: none
+
+pcap:
+  mac_enable: false
+  mac_filename: /tmp/gnb_mac.pcap
+  ngap_enable: false
+  ngap_filename: /tmp/gnb_ngap.pcap

@@ -1,0 +1,52 @@
+site_name: open5Gcube
+copyright: "&copy; Fraunhofer FKIE"
+
+site_dir: html
+
+nav:
+  - Overview: index.md
+  - Architecture: architecture.md
+  - Installation: installation.md
+  - User Guide: user_guide.md
+  - Stacks: stacks.md
+  - Development: development.md
+
+theme:
+  name: material
+  features:
+    - content.code.copy
+    - navigation.footer
+
+extra_css:
+  - css/neoteroi.css
+  - css/extra.css
+
+extra:
+  generator: false
+
+plugins:
+  - search
+  - offline
+  - link-marker
+  - open-in-new-tab
+  - glightbox:
+      zoomable: false
+  - with-pdf:
+      cover_subtitle: Technical Reference Documentation
+      author: !ENV DATE
+      exclude_pages:
+        - ^index.html$
+      output_path: ../pdf/Documentation.pdf
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - neoteroi.cards
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.superfences
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg

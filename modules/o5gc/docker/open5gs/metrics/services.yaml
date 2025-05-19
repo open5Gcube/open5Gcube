@@ -1,0 +1,38 @@
+services:
+    prometheus:
+        image: prom/prometheus:v2.48.0
+        container_name: prometheus
+        profiles: ["metrics"]
+        volumes:
+            - ${DOCKER}/open5gs/metrics/prometheus.yaml:/etc/prometheus/prometheus.yml:ro
+        networks:
+            - corenet
+            - o5gc
+
+    grafana:
+        image: grafana/grafana:10.2.2-ubuntu
+        container_name: grafana
+        profiles: ["metrics"]
+        labels:
+            o5gc.stack: ${O5GC_STACK}
+            o5gc.webui.hide: true
+            o5gc.link.title: "Grafana"
+            o5gc.link.url: "http://{{host}}:${GRAFANA_HOST_PORT}/"
+        environment:
+            - GF_ANALYTICS_REPORTING_ENABLED=false
+            - GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION=true
+            - GF_AUTH_ANONYMOUS_ENABLED=true
+            - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+            - GF_AUTH_DISABLE_SIGNOUT_MENU=true
+            - GF_AUTH_DISABLE_LOGIN_FORM=true
+            - GF_LOG_LEVEL=warn
+            - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/var/lib/grafana/dashboards/open5gs.json
+        volumes:
+            - ${DOCKER}/open5gs/metrics/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml:ro
+            - ${DOCKER}/open5gs/metrics/dashboard.yaml:/etc/grafana/provisioning/dashboards/default.yaml:ro
+            - ${DOCKER}/open5gs/metrics/dashboard.json:/var/lib/grafana/dashboards/open5gs.json
+        networks:
+            - corenet
+            - o5gc
+        ports:
+            - ${GRAFANA_HOST_PORT}:3000

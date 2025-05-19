@@ -1,0 +1,47 @@
+networks:
+    corenet:
+        driver: ${CORENET_DRIVER}
+        name: corenet
+        ipam:
+            config:
+                - subnet: ${CORENET_SUBNET}
+                  gateway: ${CORENET_HOST_IP_ADDR}
+        driver_opts:
+            parent: ${CORENET_MACVLAN_IFACE}
+            com.docker.network.bridge.name: corenet
+    extnet:
+        driver: bridge
+        name: 0_extnet
+        ipam:
+            config:
+                - subnet: ${EXTNET_SUBNET}
+                  gateway: ${EXTNET_HOST_IP_ADDR}
+        driver_opts:
+            com.docker.network.bridge.name: extnet
+    rfnet:
+        driver: macvlan
+        name: rfnet
+        ipam:
+            config:
+                - subnet: ${RFNET_SUBNET}
+        driver_opts:
+            parent: ${USRP_IFACE}
+    rfsim:
+        driver: bridge
+        name: rfsim
+        ipam:
+            config:
+                - subnet: ${RFNET_SUBNET}
+        driver_opts:
+            com.docker.network.bridge.name: rfsim
+    o5gc:
+        name: o5gc
+        external: true
+
+volumes:
+    develop:
+        driver: local
+        driver_opts:
+            type: nfs
+            o: nfsvers=4,addr=127.0.0.1,rw
+            device: ":${DEVELOP_DIR}"

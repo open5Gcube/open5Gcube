@@ -1,0 +1,21 @@
+    graph LR
+    sdr((SDR)) --> trx(TRX)
+    trx -- UDP --> bts(BTS)
+    bts -- Abis/IP --> bsc(BSC)
+    bsc -- AoIP/M3UA --> stp(STP)
+    bsc -- MGCP --> mgw(MGW)
+    stp -- AoIP/M3UA --> msc(MSC)
+    msc -- MGCP --> mgw
+    mgw -- RTP --> mgw
+    msc -- GSUP --> hlr(HLR)
+    bts --> pcu(PCU)
+    pcu -- Gb/IP --> sgsn(SGSN)
+    sgsn -- GSUP --> hlr
+    sgsn -- Gp (GTP) --> ggsn(GGSN)
+    ggsn -- Gi (IP) --> internet((Internet))
+    subgraph bss [BSS]
+        trx
+        bts
+        pcu
+        bsc
+    end

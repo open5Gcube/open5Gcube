@@ -1,0 +1,26 @@
+From 32ab9e4331acce3d344d7179fb885e3ebb4467f5 Mon Sep 17 00:00:00 2001
+From: Thorsten Horstmann <thorsten.horstmann@fkie.fraunhofer.de>
+Date: Thu, 26 Jan 2023 11:28:13 +0100
+Subject: [PATCH 1/1] Add ip and port option to gnb tracer
+
+---
+ common/utils/T/tracer/gnb.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/common/utils/T/tracer/gnb.c b/common/utils/T/tracer/gnb.c
+index 6629a1efd6..720c446c69 100644
+--- a/common/utils/T/tracer/gnb.c
++++ b/common/utils/T/tracer/gnb.c
+@@ -228,6 +228,9 @@ int main(int n, char **v)
+ 
+   for (i = 1; i < n; i++) {
+     if (!strcmp(v[i], "-h") || !strcmp(v[i], "--help")) usage();
++    if (!strcmp(v[i], "-ip")) { if (i > n-2) usage(); ip = v[++i]; continue; }
++    if (!strcmp(v[i], "-p"))
++      { if (i > n-2) usage(); port = atoi(v[++i]); continue; }
+     if (!strcmp(v[i], "-d"))
+       { if (i > n-2) usage(); database_filename = v[++i]; continue; }
+     usage();
+-- 
+2.34.1
+

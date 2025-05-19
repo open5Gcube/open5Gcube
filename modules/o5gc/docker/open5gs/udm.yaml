@@ -1,0 +1,32 @@
+logger:
+    file:
+      path: /var/log/open5gs/udm.log
+    level: ${OPEN5GS_LOGLEVEL}
+
+sbi:
+    server:
+      no_tls: true
+    client:
+      no_tls: true
+
+global:
+  max:
+    ue: 1024
+
+udm:
+    hnet:
+      - id: 1
+        scheme: 1
+        key: /mnt/open5gs/curve25519-1.key
+      - id: 2
+        scheme: 2
+        key: /mnt/open5gs/secp256r1-2.key
+    sbi:
+      server:
+        - address: ${UDM_IP_ADDR}
+          port: 7777
+      client:
+        nrf:
+          - uri: http://${NRF_IP_ADDR}:7777
+        scp:
+          - uri: http://${SCP_IP_ADDR}:7777

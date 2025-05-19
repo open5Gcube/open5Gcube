@@ -1,0 +1,65 @@
+logger:
+    file:
+      path: /var/log/open5gs/smf.log
+    level: ${OPEN5GS_LOGLEVEL}
+
+sbi:
+    server:
+      no_tls: true
+    client:
+      no_tls: true
+
+global:
+  max:
+    ue: 1024
+  parameter:
+      no_ipv4v6_local_addr_in_packet_filter: true
+
+smf:
+    freeDiameter: /open5gs/install/etc/freeDiameter/smf.conf
+    sbi:
+      server:
+        - address: ${SMF_IP_ADDR}
+          port: 7777
+      client:
+        nrf:
+          - uri: http://${NRF_IP_ADDR}:7777
+        scp:
+          - uri: http://${SCP_IP_ADDR}:7777
+    gtpc:
+      server:
+        - address: ${SMF_IP_ADDR}
+    gtpu:
+      server:
+        - address: ${SMF_IP_ADDR}
+    pfcp:
+      server:
+        - address: ${SMF_IP_ADDR}
+      client:
+        upf:
+          - address: ${UPF_IP_ADDR}
+    session:
+      - subnet: ${UE_IP_SUBNET}
+        gateway: 192.168.100.1
+        dnn: internet
+      - subnet: 2001:230:cafe::/48
+        gateway: 2001:230:cafe::1
+        dnn: internet
+      - subnet: 192.168.101.0/24
+        gateway: 192.168.101.1
+        dnn: ims
+      - subnet: 2001:230:babe::/48
+        gateway: 2001:230:babe::1
+        dnn: ims
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+      - 2001:4860:4860::8888
+      - 2001:4860:4860::8844
+    p-cscf:
+      - ${PCSCF_IP_ADDR}
+    mtu: 1450
+    metrics:
+      server:
+        - address: ${SMF_IP_ADDR}
+          port: 9091

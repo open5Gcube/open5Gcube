@@ -1,0 +1,93 @@
+apt-utils
+autoconf
+automake
+bash-completion
+bc
+bison
+build-essential
+ccache
+cmake-curses-gui
+curl
+daemon
+dnsutils
+doxygen doxygen-gui
+ethtool
+flex
+gdb
+git
+gpg-agent
+graphviz
+gtkwave
+iperf iperf3
+iproute2
+iptables
+iputils-ping
+isc-dhcp-client
+less
+libatlas-base-dev libblas-dev
+libc-ares-dev
+libconfig-dev
+libcunit1-dev
+libcurl4-gnutls-dev
+libev-dev libevent-dev
+libffi-dev
+libforms-bin libforms-dev
+libgmp-dev
+libgnutls28-dev
+libgtk-3-dev
+libidn11-dev libidn2-0-dev
+libjansson-dev
+libjemalloc-dev
+liblapack-dev liblapacke-dev
+libmysqlclient-dev
+libpython2.7-dev
+libsctp-dev libsctp1
+libssl-dev
+libsystemd-dev
+libtasn1-6-dev
+libtool
+libusb-1.0-0-dev
+libuv1-dev
+libxml2 libxml2-dev
+libxpm-dev
+libxslt1-dev
+libyaml-dev
+man-db
+memcached libmemcached-dev
+mlocate
+moreutils
+mscgen
+mysql-client
+ncat
+net-tools
+netbase
+netcat
+nettle-bin nettle-dev
+ninja-build
+octave-signal
+openssh-client openssh-server
+openssl
+prips
+psmisc
+python3-blist
+python3-dev
+python3-docutils
+python3-mako
+python3-numpy
+python3-pip
+python3-requests
+python3-setuptools
+retry
+rsync
+socat
+software-properties-common
+subversion
+tcpdump
+tini
+unzip
+usbutils
+vim
+wait-for-it
+wget
+xmlstarlet
+xxd

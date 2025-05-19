@@ -1,0 +1,75 @@
+services:
+    gnb:
+        extends:
+            file: ${DOCKER}/oai/services.yaml
+            service: gnb
+        image: o5gc/oai-ran:2024.w23-4.4.0.0
+        volumes:
+            - ./gnb.conf:/o5gc/openairinterface5g/etc/gnb.conf:ro
+        command: gnb --sa
+
+    mongo:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: mongo
+    mongo-express:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: mongo-express
+        depends_on: [mongo]
+
+    nrf:
+        extends:
+            file: ${DOCKER}/free5gc/services.yaml
+            service: nrf
+
+    upf:
+        extends:
+            file: ${DOCKER}/free5gc/services.yaml
+            service: upf
+
+    amf:
+        extends:
+            file: ${DOCKER}/free5gc/services.yaml
+            service: amf
+
+    ausf:
+        extends:
+            file: ${DOCKER}/free5gc/services.yaml
+            service: ausf
+
+    nssf:
+        extends:
+            file: ${DOCKER}/free5gc/services.yaml
+            service: nssf
+
+    pcf:
+        extends:
+            file: ${DOCKER}/free5gc/services.yaml
+            service: pcf
+
+    smf:
+        extends:
+            file: ${DOCKER}/free5gc/services.yaml
+            service: smf
+
+    udm:
+        extends:
+            file: ${DOCKER}/free5gc/services.yaml
+            service: udm
+
+    udr:
+        extends:
+            file: ${DOCKER}/free5gc/services.yaml
+            service: udr
+
+    free5gc-webui:
+        extends:
+            file: ${DOCKER}/free5gc/services.yaml
+            service: webui
+
+    free5gc-init:
+        extends:
+            file: ${DOCKER}/free5gc/services.yaml
+            service: init
+        depends_on: [free5gc-webui]

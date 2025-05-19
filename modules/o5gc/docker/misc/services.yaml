@@ -1,0 +1,67 @@
+services:
+    sigdigger:
+        image: o5gc/misc-sigdigger
+        privileged: true
+        container_name: sigdigger
+        profiles: ["sigdigger"]
+        entrypoint: /o5gc/SigDigger/entrypoint.sh
+        volumes:
+            - ${DOCKER}/misc/sigdigger-entrypoint.sh:/o5gc/SigDigger/entrypoint.sh:ro
+            - ${BASE}/scripts/band_helper.py:/o5gc/SigDigger/scripts/band_helper.py:ro
+            - /dev/bus/usb:/dev/bus/usb
+            - /tmp/.X11-unix:/tmp/.X11-unix
+            - ${HOME}/.Xauthority:/root/.Xauthority:rw
+        env_file: ["${ENV_FILE}"]
+        environment:
+            - DISPLAY
+
+    osmocom_fft:
+        image: o5gc/misc-gr-osmosdr
+        privileged: true
+        container_name: osmocom_fft
+        profiles: ["osmocom_fft"]
+        entrypoint: bash -xc "osmocom_fft -a uhd"
+        volumes:
+            - /dev/bus/usb:/dev/bus/usb
+            - /tmp/.X11-unix:/tmp/.X11-unix
+            - ${HOME}/.Xauthority:/root/.Xauthority:rw
+        env_file: ["${ENV_FILE}"]
+        environment:
+            - DISPLAY
+
+    ltesniffer:
+        image: o5gc/misc-ltesniffer
+        privileged: true
+        container_name: ltesniffer
+        profiles: ["ltesniffer"]
+        entrypoint: /o5gc/ltesniffer/entrypoint.sh
+        volumes:
+            - ${DOCKER}/misc/ltesniffer-entrypoint.sh:/o5gc/ltesniffer/entrypoint.sh:ro
+            - ${BASE}/scripts/band_helper.py:/o5gc/band_helper.py:ro
+            - /dev/bus/usb:/dev/bus/usb
+        env_file: ["${ENV_FILE}"]
+        environment:
+            - SNIFF_BAND=${SNIFF_BAND:-${EUTRA_BAND}}
+            - SNIFF_ARFCN=${SNIFF_ARFCN:-${EUTRA_ARFCN_DL}}
+            - SNIFF_CELL_SEARCH=${SNIFF_CELL_SEARCH:-1}
+            - SNIFF_CELL_PCI
+            - SNIFF_CELL_PRB
+            - SNIFF_SECURITY_API=${SNIFF_SECURITY_API:-3}
+            - SNIFF_DEBUG
+
+    swagger-ui:
+        image: o5gc/misc-swagger
+        container_name: swagger-ui
+        profiles: ["swagger-ui"]
+        env_file: ["${ENV_FILE}"]
+        ports:
+            - ${SWAGGER_UI_HOST_PORT}:8288
+        volumes:
+            - ${DOCKER}/misc/swagger-config.json:/usr/share/nginx/html/swagger-config.json:ro
+            - ${DOCKER}/misc/swagger-entrypoint.sh:/docker-entrypoint.d/99-o5gc.sh:ro
+        environment:
+            - CONFIG_URL=./swagger-config.json
+            - HOST_DEFAULT_ROUTE_IFACE_IP=${DEFAULT_ROUTE_IFACE_IP:-}
+        networks:
+            - corenet
+            - o5gc

@@ -1,0 +1,8 @@
+flask~=2.3.2
+pytest~=7.4.0
+jsonschema~=4.18.4
+docker
+flask-cors
+pytz
+gunicorn~=21.2.0
+python-dotenv~=1.0.0

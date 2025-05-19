@@ -1,0 +1,5 @@
+services:
+    ltesniffer:
+        extends:
+            file: ${DOCKER}/misc/services.yaml
+            service: ltesniffer

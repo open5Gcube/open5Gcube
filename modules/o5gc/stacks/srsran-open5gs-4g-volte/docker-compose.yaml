@@ -1,0 +1,141 @@
+services:
+    enb:
+        extends:
+            file: ${DOCKER}/srsran/4g/services.yaml
+            service: enb
+        environment:
+            - RF_DEVICE_NAME=auto
+            - RF_DEVICE_ARGS=auto
+
+    mongo:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: mongo
+    mongo-express:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: mongo-express
+        depends_on: [mongo]
+
+    open5gs-webui:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: webui
+        depends_on: [mongo]
+
+    open5gs-init:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: init
+        depends_on: [open5gs-webui]
+
+    hss:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: hss
+        depends_on: [mongo]
+
+    sgwc:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: sgwc
+        depends_on: [smf, upf]
+
+    sgwu:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: sgwu
+        depends_on: [smf, upf]
+
+    smf:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: smf
+        volumes:
+          #            - ./smf.yaml:/mnt/open5gs/smf.yaml
+
+    upf:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: upf
+        depends_on: [smf]
+
+    nrf:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: nrf
+
+    mme:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: mme
+        depends_on: [hss, sgwc, sgwu, smf, upf]
+
+    pcrf:
+        extends:
+            file: ${DOCKER}/open5gs/services.yaml
+            service: pcrf
+        depends_on: [mongo]
+
+    volte-dns:
+        extends:
+            file: ${DOCKER}/volte/services.yaml
+            service: dns
+
+    mysql:
+        extends:
+            file: ${DOCKER}/mysql/services.yaml
+            service: mysql
+        profiles: ["core"]
+    phpmyadmin:
+        extends:
+            file: ${DOCKER}/mysql/services.yaml
+            service: phpmyadmin
+        profiles: ["core"]
+
+    fhoss:
+        extends:
+            file: ${DOCKER}/volte/services.yaml
+            service: fhoss
+        depends_on: [mysql, volte-dns]
+
+    icscf:
+        extends:
+            file: ${DOCKER}/volte/services.yaml
+            service: icscf
+        depends_on: [mysql, volte-dns, fhoss]
+
+    pcscf:
+        extends:
+            file: ${DOCKER}/volte/services.yaml
+            service: pcscf
+        depends_on: [mysql, volte-dns, rtpengine, icscf, scscf]
+
+    scscf:
+        extends:
+            file: ${DOCKER}/volte/services.yaml
+            service: scscf
+        depends_on: [mysql, volte-dns, fhoss]
+
+    smsc:
+        extends:
+            file: ${DOCKER}/volte/services.yaml
+            service: smsc
+        depends_on: [mysql, volte-dns]
+
+    rtpengine:
+        extends:
+            file: ${DOCKER}/volte/services.yaml
+            service: rtpengine
+        depends_on: [mysql, volte-dns, fhoss]
+
+    # 2G components are started if SMS_DOMAIN is set to 'SMS-over-SGs'
+    osmo-msc:
+        extends:
+            file: ${DOCKER}/osmocom/services.yaml
+            service: osmo-msc
+
+    osmo-hlr:
+        extends:
+            file: ${DOCKER}/osmocom/services.yaml
+            service: osmo-hlr

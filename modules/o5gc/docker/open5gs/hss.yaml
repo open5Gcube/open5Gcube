@@ -1,0 +1,13 @@
+db_uri: ${DB_URI}
+
+logger:
+    file:
+      path: /var/log/open5gs/hss.log
+    level: ${OPEN5GS_LOGLEVEL}
+
+global:
+  max:
+    ue: 1024
+
+hss:
+    freeDiameter: /open5gs/install/etc/freeDiameter/hss.conf

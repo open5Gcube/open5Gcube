@@ -1,0 +1,21 @@
+From e8faadecf1dc1dcf1a72ecfd0cfc8c2502c3fc93 Mon Sep 17 00:00:00 2001
+From: Thorsten Horstmann <Thorsten.Horstmann@fkie.fraunhofer.de>
+Date: Mon, 13 Feb 2023 13:52:02 +0100
+Subject: [PATCH 1/1] Extend .gitignore
+
+---
+ .gitignore | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/.gitignore b/.gitignore
+index de384f138..02b78bb1b 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -5,3 +5,7 @@ subprojects/prometheus-client-c
+ subprojects/usrsctp
+
+ webui/.next
++
++install
++build
++.vscode

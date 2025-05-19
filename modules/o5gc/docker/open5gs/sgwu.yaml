@@ -1,0 +1,20 @@
+logger:
+    file:
+      path: /var/log/open5gs/sgwu.log
+    level: ${OPEN5GS_LOGLEVEL}
+
+global:
+  max:
+    ue: 1024
+
+sgwu:
+    gtpu:
+      server:
+        - address: ${SPGWU_IP_ADDR}
+          advertise: ${SGWU_ADVERTISE_IP}
+    pfcp:
+      server:
+        - address: ${SPGWU_IP_ADDR}
+      client:
+        sgwc:
+          - address: ${SPGWU_IP_ADDR}

@@ -1,0 +1,14 @@
+mme:
+    sgsap:
+      addr: ${OSMO_MSC_IP_ADDR}
+      map:
+        tai:
+          plmn_id:
+            mcc: ${MCC}
+            mnc: ${MNC}
+          tac: 1
+        lai:
+          plmn_id:
+            mcc: ${MCC}
+            mnc: ${MNC}
+          lac: 1

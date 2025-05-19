@@ -1,0 +1,37 @@
+logger:
+    file:
+      path: /var/log/open5gs/upf.log
+    level: ${OPEN5GS_LOGLEVEL}
+
+global:
+  max:
+    ue: 1024
+
+upf:
+    pfcp:
+      server:
+        - address: ${UPF_IP_ADDR}
+      client:
+        smf:
+          - address: ${SMF_IP_ADDR}
+    gtpu:
+      server:
+        - address: ${UPF_IP_ADDR}
+          advertise: ${UPF_ADVERTISE_IP}
+    session:
+      - subnet: 192.168.100.1/24
+        dev: ogstun
+        dnn: ${APN}
+      - subnet: 2001:230:cafe::1/48
+        dev: ogstun
+        dnn: internet
+      - subnet: 192.168.100.1/24
+        dnn: ims
+        dev: ogstun2
+      - subnet: 2001:230:babe::1/48
+        dnn: ims
+        dev: ogstun2
+    metrics:
+      server:
+        - address: ${UPF_IP_ADDR}
+          port: 9090
