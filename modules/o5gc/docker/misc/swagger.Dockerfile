@@ -1,4 +1,4 @@
-FROM o5gc/o5gc-base:jammy as o5gc-base
+FROM o5gc/o5gc-base:jammy AS o5gc-base
 
 RUN git clone --branch Rel-17 https://github.com/jdegre/5GC_APIs.git
 

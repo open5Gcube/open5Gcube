@@ -3,10 +3,6 @@ FROM o5gc/o5gc-base:jammy
 # Install dependencies
 RUN apt-get.sh install libsctp-dev lksctp-tools
 
-# Install up-to-date cmake
-RUN pip3 install --upgrade --no-cache-dir pip                                 \
-    && pip3 install --upgrade --no-cache-dir cmake
-
 # Clone and build UERANSIM
 ENV UERANSIM_VERSION=3.2.6
 

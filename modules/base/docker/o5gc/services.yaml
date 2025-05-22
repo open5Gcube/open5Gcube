@@ -62,8 +62,7 @@ services:
             - ${BASE}/Doc/mkdocs.yml:/Doc/mkdocs.yml
             - ${BASE}/Doc/html:/Doc/html
             - ${BASE}/Doc/pdf:/Doc/pdf
-        networks:
-            - o5gc
+        network_mode: bridge
         ports:
             - ${DOCUMENTATION_SERVE_HOST_PORT}:8000
         user: ${HOST_USER_GROUP_ID}

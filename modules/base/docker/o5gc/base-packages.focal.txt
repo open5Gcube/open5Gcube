@@ -6,17 +6,15 @@ bc
 bison
 build-essential
 ccache
-cmake-curses-gui
+cmake
 curl
 daemon
 dnsutils
-doxygen doxygen-gui
 ethtool
 flex
 gdb
 git
 gpg-agent
-graphviz
 gtkwave
 iperf iperf3
 iproute2
@@ -52,7 +50,6 @@ libxml2 libxml2-dev
 libxpm-dev
 libxslt1-dev
 libyaml-dev
-man-db
 memcached libmemcached-dev
 mlocate
 moreutils
@@ -64,7 +61,6 @@ netbase
 netcat
 nettle-bin nettle-dev
 ninja-build
-octave-signal
 openssh-client openssh-server
 openssl
 prips
