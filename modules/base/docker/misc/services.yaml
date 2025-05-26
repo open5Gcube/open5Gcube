@@ -1,5 +1,5 @@
 services:
-´   coredns:
+    coredns:
         image: coredns/coredns:1.11.3
         profiles: ["coredns"]
         container_name: coredns

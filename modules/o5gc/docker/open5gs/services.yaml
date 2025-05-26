@@ -1,6 +1,6 @@
 services:
     base:
-        image: o5gc/open5gs:${OPEN5GS_VERSION:-latest}
+        image: o5gc/${OPEN5GS_IMAGE:-open5gs:${OPEN5GS_VERSION:-latest}}
         profiles: ["open5gs"]
         entrypoint: ["/mnt/open5gs/entrypoint.sh"]
         env_file: ["${ENV_FILE}"]

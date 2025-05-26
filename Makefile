@@ -90,7 +90,7 @@ DOCKER_RAN_HOSTS = $(sort $(call get_env,ENB_HOSTNAME GNB_HOSTNAME))
 DOCKER_ALL_HOSTS = $(sort localhost ${DOCKER_RAN_HOSTS})
 
 DOCKER_BUILD_ALL = $(filter-out %-build-cacher,$(filter-out %-base,$(sort     \
-    $(shell cd modules; find ./ -name *Dockerfile                             \
+    $(shell cd modules; find -L ./ -name *Dockerfile                          \
         | sed -E "s|./.*/docker/(.*)/([^.]*).?Dockerfile|docker-build-\1-\2|" \
         | sed -E "s|/|-|" | sed -E "s|(.*)-$$|\1|"))))
 docker-build-all: clean build-cacher-restart docker-build-o5gc-base  ## Build all Docker images
@@ -100,7 +100,6 @@ docker-build-all: clean build-cacher-restart docker-build-o5gc-base  ## Build al
 
 pull-all-external-images:
 	$(foreach img,$(filter-out o5gc/%,${IMAGES}),docker pull ${img};)
-
 
 DEVLOP_IMAGES = $(shell docker images o5gc/*:develop --format "{{.Repository}}")
 DEVELOP_VOLUMES = $(shell                                                     \
@@ -127,7 +126,9 @@ profiles = $(foreach p,$(shell cd ${1}; $(DOCKER_COMPOSE) config --profiles),--p
 IMAGES = $(eval IMAGES := $(sort $(foreach s,${STACKS},$(shell cd ${s}; $(DOCKER_COMPOSE) $(call profiles,${s}) config --images))))${IMAGES}
 image_versions = $(sort $(foreach i,$(filter o5gc/$1:%,${IMAGES}),$(shell echo ${i} | sed "s|o5gc/$1:\(.*\)|\1|")))
 
-MODULE_TARGET_FILES = $(wildcard modules/*/targets.mk)
+DEFAULT_MODULES = base o5gc
+DEFAULT_MODULE_TARGET_FILES = $(foreach module,${DEFAULT_MODULES},modules/${module}/targets.mk) 
+MODULE_TARGET_FILES = ${DEFAULT_MODULE_TARGET_FILES} $(sort $(filter-out ${DEFAULT_MODULE_TARGET_FILES},$(wildcard modules/*/targets.mk)))
 include ${MODULE_TARGET_FILES}
 
 .develop-%-build:
@@ -150,6 +151,7 @@ ${ENV_OVERRIDES_PATH}: ;
 ${ENV_DIR}/%.env:                                                             \
         ${BASE_DIR}/etc/settings.env ${BASE_DIR}/etc/networks.env             \
         ${BASE_DIR}/etc/o5gc.env ${BASE_DIR}/etc/local.env                    \
+        $$(wildcard ${MODULES_DIR}/$$(firstword $$(subst /, ,$$*))/settings.env) \
         $$(wildcard ${MODULES_DIR}/$$(subst /,/stacks/,$$*)/settings.env)     \
         ${ENV_OVERRIDES_PATH} ${BASE_DIR}/etc/uedb.env
 	mkdir -p $(dir $@)
@@ -173,7 +175,7 @@ stop_stack = cd modules/${1}/stacks/${2}; $(DOCKER_COMPOSE) $(foreach p,${3},--p
 uhd_image_loader:  ##
 	scripts/uhd_image_loader.sh
 
-docker-cleanup:  ## Cleanup old Docker related artifacts
+docker-cleanup: ${O5GC_ENV}  ## Cleanup old Docker related artifacts
 	$(MAKE) $(foreach host,${DOCKER_ALL_HOSTS},docker-cleanup-${host})
 docker-cleanup-%:
 	$(eval $@_HOST = $(if $(subst localhost,,$*),$*))

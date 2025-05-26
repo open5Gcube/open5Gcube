@@ -1,0 +1,6 @@
+develop/
+tests/.venv.build
+tests/venv
+tests/results
+scripts/.venv.build
+.vscode

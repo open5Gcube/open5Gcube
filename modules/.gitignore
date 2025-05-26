@@ -1,0 +1,6 @@
+*
+!.gitignore
+!base/
+!base/**
+!o5gc/
+!o5gc/**
