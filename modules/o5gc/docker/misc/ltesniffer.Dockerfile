@@ -7,7 +7,7 @@ RUN apt-get.sh install                                                        \
 
 ARG UHD_VERSION=4.6
 
-RUN git clone --branch UHD-${UHD_VERSION} --depth 1 --progress                \
+RUN git clone --branch UHD-${UHD_VERSION} --depth 1                           \
         https://github.com/EttusResearch/uhd.git                              \
     && mkdir uhd/host/build                                                   \
     && cd uhd/host/build                                                      \
@@ -27,7 +27,7 @@ RUN apt-get.sh install                                                        \
 
 WORKDIR /o5gc/LTESniffer
 
-RUN git clone --branch LTESniffer-v${LTESNIFFER_VERSION} --depth 1 --progress \
+RUN git clone --branch LTESniffer-v${LTESNIFFER_VERSION} --depth 1            \
         https://github.com/SysSec-KAIST/LTESniffer.git .                      \
     && mkdir build                                                            \
     && cd build                                                               \

@@ -9,7 +9,7 @@ RUN apt-get.sh install                                                        \
 
 #ENV KAMAILIO_VERSION=5.3
 
-#RUN git clone --branch ${KAMAILIO_VERSION} --depth 1 --progress               \
+#RUN git clone --branch ${KAMAILIO_VERSION} --depth 1                          \
 #    https://github.com/herlesupreeth/kamailio
 RUN git clone https://github.com/kamailio/kamailio                            \
     && cd kamailio                                                            \
