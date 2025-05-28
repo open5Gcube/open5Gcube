@@ -4,7 +4,7 @@ services:
         container_name: prometheus
         profiles: ["metrics"]
         volumes:
-            - ${DOCKER}/open5gs/metrics/prometheus.yaml:/etc/prometheus/prometheus.yml:ro
+            - ./prometheus.yaml:/etc/prometheus/prometheus.yml:ro
         networks:
             - corenet
             - o5gc
@@ -28,9 +28,9 @@ services:
             - GF_LOG_LEVEL=warn
             - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/var/lib/grafana/dashboards/open5gs.json
         volumes:
-            - ${DOCKER}/open5gs/metrics/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml:ro
-            - ${DOCKER}/open5gs/metrics/dashboard.yaml:/etc/grafana/provisioning/dashboards/default.yaml:ro
-            - ${DOCKER}/open5gs/metrics/dashboard.json:/var/lib/grafana/dashboards/open5gs.json
+            - ./datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml:ro
+            - ./dashboard.yaml:/etc/grafana/provisioning/dashboards/default.yaml:ro
+            - ./dashboard.json:/var/lib/grafana/dashboards/open5gs.json
         networks:
             - corenet
             - o5gc

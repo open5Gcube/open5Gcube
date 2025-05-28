@@ -9,7 +9,7 @@ services:
         privileged: true
         entrypoint: ["/mnt/ueransim/entrypoint.sh"]
         volumes:
-            - ${DOCKER}/ueransim:/mnt/ueransim:ro
+            - .:/mnt/ueransim:ro
 
     ueransim-gnb:
         extends:

@@ -11,7 +11,7 @@ services:
         environment:
             GIN_MODE: release
         volumes:
-            - ${DOCKER}/free5gc/:/mnt/free5gc/:ro
+            - .:/mnt/free5gc/:ro
         privileged: true
         healthcheck:
             test: /bin/bash -c "/mnt/free5gc/healthcheck.sh"

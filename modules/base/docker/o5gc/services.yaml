@@ -35,7 +35,7 @@ services:
         ports:
             - ${O5GC_WEBUI_HOST_PORT}:80
         volumes:
-            - ${DOCKER}/o5gc/webui:/mnt/webui:ro
+            - ./webui:/mnt/webui:ro
             - ${BASE}/Doc/html:/mnt/doc/html:ro
             - ${BASE}:${BASE}
             - ${HOME}/.ssh:/mnt/.ssh:ro
@@ -80,7 +80,7 @@ services:
         profiles: ["develop"]
         image: o5gc/o5gc-base:jammy
         volumes:
-            - ${DOCKER}/o5gc/develop-entrypoint.sh:/entrypoint.sh:ro
+            - ./develop-entrypoint.sh:/entrypoint.sh:ro
             - ${VAR}/ssh/:/var/run/ssh/
             - develop:/o5gc/
         env_file: ["${ENV_FILE}"]

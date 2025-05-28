@@ -2,11 +2,11 @@ services:
     base:
         profiles: ["osmocom"]
         entrypoint: ["/mnt/osmocom/entrypoint.sh"]
-        env_file: ["${ENV_FILE}", "${DOCKER}/osmocom/ports.env"]
+        env_file: ["${ENV_FILE}", "./ports.env"]
         labels:
             o5gc.stack: ${O5GC_STACK}
         volumes:
-            - ${DOCKER}/osmocom/:/mnt/osmocom/:ro
+            - .:/mnt/osmocom/:ro
         privileged: true
         init: true
         healthcheck:

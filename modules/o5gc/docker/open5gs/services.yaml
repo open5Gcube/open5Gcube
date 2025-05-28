@@ -9,7 +9,7 @@ services:
             o5gc.stack: ${O5GC_STACK}
             o5gc.webui.priority: ${WEBUI_PRIO_CORE_DEFAULT}
         volumes:
-            - ${DOCKER}/open5gs/:/mnt/open5gs/:ro
+            - .:/mnt/open5gs/:ro
             - ${DEVELOP_VOLUME_OPEN5GS:-${BASE}/var/empty:/var/empty}
         environment:
             - OPEN5GS_USE_HTTP1=${OPEN5GS_USE_HTTP1:-yes}

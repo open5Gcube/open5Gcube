@@ -8,7 +8,7 @@ services:
             o5gc.stack: ${O5GC_STACK}
             o5gc.webui.priority: ${WEBUI_PRIO_RAN}
         volumes:
-            - ${DOCKER}/srsran/4g/:/mnt/srsran/:ro
+            - .:/mnt/srsran/:ro
             - ${DEVELOP_VOLUME_SRSRAN:-${BASE}/var/empty:/var/empty}
         privileged: true
 

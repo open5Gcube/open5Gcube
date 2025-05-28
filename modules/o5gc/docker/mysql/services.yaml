@@ -6,7 +6,7 @@ services:
         labels:
             o5gc.stack: ${O5GC_STACK}
         volumes:
-            - ${DOCKER}/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
+            - ./my.cnf:/etc/mysql/conf.d/my.cnf:ro
         networks:
             corenet:
                 ipv4_address: ${MYSQL_IP_ADDR}

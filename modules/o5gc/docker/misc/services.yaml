@@ -6,7 +6,7 @@ services:
         profiles: ["sigdigger"]
         entrypoint: /o5gc/SigDigger/entrypoint.sh
         volumes:
-            - ${DOCKER}/misc/sigdigger-entrypoint.sh:/o5gc/SigDigger/entrypoint.sh:ro
+            - ./sigdigger-entrypoint.sh:/o5gc/SigDigger/entrypoint.sh:ro
             - ${BASE}/scripts/band_helper.py:/o5gc/SigDigger/scripts/band_helper.py:ro
             - /dev/bus/usb:/dev/bus/usb
             - /tmp/.X11-unix:/tmp/.X11-unix
@@ -36,7 +36,7 @@ services:
         profiles: ["ltesniffer"]
         entrypoint: /o5gc/ltesniffer/entrypoint.sh
         volumes:
-            - ${DOCKER}/misc/ltesniffer-entrypoint.sh:/o5gc/ltesniffer/entrypoint.sh:ro
+            - ./ltesniffer-entrypoint.sh:/o5gc/ltesniffer/entrypoint.sh:ro
             - ${BASE}/scripts/band_helper.py:/o5gc/band_helper.py:ro
             - /dev/bus/usb:/dev/bus/usb
         env_file: ["${ENV_FILE}"]
@@ -57,8 +57,8 @@ services:
         ports:
             - ${SWAGGER_UI_HOST_PORT}:8288
         volumes:
-            - ${DOCKER}/misc/swagger-config.json:/usr/share/nginx/html/swagger-config.json:ro
-            - ${DOCKER}/misc/swagger-entrypoint.sh:/docker-entrypoint.d/99-o5gc.sh:ro
+            - ./swagger-config.json:/usr/share/nginx/html/swagger-config.json:ro
+            - ./swagger-entrypoint.sh:/docker-entrypoint.d/99-o5gc.sh:ro
         environment:
             - CONFIG_URL=./swagger-config.json
             - HOST_DEFAULT_ROUTE_IFACE_IP=${DEFAULT_ROUTE_IFACE_IP:-}

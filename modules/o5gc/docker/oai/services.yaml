@@ -5,9 +5,9 @@ services:
             service: mysql
         profiles: ["core"]
         volumes:
-            - ${DOCKER}/oai/mysql-healthcheck.sh:/tmp/mysql-healthcheck.sh:ro
-            - ${DOCKER}/oai/oai_db.${OAI_CN5G_TYPE:-none}.sql:/docker-entrypoint-initdb.d/oai_db.sql:ro
-            - ${DOCKER}/oai/cn5g-init.sh:/docker-entrypoint-initdb.d/zz_cn5g-init.sh:ro
+            - ./mysql-healthcheck.sh:/tmp/mysql-healthcheck.sh:ro
+            - ./oai_db.${OAI_CN5G_TYPE:-none}.sql:/docker-entrypoint-initdb.d/oai_db.sql:ro
+            - ./cn5g-init.sh:/docker-entrypoint-initdb.d/zz_cn5g-init.sh:ro
         environment:
             - MYSQL_DATABASE=oai_db
             - OAI_CN5G_TYPE
@@ -27,8 +27,8 @@ services:
         init: true
         entrypoint: ["/mnt/oai/cn5g-entrypoint.sh"]
         volumes:
-            - ${DOCKER}/oai/cn5g-entrypoint.sh:/mnt/oai/cn5g-entrypoint.sh:ro
-            - ${DOCKER}/oai/cn5g.yaml:/mnt/oai/cn5g.yaml:ro
+            - ./cn5g-entrypoint.sh:/mnt/oai/cn5g-entrypoint.sh:ro
+            - ./cn5g.yaml:/mnt/oai/cn5g.yaml:ro
 
     nrf:
         extends:
@@ -118,7 +118,7 @@ services:
             o5gc.stack: ${O5GC_STACK}
             o5gc.webui.priority: ${WEBUI_PRIO_RAN}
         volumes:
-            - ${DOCKER}/oai/ran-entrypoint.sh:/o5gc/openairinterface5g/ran-entrypoint.sh:ro
+            - ./ran-entrypoint.sh:/o5gc/openairinterface5g/ran-entrypoint.sh:ro
             - ${BASE}/scripts/band_helper.py:/o5gc/openairinterface5g/scripts/band_helper.py:ro
             - ${BASE}/scripts/docker-remote.sh:/docker-remote.sh:ro
             - ${BASE}:/tmp/o5gc:ro
@@ -164,7 +164,7 @@ services:
         container_name: ue
         profiles: ["ue"]
         volumes:
-            - ${DOCKER}/oai/ran-entrypoint.sh:/o5gc/openairinterface5g/ran-entrypoint.sh:ro
+            - ./ran-entrypoint.sh:/o5gc/openairinterface5g/ran-entrypoint.sh:ro
             - ${BASE}/scripts/band_helper.py:/o5gc/openairinterface5g/scripts/band_helper.py:ro
             - /dev/bus/usb:/dev/bus/usb
         env_file: ["${ENV_FILE}"]
@@ -180,7 +180,7 @@ services:
         entrypoint: /o5gc/openairinterface5g/ran-entrypoint.sh
         command: tracer ${OAI_TRACEE:-}
         volumes:
-            - ${DOCKER}/oai/ran-entrypoint.sh:/o5gc/openairinterface5g/ran-entrypoint.sh:ro
+            - ./ran-entrypoint.sh:/o5gc/openairinterface5g/ran-entrypoint.sh:ro
             - ${BASE}/scripts/band_helper.py:/o5gc/openairinterface5g/scripts/band_helper.py:ro
             - /tmp/.X11-unix:/tmp/.X11-unix
             - ${HOME}/.Xauthority:/root/.Xauthority:rw
@@ -198,7 +198,7 @@ services:
         entrypoint: /o5gc/openairinterface5g/ran-entrypoint.sh
         command: macpdu2wireshark ${OAI_TRACEE:-}
         volumes:
-            - ${DOCKER}/oai/ran-entrypoint.sh:/o5gc/openairinterface5g/ran-entrypoint.sh:ro
+            - ./ran-entrypoint.sh:/o5gc/openairinterface5g/ran-entrypoint.sh:ro
             - ${BASE}/scripts/band_helper.py:/o5gc/openairinterface5g/scripts/band_helper.py:ro
         env_file: ["${ENV_FILE}"]
         environment:
