@@ -26,7 +26,7 @@ RUN pip3 install --upgrade --no-cache-dir pip                                 \
 WORKDIR /o5gc/open5gs
 
 ARG OPEN5GS_VERSION=2.7.2
-RUN git clone --branch v${OPEN5GS_VERSION} --depth 1 --progress               \
+RUN git clone --branch v${OPEN5GS_VERSION} --depth 1                          \
         https://github.com/open5gs/open5gs .
 
 COPY *.patch .

@@ -55,7 +55,7 @@ define docker-build
     $(eval $@_BUILD_CACHER = $(if ${$@_BUILD_HOST},$(call docker-src-ip-for-remote,${$@_BUILD_HOST}),${DOCKER_HOST_BRIDGE}))
     $(eval $@_DOCKER = docker $(if ${$@_BUILD_HOST},-H ssh://${$@_BUILD_HOST}))
     mkdir -p $(foreach cache,${SYNC_CACHES},var/cache/${cache}/$(if ${7},${7},localhost)/${$@_IMG})
-    $(if ${$@_BUILD_HOST},tar -cf var/tmp/${$@_BUILD_HOST}-${$@_PRJ}.tar -C docker/${$@_PRJ} .)
+    $(if ${$@_BUILD_HOST},tar -cf var/tmp/${$@_BUILD_HOST}-${$@_PRJ}.tar -C modules/${1}/docker/${$@_PRJ} .)
     cd modules/${1}/docker/${$@_PRJ} &&                                       \
     DOCKER_BUILDKIT=1 ${$@_DOCKER} build                                      \
         --tag o5gc/${$@_TAG}                                                  \
