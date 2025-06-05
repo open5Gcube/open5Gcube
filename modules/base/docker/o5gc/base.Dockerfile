@@ -4,8 +4,6 @@ ARG BASE_IMG
 ARG BUILD_HOST
 ARG USE_BUILD_CACHER=1
 
-ENV TZ=Europe/Berlin
-
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 COPY base-packages.${BASE_IMG}.txt /tmp/base.packages.txt
@@ -23,8 +21,11 @@ RUN sed -i 's|http://archive.ubuntu.com|http://de.archive.ubuntu.com|g'       \
 RUN echo "dash dash/sh boolean false" | debconf-set-selections                \
     && DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash
 # set timezone
+ARG TZ
+ENV TZ=${TZ}
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime                            \
-    && echo $TZ > /etc/timezone
+    && ln -fs /usr/share/zoneinfo/$TZ /etc/timezone                           \
+    && DEBIAN_FRONTEND=noninteractive dpkg-reconfigure -f noninteractive tzdata
 # setup ccache
 RUN /usr/sbin/update-ccache-symlinks
 ENV PATH="/usr/lib/ccache:${PATH}"

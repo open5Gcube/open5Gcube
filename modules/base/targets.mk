@@ -20,12 +20,13 @@ build-cacher-clean:
 	rm -rf $(foreach cache,${CACHES},var/cache/${cache}/*)
 
 O5GC_BASE_IMAGES = jammy focal
+TZ=$(shell timedatectl show -p Timezone --value)
 docker-build-o5gc-base:
 	$(call docker-build-remotely,${DOCKER_ALL_HOSTS},${O5GC_BASE_IMAGES})
 	docker image ls o5gc/o5gc-base
 docker-build-o5gc-base-%: .docker-build-prerequisites
 	$(call parse-stem,$*)
-	$(call docker-build,base,o5gc,base,BUILD_HOST=${$@_H} BASE_IMG=${$@_V},,${$@_V},${$@_H})
+	$(call docker-build,base,o5gc,base,BUILD_HOST=${$@_H} BASE_IMG=${$@_V} TZ=$(TZ),,${$@_V},${$@_H})
 
 docker-build-o5gc-mkdocs:
 	$(call docker-build,base,o5gc,mkdocs)
