@@ -15,7 +15,6 @@ flex
 gdb
 git
 gpg-agent
-gtkwave
 iperf iperf3
 iproute2
 iptables
@@ -80,6 +79,7 @@ software-properties-common
 subversion
 tcpdump
 tini
+tzdata
 unzip
 usbutils
 vim
