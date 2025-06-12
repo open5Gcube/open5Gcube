@@ -10,7 +10,7 @@ service nginx start
 if [ -d /mnt/.ssh/ ]; then
     cp -a /mnt/.ssh/* ~/.ssh
     chown $(id -u):$(id -g) ~/.ssh/*
-    rm ~/.ssh/known_hosts
+    rm -f ~/.ssh/known_hosts
     echo -e "Host *\n\tUser ${HOST_USER}" >> ~/.ssh/config
 fi
 [ "${ENB_HOSTNAME}" != "localhost" ] && ssh-keyscan ${ENB_HOSTNAME} >> ~/.ssh/known_hosts

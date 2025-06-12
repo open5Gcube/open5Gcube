@@ -55,8 +55,8 @@ Documentation-serve-stop:
 
 webui-start:
 	cd ${BASE_O5GC_DIR};                                                      \
-	$(DOCKER_COMPOSE) --profile=webui up --detach
-	@echo WebUI available at http://${DEFAULT_ROUTE_IFACE_IP}
+	$(DOCKER_COMPOSE) --profile=webui up --detach --wait
+	@echo WebUI available at http://${DEFAULT_ROUTE_IFACE_IP}:${O5GC_WEBUI_HOST_PORT}
 webui-stop:
 	cd ${BASE_O5GC_DIR};                                                      \
 	$(DOCKER_COMPOSE) --profile=webui down || true

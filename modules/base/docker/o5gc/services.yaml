@@ -49,6 +49,13 @@ services:
         privileged: true
         init: true
         restart: always
+        healthcheck:
+            test: nc -z 127.0.0.1 80 && nc -z 127.0.0.1 5000
+            interval: 10s
+            timeout: 1s
+            retries: 2
+            start_period: 5s
+            start_interval: 1s
 
     documentation:
         image: o5gc/o5gc-mkdocs
