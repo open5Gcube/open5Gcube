@@ -16,9 +16,10 @@ RUN OAI_RAN_VERSION=$(echo ${VERSION} | sed "s|\(.*\)-.*|\1|")                \
 WORKDIR /o5gc/openairinterface5g
 
 COPY 0001-Add-ip-and-port-option-to-gnb-tracer.patch .
+COPY 0002-Thin-UHD-compilation*.patch .
 RUN sync-cache.sh download oai-ran ccache                                     \
     && git -c user.name='o5gc' -c user.email='o5gc@fkie.fraunhofer.de'        \
-        am *.patch                                                            \
+        am --3way *.patch                                                     \
     && source ./oaienv                                                        \
     && cd cmake_targets                                                       \
     && export UHD_VERSION=$(echo ${VERSION} | sed "s|.*-\(.*\)|\1|")          \

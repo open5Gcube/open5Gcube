@@ -1,0 +1,25 @@
+From 3987b495eb7c471bc81a6a1e88dc4cba1d0048bb Mon Sep 17 00:00:00 2001
+From: Thorsten Horstmann <thorsten.horstmann@fkie.fraunhofer.de>
+Date: Thu, 12 Jun 2025 17:24:24 +0200
+Subject: [PATCH 1/1] Thin UHD compilation - Part I
+
+---
+ cmake_targets/tools/build_helper | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cmake_targets/tools/build_helper b/cmake_targets/tools/build_helper
+index 041621ffe4..c45cb636a1 100755
+--- a/cmake_targets/tools/build_helper
++++ b/cmake_targets/tools/build_helper
+@@ -290,7 +290,7 @@ install_usrp_uhd_driver_from_source(){
+     git diff
+     mkdir -p host/build
+     cd host/build || true
+-    $CMAKE ../ -GNinja
++    $CMAKE ../ -GNinja -DENABLE_TESTS=OFF -DENABLE_EXAMPLES=OFF
+     echo "Compiling UHD"
+     ninja
+     $SUDO ninja install
+-- 
+2.43.0
+
