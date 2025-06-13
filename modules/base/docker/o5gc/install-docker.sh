@@ -31,17 +31,46 @@ install_preliminaries() {
 }
 
 install_docker_cli() {
-    [ "$(lsb_release -cs)" == "focal" ] &&                                   \
-        apt_get_install docker-ce-cli=5:24.* docker-compose-plugin=2.18.* docker-buildx-plugin=0.10.*
-    [ "$(lsb_release -cs)" == "jammy" ] &&                                    \
-        apt_get_install docker-ce-cli=5:24.* docker-compose-plugin=2.21.* docker-buildx-plugin=0.12.*
+    case "$OS_DISTRO $OS_RELEASE" in
+        "ubuntu 20.04" | "ubuntu 22.04" | "ubuntu 24.04")
+            apt_get_install docker-ce-cli=5:28.* docker-compose-plugin=2.35.* docker-buildx-plugin=0.23.*
+            ;;
+        *)
+            exit 1
+    esac
     apt-mark hold docker-ce-cli docker-compose-plugin docker-buildx-plugin
 }
 
 install_docker_ce() {
-    apt_get_install docker-ce=5:24.* docker-ce-rootless-extras=5:24.* containerd.io=1.6.*
+    case "$OS_DISTRO $OS_RELEASE" in
+        "ubuntu 20.04" | "ubuntu 22.04" | "ubuntu 24.04")
+            apt_get_install docker-ce=5:28.* docker-ce-rootless-extras=5:28.* containerd.io=1.7.*
+            ;;
+        *)
+            exit 1
+    esac
     apt-mark hold docker-ce docker-ce-rootless-extras containerd.io
+    systemctl restart docker
 }
+
+check_supported_distribution() {
+    case "$OS_DISTRO $OS_RELEASE" in
+        "ubuntu 20.04") return 0 ;;
+        "ubuntu 22.04") return 0 ;;
+        "ubuntu 24.04") return 0 ;;
+    esac
+    echo "You're using an unsupported distro: $OS_DISTRO $OS_RELEASE"
+    exit 1
+}
+
+if [ ! -f /etc/os-release ]; then
+    echo "No /etc/os-release file found. You're using an unsupported distro."
+    exit 1
+fi
+OS_DISTRO=$(grep "^ID=" /etc/os-release | sed "s/ID=//" | sed "s/\"//g")
+OS_RELEASE=$(grep "^VERSION_ID=" /etc/os-release | sed "s/VERSION_ID=//" | sed "s/\"//g")
+
+check_supported_distribution
 
 install_preliminaries
 
