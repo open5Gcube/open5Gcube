@@ -32,14 +32,14 @@ if [ -d /mnt/.ssh/ ]; then
     echo -e "Host *\n\tUser ${HOST_USER}" >> ~/.ssh/config
 fi
 
-unset BASE DOCKER VAR
+unset BASE DOCKER MODULES VAR
 export BASE_DIR=/tmp/o5gc
 export USER=$(whoami)
-export ENV_FILE=${BASE_DIR}/var/etc/${O5GC_STACK}.env
+export ENV_FILE=${BASE_DIR}/var/etc/${MODULE}/${O5GC_STACK}.env
 
 ssh-keyscan ${DOCKER_TARGET_HOSTNAME} >> ~/.ssh/known_hosts
 
-rsync -a --delete --filter=':- .gitignore' ${BASE_DIR}/ ${DOCKER_TARGET_HOSTNAME}:${BASE_DIR}
+rsync -a --delete --exclude var/cache ${BASE_DIR}/ ${DOCKER_TARGET_HOSTNAME}:${BASE_DIR}
 
 { set +x; } 2>/dev/null
 echo
@@ -53,7 +53,7 @@ DOCKER_COMPOSE="docker -H ssh://${DOCKER_TARGET_HOSTNAME} compose             \
     --file docker-compose.yaml --file ${BASE_DIR}/etc/networks.yaml           \
     --profile $1"                                                             \
 
-cd ${BASE_DIR}/etc/${O5GC_STACK}
+cd ${BASE_DIR}/modules/${MODULE}/stacks/${O5GC_STACK}
 ${DOCKER_COMPOSE} up --force-recreate --no-log-prefix &
 docker_pid=$!
 wait -n ${docker_pid}

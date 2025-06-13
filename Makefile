@@ -55,7 +55,7 @@ define docker-build
     $(eval $@_BUILD_CACHER = $(if ${$@_BUILD_HOST},$(call docker-src-ip-for-remote,${$@_BUILD_HOST}),${DOCKER_HOST_BRIDGE}))
     $(eval $@_DOCKER = docker $(if ${$@_BUILD_HOST},-H ssh://${$@_BUILD_HOST}))
     mkdir -p $(foreach cache,${SYNC_CACHES},var/cache/${cache}/$(if ${7},${7},localhost)/${$@_IMG})
-    $(if ${$@_BUILD_HOST},tar -cf var/tmp/${$@_BUILD_HOST}-${$@_PRJ}.tar -C modules/${1}/docker/${$@_PRJ} .)
+    $(if ${$@_BUILD_HOST},tar -cf var/tmp/${$@_BUILD_HOST}-${$@_IMG}.tar -C modules/${1}/docker/${$@_PRJ} .)
     cd modules/${1}/docker/${$@_PRJ} &&                                       \
     DOCKER_BUILDKIT=1 ${$@_DOCKER} build                                      \
         --tag o5gc/${$@_TAG}                                                  \
@@ -66,8 +66,8 @@ define docker-build
         --secret id=id_ed25519.pub,src=${BASE_DIR}/var/ssh/id_ed25519.pub     \
         --add-host o5gc-build-cacher:${$@_BUILD_CACHER}                       \
         --file $(if ${3},$(subst docker-build-${2}-,,${3}).)Dockerfile        \
-        $(if ${$@_BUILD_HOST},- < ${BASE_DIR}/var/tmp/${$@_BUILD_HOST}-${$@_PRJ}.tar,.)
-    $(if ${$@_BUILD_HOST},rm -f var/tmp/${$@_BUILD_HOST}-${$@_PRJ}.tar)
+        $(if ${$@_BUILD_HOST},- < ${BASE_DIR}/var/tmp/${$@_BUILD_HOST}-${$@_IMG}.tar,.)
+    $(if ${$@_BUILD_HOST},rm -f var/tmp/${$@_BUILD_HOST}-${$@_IMG}.tar)
     echo "FROM o5gc/${$@_TAG}" | ${$@_DOCKER} build                           \
         --tag "o5gc/${$@_TAG}"                                                \
         --label ${OCI_IMG_KEY}.version="$(call docker-img-version,${$@_DOCKER},${$@_TAG})" -
