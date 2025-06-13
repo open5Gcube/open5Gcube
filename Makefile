@@ -180,11 +180,7 @@ docker-cleanup: ${O5GC_ENV}  ## Cleanup old Docker related artifacts
 docker-cleanup-%:
 	$(eval $@_HOST = $(if $(subst localhost,,$*),$*))
 	$(eval $@_DOCKER = docker $(if ${$@_HOST},-H ssh://${$@_HOST}))
-#	${$@_DOCKER} volume prune --filter all=1 --force
-#	${$@_DOCKER} system prune --force
-	${$@_DOCKER} image prune --force
-	${$@_DOCKER} container prune --force
-	${$@_DOCKER} volume prune --force
+	${$@_DOCKER} system prune --filter label!=o5gc-bridge --force --volumes
 
 docker-purge-old-images:
 	@echo "Old images:";                                                      \

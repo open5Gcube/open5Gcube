@@ -41,7 +41,7 @@ fi
 docker network inspect o5gc &>/dev/null || (
     echo "Create custom Docker bridge 'o5gc'"
     set -x
-    docker network create --driver bridge o5gc )
+    docker network create --driver bridge --label o5gc-bridge o5gc )
 
 echo Start /etc/hosts updater
 make -s -C ${BASE_DIR} USER=root HOME=/root docker-etc-hosts-updater-restart
