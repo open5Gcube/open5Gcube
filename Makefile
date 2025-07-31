@@ -45,45 +45,10 @@ system-enroll-mok: var/ssl/MOK.der
 system-test-mok: var/ssl/MOK.der
 	sudo mokutil --test-key $<
 
-docker-img-version = $$(${1} run --rm --entrypoint /bin/cat o5gc/${2} /etc/image_version)
-docker-src-ip-for-remote = $(shell ip route get $$(getent hosts ${1} | cut -d " " -f1) | sed -n 's|.* src \([0-9.]*\) .*|\1|p')
-define docker-build
-    $(eval $@_PRJ = $(subst docker-build-,,${2}))
-    $(eval $@_IMG = $(subst /,-,${$@_PRJ})$(if ${3},-$(subst docker-build-${2}-,,${3})))
-    $(eval $@_TAG = ${$@_IMG}:$(or ${6},latest))
-    $(eval $@_BUILD_HOST = $(if $(subst localhost,,${7}),${7}))
-    $(eval $@_BUILD_CACHER = $(if ${$@_BUILD_HOST},$(call docker-src-ip-for-remote,${$@_BUILD_HOST}),${DOCKER_HOST_BRIDGE}))
-    $(eval $@_DOCKER = docker $(if ${$@_BUILD_HOST},-H ssh://${$@_BUILD_HOST}))
-    mkdir -p $(foreach cache,${SYNC_CACHES},var/cache/${cache}/$(if ${7},${7},localhost)/${$@_IMG})
-    $(if ${$@_BUILD_HOST},tar -cf var/tmp/${$@_BUILD_HOST}-${$@_IMG}.tar -C modules/${1}/docker/${$@_PRJ} .)
-    cd modules/${1}/docker/${$@_PRJ} &&                                       \
-    DOCKER_BUILDKIT=1 ${$@_DOCKER} build                                      \
-        --tag o5gc/${$@_TAG}                                                  \
-		$(if ${5},--target=${5})                                              \
-        $(foreach arg,${4},--build-arg $(arg))                                \
-        --label ${OCI_IMG_KEY}.created="$(shell date --rfc-3339=seconds)"     \
-        --secret id=id_ed25519,src=${BASE_DIR}/var/ssh/id_ed25519             \
-        --secret id=id_ed25519.pub,src=${BASE_DIR}/var/ssh/id_ed25519.pub     \
-        --add-host o5gc-build-cacher:${$@_BUILD_CACHER}                       \
-        --file $(if ${3},$(subst docker-build-${2}-,,${3}).)Dockerfile        \
-        $(if ${$@_BUILD_HOST},- < ${BASE_DIR}/var/tmp/${$@_BUILD_HOST}-${$@_IMG}.tar,.)
-    $(if ${$@_BUILD_HOST},rm -f var/tmp/${$@_BUILD_HOST}-${$@_IMG}.tar)
-    echo "FROM o5gc/${$@_TAG}" | ${$@_DOCKER} build                           \
-        --tag "o5gc/${$@_TAG}"                                                \
-        --label ${OCI_IMG_KEY}.version="$(call docker-img-version,${$@_DOCKER},${$@_TAG})" -
-    ${$@_DOCKER} tag                                                          \
-        o5gc/${$@_TAG}                                                        \
-        o5gc/${$@_IMG}:$(call docker-img-version,${$@_DOCKER},${$@_TAG})
-    ${$@_DOCKER} image ls o5gc/${$@_IMG}
-endef
+DOCKER_BUILD = SYNC_CACHES="${SYNC_CACHES}" ${BASE_DIR}/scripts/docker.sh build
 
 define docker-build-remotely
-    $(foreach ver,$(if ${2},${2},latest),                                     \
-        $(MAKE) ${PARALLEL_JOBS} RUN_PARALLEL=1 $(foreach host,${1},$@-${ver}@${host}) &&) true
-endef
-define parse-stem
-    $(eval $@_V = $(firstword $(subst @, ,${1})))
-    $(eval $@_H = $(lastword $(subst @, ,${1})))
+    $(MAKE) ${PARALLEL_JOBS} RUN_PARALLEL=1 $(foreach host,${1},$@-at-${host})
 endef
 
 DOCKER_RAN_HOSTS = $(sort $(call get_env,ENB_HOSTNAME GNB_HOSTNAME))
@@ -132,13 +97,12 @@ MODULE_TARGET_FILES = ${DEFAULT_MODULE_TARGET_FILES} $(sort $(filter-out ${DEFAU
 include ${MODULE_TARGET_FILES}
 
 .develop-%-build:
-	$(call docker-build,$*,,,develop)
+#	${DOCKER_BUILD} -m base -p o5gc -i base --host $*
 .develop-%-tag-latest:
 	docker tag o5gc/$*:develop o5gc/$*:latest
 	docker images o5gc/$*
 .develop-%-untag-latest:
-	@rm -f docker/$(subst -,/,$*)/.build
-	$(call docker-build,$*)
+#	${DOCKER_BUILD} -m base -p o5gc -i base --host $*
 .develop-%-start: var/ssh/ssh_host_$$*_ed25519_key var/ssh/authorized_keys
 	cd docker/$(subst -,/,$*);                                                \
 	$(DOCKER_COMPOSE) --profile=develop up --detach
@@ -267,7 +231,7 @@ lint:
 	$(MAKE) --ignore-errors shellcheck yamllint codespell hadolint            \
 	    markdownlint space-end-check cargo-machete
 
-SHELLCHECK_FILES = $(filter-out %-healthcheck.sh %/wait-for-it.sh,            \
+SHELLCHECK_FILES = $(filter-out %/wait-for-it.sh,                             \
                        $(shell find modules/ etc/ scripts/ -name '*.sh' -not -path '*/node_modules/*'))
 SHELLCHECK_IGNORE = SC1091 SC2016 SC2046 SC3037 SC2086 SC2059 SC2155 SC2153   \
                     SC2291 SC3040 SC1090 SC2317

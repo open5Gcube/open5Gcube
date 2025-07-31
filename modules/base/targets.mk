@@ -22,22 +22,23 @@ build-cacher-clean:
 O5GC_BASE_IMAGES = jammy focal
 TZ=$(shell timedatectl show -p Timezone --value)
 docker-build-o5gc-base:
-	$(call docker-build-remotely,${DOCKER_ALL_HOSTS},${O5GC_BASE_IMAGES})
+	$(call docker-build-remotely,${DOCKER_ALL_HOSTS})
 	docker image ls o5gc/o5gc-base
-docker-build-o5gc-base-%: .docker-build-prerequisites
-	$(call parse-stem,$*)
-	$(call docker-build,base,o5gc,base,BUILD_HOST=${$@_H} BASE_IMG=${$@_V} TZ=$(TZ),,${$@_V},${$@_H})
+docker-build-o5gc-base-at-%: .docker-build-prerequisites
+	${DOCKER_BUILD} -m base -p o5gc -i base --host $*                         \
+	    -a BUILD_HOST=$* -a TZ=${TZ} --version-arg BASE_IMG                   \
+	    $(foreach img,${O5GC_BASE_IMAGES}, --version ${img})
 
 docker-build-o5gc-mkdocs:
-	$(call docker-build,base,o5gc,mkdocs)
+	${DOCKER_BUILD} -m base -p o5gc -i mkdocs
 docker-build-o5gc-webui: docker-build-o5gc-base Documentation-build
 	rm -rf modules/base/docker/o5gc/webui/frontend/theme/*
 	[ -z "$(call get_env,WEBUI_THEME)" ] ||                                   \
 	    cp -a $(call get_env,WEBUI_THEME)/* modules/base/docker/o5gc/webui/frontend/theme/
-	$(call docker-build,base,o5gc/webui)
+	${DOCKER_BUILD} -m base -p o5gc/webui
 
 docker-build-misc-lbgpsdo: docker-build-o5gc-base
-	$(call docker-build,base,misc,lbgpsdo)
+	${DOCKER_BUILD} -m base -p misc -i lbgpsdo
 
 Documentation-build: docker-build-o5gc-mkdocs
 	cd ${BASE_O5GC_DIR};                                                      \

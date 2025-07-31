@@ -1,26 +1,22 @@
 docker-build-srsran: docker-build-srsran-4g docker-build-srsran-project
 docker-build-srsran-4g docker-build-srsran-project: docker-build-o5gc-base
-	$(call docker-build,o5gc,srsran/$(word 4,$(subst -, ,$@)),,,proxy)
+	${DOCKER_BUILD} -m o5gc -p srsran/$(word 4,$(subst -, ,$@)) --target proxy
 	$(call docker-build-remotely,${DOCKER_RAN_HOSTS})
-docker-build-srsran-4g-% docker-build-srsran-project-%:
-	$(call parse-stem,$*)
-	$(call docker-build,o5gc,srsran/$(word 4,$(subst -, ,$@)),,,,,${$@_H})
+docker-build-srsran-4g-at-% docker-build-srsran-project-at-%:
+	${DOCKER_BUILD} -m o5gc -p srsran/$(word 4,$(subst -, ,$@)) --host $*
 	
 OPEN5GS_VERSIONS = $(filter-out latest,$(call image_versions,open5gs))
 docker-build-open5gs: docker-build-o5gc-base
-	$(foreach ver,${OPEN5GS_VERSIONS},$(call docker-build,o5gc,open5gs,,OPEN5GS_VERSION=${ver},,${ver}))
-	$(call docker-build,o5gc,open5gs)
+	${DOCKER_BUILD} -m o5gc -p open5gs --version-arg OPEN5GS_VERSION $(foreach ver,${OPEN5GS_VERSIONS}, --version ${ver})
 
 OAI_RAN_VERSIONS = $(call image_versions,oai-ran)
 docker-build-oai-ran: docker-build-o5gc-base
-	$(MAKE) $(foreach ver,${OAI_RAN_VERSIONS},$@-proxy-${ver})
-	$(call docker-build-remotely,${DOCKER_RAN_HOSTS},${OAI_RAN_VERSIONS})
-docker-build-oai-ran-proxy-%:
-	$(call docker-build,o5gc,oai,ran,BASE_IMG=jammy VERSION=$*,proxy,$*,localhost)
-docker-build-oai-ran-%:
-	$(call parse-stem,$*)
-	$(eval $@_BASE_IMG = $(shell [ "${$@_V}" \> "2022.w33" ] && echo jammy || echo bionic))
-	$(call docker-build,o5gc,oai,ran,BASE_IMG=${$@_BASE_IMG} VERSION=${$@_V},,${$@_V},${$@_H})
+	${DOCKER_BUILD} -m o5gc -p oai -i ran -a VERSION="%version%"              \
+	    --target proxy $(foreach ver,${OAI_RAN_VERSIONS}, --version ${ver})
+	$(call docker-build-remotely,${DOCKER_RAN_HOSTS})
+docker-build-oai-ran-at-%:
+	${DOCKER_BUILD} -m o5gc -p oai -i ran -a VERSION="%version%"              \
+	    --host $* $(foreach ver,${OAI_RAN_VERSIONS}, --version ${ver})
 
 OAI_CORE_IMAGES = amf ausf lmf nrf smf udm udr upf
 docker-build-oai-core:
@@ -28,56 +24,43 @@ docker-build-oai-core:
 
 OAI_CN5G_VERSIONS = $(sort $(foreach img,${OAI_CORE_IMAGES},$(filter-out latest,$(call image_versions,oai-${img}))))
 docker-build-oai-cn5g-base: docker-build-o5gc-base
-	$(foreach ver,${OAI_CN5G_VERSIONS},$(call docker-build,o5gc,oai,cn5g-base,BASE_IMG=jammy OAI_CN5G_VERSION=${ver},,${ver}))
-	$(call docker-build,o5gc,oai,cn5g-base)
+	${DOCKER_BUILD} -m o5gc -p oai -i cn5g-base -a OAI_CN5G_VERSION="%version%" $(foreach ver,${OAI_CN5G_VERSIONS}, --version ${ver})
+	${DOCKER_BUILD} -m o5gc -p oai -i cn5g-base
 
 docker-build-oai-amf docker-build-oai-ausf docker-build-oai-lmf               \
 docker-build-oai-nrf docker-build-oai-smf docker-build-oai-udm                \
 docker-build-oai-udr docker-build-oai-upf: docker-build-oai-cn5g-base
-	$(foreach ver,${OAI_CN5G_VERSIONS} latest,$(call docker-build,o5gc,oai,$(subst docker-build-oai-,,$@),OAI_CN5G_VERSION=${ver}))
+	${DOCKER_BUILD} -m o5gc -p oai -i $@ -a OAI_CN5G_VERSION="%version%" $(foreach ver,${OAI_CN5G_VERSIONS}, --version ${ver})
 
 OSMOCOM_IMAGES = base hlr mgw stp msc bts trx bsc ggsn sgsn pcu cbc
 docker-build-osmocom: $(foreach img,${OSMOCOM_IMAGES},docker-build-osmocom-${img})
 	docker images o5gc/osmocom-* | (read h; echo "$$h"; LC_ALL=C sort)
 docker-build-osmocom-base: docker-build-o5gc-base
 	$(call docker-build-remotely,localhost ${DOCKER_RAN_HOSTS})
-docker-build-osmocom-msc docker-build-osmocom-bsc:                            \
-        docker-build-osmocom-hlr docker-build-osmocom-mgw docker-build-osmocom-stp
+docker-build-osmocom-msc docker-build-osmocom-bsc: docker-build-osmocom-hlr docker-build-osmocom-mgw docker-build-osmocom-stp
 docker-build-osmocom-sgsn: docker-build-osmocom-hlr docker-build-osmocom-ggsn
 docker-build-osmocom-%: docker-build-osmocom-base
-	$(call docker-build,o5gc,osmocom,$*)
+	${DOCKER_BUILD} -m o5gc -p osmocom -i $*
 docker-build-osmocom-trx: docker-build-osmocom-base
-	$(call docker-build,o5gc,osmocom,trx,,proxy)
+	${DOCKER_BUILD} -m o5gc -p osmocom -i trx --target proxy
 	$(call docker-build-remotely,${DOCKER_RAN_HOSTS})
-docker-build-osmocom-base-% docker-build-osmocom-trx-%:
-	$(call parse-stem,$*)
-	$(call docker-build,o5gc,osmocom,$(word 4,$(subst -, ,$@)),,,,${$@_H})
+docker-build-osmocom-base-at-% docker-build-osmocom-trx-at-%:
+	${DOCKER_BUILD} -m o5gc -p osmocom -i $(word 4,$(subst -, ,$@)) --host $*
 
 docker-build-volte: docker-build-volte-kamailio docker-build-volte-fhoss      \
                     docker-build-volte-dns docker-build-volte-rtpengine
 	docker image ls o5gc/volte-*
 docker-build-volte-%: docker-build-o5gc-base
-	$(call docker-build,o5gc,volte/$*)
+	${DOCKER_BUILD} -m o5gc -p volte/$*
 
-docker-build-ueransim: docker-build-o5gc-base
-	$(call docker-build,o5gc,ueransim)
-
-docker-build-simcard: docker-build-o5gc-base
-	$(call docker-build,o5gc,simcard)
-
-docker-build-packetrusher: docker-build-o5gc-base
-	$(call docker-build,o5gc,packetrusher)
-
-docker-build-mysql: docker-build-o5gc-base
-	$(call docker-build,o5gc,mysql)
-
-docker-build-free5gc: docker-build-o5gc-base
-	$(call docker-build,o5gc,free5gc)
+docker-build-ueransim docker-build-simcard docker-build-packetrusher          \
+docker-build-mysql docker-build-free5gc: docker-build-o5gc-base
+	${DOCKER_BUILD} -m o5gc -p $@
 
 docker-build-misc-falcon docker-build-misc-sigdigger                          \
 docker-build-misc-gr-osmosdr docker-build-misc-ltesniffer                     \
 docker-build-misc-swagger: docker-build-o5gc-base
-	$(call docker-build,o5gc,misc,$(subst docker-build-misc-,,$@))
+	${DOCKER_BUILD} -m o5gc -p misc -i $@
 
 run-oai-5g-basic: .create-running-env  ##
 	export OAI_CN5G_TYPE=basic;                                               \
