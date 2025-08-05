@@ -20,7 +20,7 @@ ln -s ${config} -t /openair-${service}/etc
 
 cat /etc/image_version
 
-wait-for-it ${MYSQL_IP_ADDR}:3306
+wait-for-it -t 30 ${MYSQL_IP_ADDR}:3306
 [[ "${service}" != "nrf" ]] && wait-for-it -t 30 ${NRF_IP_ADDR}:7777
 [[ "${service}" == "smf" ]] && retry --until=success --times=10 --delay=1 -- nc -v -z -u  ${UPF_IP_ADDR} 2152
 
