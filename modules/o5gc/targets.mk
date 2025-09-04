@@ -78,6 +78,9 @@ docker-build-misc-falcon docker-build-misc-sigdigger                          \
 docker-build-misc-gr-osmosdr docker-build-misc-ltesniffer                     \
 docker-build-misc-swagger: docker-build-o5gc-base
 	$(call docker-build,o5gc,misc,$(subst docker-build-misc-,,$@))
+docker-build-misc-nrscope: docker-build-o5gc-base
+	$(call docker-build,o5gc,srsran/4g,,,develop,develop)
+	$(call docker-build,o5gc,misc,nrscope)
 
 run-oai-5g-basic: .create-running-env  ##
 	export OAI_CN5G_TYPE=basic;                                               \
@@ -206,8 +209,8 @@ lbgpsdo-list lbgpsdo-status lbgpsdo-detail:
 	    --volume="/dev/bus/usb:/dev/bus/usb" --env LANG=C.UTF-8               \
 	  o5gc/misc-lbgpsdo $(subst lbgpsdo-,,$@)
 
-develop-srsran-build develop-srsran-start develop-srsran-stop                 \
-develop-srsran-tag-latest develop-srsran-untag-latest                         \
+develop-srsran-4g-build develop-srsran-4g-start develop-srsran-4g-stop        \
+develop-srsran-4g-tag-latest develop-srsran-4g-untag-latest                   \
 develop-open5gs-build develop-open5gs-start develop-open5gs-stop              \
 develop-open5gs-tag-latest develop-open5gs-untag-latest:
 	$(MAKE) .$@
