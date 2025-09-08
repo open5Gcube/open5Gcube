@@ -1,4 +1,5 @@
 #!/bin/bash
+
 term_handler()
 {
     /etc/init.d/apt-cacher-ng stop
@@ -8,7 +9,7 @@ term_handler()
     exit 0
 }
 
-set -ex
+set -e
 
 trap 'term_handler' SIGTERM
 
@@ -17,6 +18,10 @@ cat << EOT >> /etc/default/apt-cacher-ng
 USER=$(id -u)
 GROUP=$(id -g)
 EOT
+# configure http prxy
+[ -n "${http_proxy}" ] && echo "Proxy: ${http_proxy}" >> /etc/apt-cacher-ng/acng.conf
+
+set -x
 
 /etc/init.d/apt-cacher-ng start
 

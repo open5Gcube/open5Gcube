@@ -5,6 +5,7 @@ docker-build-o5gc-build-cacher:
 	    --tag o5gc/build-cacher                                               \
 	    --label ${OCI_IMG_KEY}.created="$(shell date --rfc-3339=seconds)"     \
 	    --build-arg SYNC_CACHES="${SYNC_CACHES}"                              \
+	    $(if ${http_proxy},--build-arg http_proxy=${http_proxy},)             \
 	  ./modules/base/docker/o5gc
 
 build-cacher-start: docker-build-o5gc-build-cacher

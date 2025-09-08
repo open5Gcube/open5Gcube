@@ -1,5 +1,7 @@
 FROM node:16-bullseye
 
+ARG http_proxy
+
 RUN git clone https://github.com/jonasmalacofilho/git-cache-http-server       \
     && cd git-cache-http-server                                               \
     && npm install                                                            \
@@ -29,7 +31,8 @@ RUN chmod 666 /etc/default/apt-cacher-ng /etc/apt-cacher-ng/*                 \
                "PidFile: /tmp/apt-cacher-ng/pid\n"                            \
                "PassThroughPattern: .*\n"                                     \
                "LogDir:\n"                                                    \
-        >> /etc/apt-cacher-ng/acng.conf
+        >> /etc/apt-cacher-ng/acng.conf                                       \
+    && chmod 666 /etc/apt-cacher-ng/acng.conf
 
 COPY build-cacher-entrypoint.sh /
 CMD ["/build-cacher-entrypoint.sh"]
