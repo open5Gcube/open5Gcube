@@ -12,10 +12,10 @@ RUN apt-get.sh install                                                        \
         libyaml-cpp-dev libgtest-dev libboost-dev libzmq3-dev
 
 # Install UHD for USRP support
-RUN add-apt-repository -y ppa:ettusresearch/uhd                               \
-    && apt-get.sh install libuhd-dev uhd-host                                 \
-    && ldconfig                                                               \
-    && /usr/lib/uhd/utils/uhd_images_downloader.py -t "x310|b2"
+ARG UHD_VERSION=4.4
+RUN sync-cache.sh download srsran-project ccache                              \
+    && install-uhd.sh ${UHD_VERSION}                                          \
+    && sync-cache.sh upload srsran-project ccache
 
 RUN pip3 install --no-cache-dir nrarfcn
 

@@ -77,6 +77,8 @@ RUN --mount=type=secret,id=id_ed25519 --mount=type=secret,id=id_ed25519.pub   \
     && chmod +r id_ed25519.pub                                                \
     && cp id_ed25519.pub authorized_keys
 
+COPY install-uhd.sh /usr/local/bin/
+
 RUN echo ${BASE_IMG} > /etc/image_version                                     \
     && echo ${BUILD_HOST} > /etc/build_host
 

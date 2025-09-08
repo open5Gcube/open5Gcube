@@ -7,10 +7,10 @@ FROM proxy
 RUN apt-get.sh install libfftw3-dev libboost-system-dev
 
 # Install UHD for USRP support
-RUN add-apt-repository -y ppa:ettusresearch/uhd                               \
-    && apt-get.sh install libuhd-dev uhd-host                                 \
-    && ldconfig                                                               \
-    && /usr/lib/uhd/utils/uhd_images_downloader.py -t "x310|b2"
+ARG UHD_VERSION=4.4
+RUN sync-cache.sh download osmocom-trx ccache                                 \
+    && install-uhd.sh ${UHD_VERSION}                                          \
+    && sync-cache.sh upload osmocom-trx ccache
 
 ARG OSMO_TRX_VERSION=1.6.1
 

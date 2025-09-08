@@ -7,10 +7,10 @@ RUN apt-get.sh install                                                        \
         libsctp-dev libzmq3-dev
 
 # Install UHD for USRP support
-RUN add-apt-repository -y ppa:ettusresearch/uhd                               \
-    && apt-get.sh install libuhd-dev uhd-host                                 \
-    && ldconfig                                                               \
-    && /usr/lib/uhd/utils/uhd_images_downloader.py -t "x310|b2"
+ARG UHD_VERSION=4.4
+RUN sync-cache.sh download misc-falcon ccache                                 \
+    && install-uhd.sh ${UHD_VERSION}                                          \
+    && sync-cache.sh upload misc-falcon ccache
 
 # Clone and build srsGUI
 RUN apt-get.sh install                                                        \
