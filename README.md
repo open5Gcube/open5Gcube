@@ -1,6 +1,6 @@
 <div id="top">
   <p align="center">
-    <img src="Doc/img/o5gc_logo.png" width="70%">
+    <img src="Doc/img/o5gc_logo.svg" width="70%">
   </p>
 </div>
 
