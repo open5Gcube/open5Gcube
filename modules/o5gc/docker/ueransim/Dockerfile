@@ -4,7 +4,7 @@ FROM o5gc/o5gc-base:jammy
 RUN apt-get.sh install libsctp-dev lksctp-tools
 
 # Clone and build UERANSIM
-ENV UERANSIM_VERSION=3.2.6
+ENV UERANSIM_VERSION=3.2.7
 
 RUN git clone --branch v${UERANSIM_VERSION}                                   \
         https://github.com/aligungr/UERANSIM ueransim
