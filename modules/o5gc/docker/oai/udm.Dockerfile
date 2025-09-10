@@ -8,7 +8,7 @@ RUN git clone --branch v${OAI_CN5G_VERSION} --depth 1                         \
 WORKDIR /o5gc/oai-cn5g-udm
 
 RUN sync-cache.sh download oai-udm ccache                                     \
-    && apt-get.sh install libcrypto++-dev libgtest-dev python-setuptools      \
+    && apt-get.sh install libcrypto++-dev libgtest-dev                        \
     && cd build/scripts                                                       \
     && ./build_udm --install-deps --force                                     \
     && ./build_udm --clean --Verbose --build-type Release --jobs              \

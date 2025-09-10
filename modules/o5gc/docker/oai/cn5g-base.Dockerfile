@@ -13,13 +13,12 @@ RUN git config --global --add                                                 \
 # Hack to install common packages
 RUN git clone --branch v${OAI_CN5G_VERSION} --depth 1 --recurse-submodules    \
         https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-pcf.git tmp               \
-    && pushd /usr/local/bin/                                                  \
-    && ln -s /usr/bin/false git                                               \
-    && popd                                                                   \
     && pushd tmp/build/scripts                                                \
-    && ./build_pcf --install-deps --force || true                             \
+    && sync-cache.sh download oai-cn5g-base ccache                            \
+    && ./build_pcf --install-deps --force                                     \
+    && sync-cache.sh upload oai-cn5g-base ccache                              \
     && popd                                                                   \
-    && rm -rf tmp /usr/local/bin/git
+    && rm -rf tmp
 
 RUN cached-download.sh                                                        \
         https://github.com/mikefarah/yq/releases/download/v4.45.1/yq_linux_amd64 /usr/local/bin/yq && \
