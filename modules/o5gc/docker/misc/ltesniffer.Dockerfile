@@ -1,29 +1,15 @@
 FROM o5gc/o5gc-base:jammy
 
-RUN apt-get.sh install                                                        \
-        libboost-dev libboost-chrono-dev libboost-date-time-dev               \
-        libboost-filesystem-dev libboost-program-options-dev                  \
-        libboost-thread-dev libboost-test-dev libncurses5-dev
-
+# Install UHD for USRP support
 ARG UHD_VERSION=4.6
-
-RUN git clone --branch UHD-${UHD_VERSION} --depth 1                           \
-        https://github.com/EttusResearch/uhd.git                              \
-    && mkdir uhd/host/build                                                   \
-    && cd uhd/host/build                                                      \
-    && cmake .. -DENABLE_USRP1=OFF -DENABLE_USRP2=OFF                         \
-        -DENABLE_MAN_PAGES=OFF -DENABLE_MANUAL=OFF -DENABLE_EXAMPLES=OFF ..   \
-    && sync-cache.sh download misc-ltesniffer ccache                          \
-    && make -j $(nproc)                                                       \
-    && make test install clean                                                \
-    && ldconfig                                                               \
-    && sync-cache.sh upload misc-ltesniffer ccache                            \
-    && uhd_images_downloader -t "x310|b2"
+RUN sync-cache.sh download misc-ltesniffer ccache                             \
+    && install-uhd.sh ${UHD_VERSION}                                          \
+    && sync-cache.sh upload misc-ltesniffer ccache
 
 ARG LTESNIFFER_VERSION=2.1.0
 
 RUN apt-get.sh install                                                        \
-        libudev-dev libfftw3-dev libmbedtls-dev libconfig++-dev
+        libudev-dev libfftw3-dev libmbedtls-dev libconfig++-dev libglib2.0-dev
 
 WORKDIR /o5gc/LTESniffer
 

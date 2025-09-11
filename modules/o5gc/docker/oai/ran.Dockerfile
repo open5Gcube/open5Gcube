@@ -30,6 +30,7 @@ RUN sync-cache.sh download oai-ran ccache                                     \
     && ldconfig                                                               \
     && cd ..                                                                  \
     && ln -s cmake_targets/ran_build/build/ .                                 \
+    && apt-get.sh install libx11-dev libxft-dev libpng-dev                    \
     && make -j $(nproc) -C common/utils/T/tracer                              \
     && find ./build/ \( -name "*.a" -o -name "*.o" \) -type f -delete         \
     && rm -rf targets/bin /tmp/* /usr/local/share/doc/*                       \

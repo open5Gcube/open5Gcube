@@ -5,7 +5,7 @@ FROM o5gc/o5gc-base:focal
 
 RUN apt-get.sh install                                                        \
         libcurl4-openssl-dev rtpproxy libmnl-dev libradcli-dev libjson-c-dev  \
-        libgcrypt20-dev libnghttp2-dev rsyslog
+        libpcre2-dev libgcrypt20-dev libnghttp2-dev uuid-dev rsyslog
 
 #ENV KAMAILIO_VERSION=5.3
 
