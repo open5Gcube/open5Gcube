@@ -21,7 +21,6 @@ iptables
 iputils-ping
 isc-dhcp-client
 less
-libatlas-base-dev libblas-dev
 libc-ares-dev
 libconfig-dev
 libcurl4-gnutls-dev
@@ -51,7 +50,6 @@ ncat
 net-tools
 netbase
 netcat
-nettle-bin nettle-dev
 ninja-build
 openssh-client openssh-server
 openssl
