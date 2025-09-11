@@ -9,8 +9,8 @@ HOST_USER_GROUP_ID := $(shell echo $$(id -u):$$(id -g))
 export BASE_DIR DOCKER_HOST_BRIDGE OAI_TRACER_ENABLE HOST_USER_GROUP_ID DEFAULT_ROUTE_IFACE_IP
 EXPORT_ENV = export BASE_DIR=${BASE_DIR} DOCKER_HOST_BRIDGE=${DOCKER_HOST_BRIDGE} HOST_USER_GROUP_ID=${HOST_USER_GROUP_ID}
 
-O5GC_ENV = ${ENV_DIR}/o5gc.env
-get_env = $(shell env=$(or ${2},${O5GC_ENV}); make -s $${env}; source $${env}; echo $(foreach v,${1},$$${v}))
+O5GC_ENV = ${ENV_DIR}/base/o5gc.env
+get_env = $(shell env=$(or ${2},${O5GC_ENV}); MAKEFLAGS= make --no-print-directory -s $${env}; source $${env}; echo $(foreach v,${1},$$${v}))
 
 # thanks to https://news.ycombinator.com/item?id=11195539
 help:  ## This help
@@ -79,7 +79,7 @@ endef
 
 define docker-build-remotely
     $(foreach ver,$(if ${2},${2},latest),                                     \
-        $(MAKE) ${PARALLEL_JOBS} RUN_PARALLEL=1 $(foreach host,${1},$@-${ver}@${host}) &&) true
+    	MAKEFLAGS= $(MAKE) -j $(words ${1}) RUN_PARALLEL=1 $(foreach host,${1},$@-${ver}@${host}) &&) true
 endef
 define parse-stem
     $(eval $@_V = $(firstword $(subst @, ,${1})))
@@ -94,7 +94,7 @@ DOCKER_BUILD_ALL = $(filter-out %-build-cacher,$(filter-out %-base,$(sort     \
         | sed -E "s|./.*/docker/(.*)/([^.]*).?Dockerfile|docker-build-\1-\2|" \
         | sed -E "s|/|-|" | sed -E "s|(.*)-$$|\1|"))))
 docker-build-all: clean build-cacher-restart docker-build-o5gc-base  ## Build all Docker images
-	$(MAKE) ${PARALLEL_JOBS} RUN_PARALLEL=1 ${DOCKER_BUILD_ALL} pull-all-external-images
+	MAKEFLAGS= $(MAKE) ${PARALLEL_JOBS} RUN_PARALLEL=1 ${DOCKER_BUILD_ALL} pull-all-external-images
 	$(MAKE) docker-cleanup
 	docker image ls o5gc/* | (read h; echo "$$h"; LC_ALL=C sort)
 
@@ -116,7 +116,7 @@ DOCKER_COMPOSE = $(EXPORT_DEVELOP_VOLUMES); $(EXPORT_ENV);                    \
     export O5GC_STACK=$$(basename $${PWD});                                   \
     export MODULE=$$(realpath --relative-to=${BASE_DIR} $${PWD}|cut -d / -f2);\
     export ENV_FILE=${ENV_DIR}/$${MODULE}/$${O5GC_STACK}.env;                 \
-    $(MAKE) -s -C ${BASE_DIR} $${ENV_FILE};                                   \
+    MAKEFLAGS= $(MAKE) --no-print-directory -s -C ${BASE_DIR} $${ENV_FILE};   \
     docker compose --env-file=$${ENV_FILE}                                    \
         --file $$(ls | grep -E "docker-compose.yaml|services.yaml")           \
         --file ${BASE_DIR}/etc/networks.yaml
@@ -156,7 +156,7 @@ ${ENV_DIR}/%.env:                                                             \
         ${ENV_OVERRIDES_PATH} ${BASE_DIR}/etc/uedb.env
 	mkdir -p $(dir $@)
 	awk 1 $^ > $@
-	$(if $(findstring ${BASE_DIR}/etc/local.env,$?),$(MAKE) ignore-localenv-changes)
+	$(if $(findstring ${BASE_DIR}/etc/local.env,$?),$(MAKE) --no-print-directory -s ignore-localenv-changes)
 
 ignore-localenv-changes:
 ifneq ($(shell id -u), 0)

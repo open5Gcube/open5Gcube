@@ -1,16 +1,20 @@
 BASE_O5GC_DIR = ${MODULES_DIR}/base/docker/o5gc
+USE_BUILD_CACHER ?= $(or $(call get_env,USE_BUILD_CACHER),1)
 
 docker-build-o5gc-build-cacher:
+	if [ ${USE_BUILD_CACHER} -eq 1 ]; then                                    \
 	docker build --file ./modules/base/docker/o5gc/build-cacher.Dockerfile    \
 	    --tag o5gc/build-cacher                                               \
 	    --label ${OCI_IMG_KEY}.created="$(shell date --rfc-3339=seconds)"     \
 	    --build-arg SYNC_CACHES="${SYNC_CACHES}"                              \
-	  ./modules/base/docker/o5gc
-
+	  ./modules/base/docker/o5gc;                                             \
+	fi
 build-cacher-start: docker-build-o5gc-build-cacher
 	mkdir -p $(foreach cache,${CACHES},var/cache/${cache})
 	cd ${BASE_O5GC_DIR};                                                      \
-	$(DOCKER_COMPOSE) --profile=build-cacher up --detach
+	if [ ${USE_BUILD_CACHER} -eq 1 ]; then                                    \
+	$(DOCKER_COMPOSE) --profile=build-cacher up --detach;                     \
+	fi
 build-cacher-stop:
 	cd ${BASE_O5GC_DIR};                                                      \
 	$(DOCKER_COMPOSE) --profile=build-cacher down || true
@@ -26,7 +30,7 @@ docker-build-o5gc-base:
 	docker image ls o5gc/o5gc-base
 docker-build-o5gc-base-%: .docker-build-prerequisites
 	$(call parse-stem,$*)
-	$(call docker-build,base,o5gc,base,BUILD_HOST=${$@_H} BASE_IMG=${$@_V} TZ=$(TZ),,${$@_V},${$@_H})
+	$(call docker-build,base,o5gc,base,USE_BUILD_CACHER=${USE_BUILD_CACHER} BUILD_HOST=${$@_H} BASE_IMG=${$@_V} TZ=$(TZ),,${$@_V},${$@_H})
 
 docker-build-o5gc-mkdocs:
 	$(call docker-build,base,o5gc,mkdocs)

@@ -1,13 +1,13 @@
-FROM node:16-bullseye
+FROM node:16-bullseye-slim
+
+RUN apt-get update                                                            \
+    && DEBIAN_FRONTEND=noninteractive                                         \
+       apt-get install --no-install-recommends -y git ca-certificates apt-cacher-ng rsync
 
 RUN git clone https://github.com/jonasmalacofilho/git-cache-http-server       \
     && cd git-cache-http-server                                               \
     && npm install                                                            \
     && npm install --global
-
-RUN apt-get update                                                            \
-&& DEBIAN_FRONTEND=noninteractive                                             \
-    apt-get install --no-install-recommends -y apt-cacher-ng rsync
 
 # make /bin/sh symlink to bash instead of dash
 RUN echo "dash dash/sh boolean false" | debconf-set-selections                \

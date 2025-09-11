@@ -62,6 +62,12 @@ the building of the actual images by incorporating the following features:
   avoiding repeated fetches.
 ``Downloads``: Large downloaded files are cached to accelerate subsequent builds.
 
+The usage of the cacher can be disabled in the installation specific settings file 
+  [``etc/local.env``](user_guide.md#localenv) by setting
+```shell
+USE_BUILD_CACHER=0
+```
+
 All Docker images specific follow a standardized naming convention within the ``o5gc/``
 namespace. Examples include images like ``o5gc/oai-amf`` for example. These images are versioned
 to reflect the project version, such as ``o5gc/oai-amf:1.4.0``. The ``latest`` tag is assigned
