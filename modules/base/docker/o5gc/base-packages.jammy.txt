@@ -31,7 +31,6 @@ libgnutls28-dev
 libjansson-dev
 libjemalloc-dev
 libmysqlclient-dev
-libpython2.7-dev
 libsctp-dev libsctp1
 libssl-dev
 libsystemd-dev
@@ -75,5 +74,3 @@ usbutils
 vim
 wait-for-it
 wget
-xmlstarlet
-xxd
