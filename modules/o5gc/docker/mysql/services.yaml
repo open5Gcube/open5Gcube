@@ -10,6 +10,8 @@ services:
         networks:
             corenet:
                 ipv4_address: ${MYSQL_IP_ADDR}
+        healthcheck:
+            test: bash -c "exec 6<> /dev/tcp/localhost/3306"
 
     phpmyadmin:
         profiles: ["phpmyadmin"]
