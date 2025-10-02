@@ -10,6 +10,8 @@ services:
             - 40860:873
         volumes:
             - ${BASE_DIR}/var/cache:/var/cache
+            - /etc/passwd:/etc/passwd:ro
+            - /etc/group:/etc/group:ro
         user: ${HOST_USER_GROUP_ID}
         restart: always
 
