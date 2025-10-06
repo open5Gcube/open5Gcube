@@ -23,6 +23,12 @@ RUN cached-download.sh                                                        \
     && ln -s /usr/local/apache-ant-1.9.14/bin/ant /usr/bin/ant
 ENV ANT_HOME="/usr/local/apache-ant-1.9.14"
 
+# Install old MySQL
+RUN echo "deb http://repo.mysql.com/apt/ubuntu bionic mysql-5.7" >> /etc/apt/sources.list.d/mysql.list \
+    && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B7B3B788A8D3785C \
+    && apt-get.sh purge mysql-client                                          \
+    && apt-get.sh install mysql-client=5.7* mysql-community-server=5.7* mysql-server=5.7*
+
 # Install FHoSS
 ENV FHOSS_REVERSION=4ffa54b
 

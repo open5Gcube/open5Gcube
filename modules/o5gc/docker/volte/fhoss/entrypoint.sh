@@ -16,9 +16,13 @@ adjust_conf_files () {
 }
 
 init_database () {
-    export MYSQL_HOST=${MYSQL_IP_ADDR}
+    export MYSQL_HOST=localhost
     export MYSQL_USER=root
-    export MYSQL_PWD=${MYSQL_ROOT_PASSWORD}
+    export MYSQL_PWD=
+
+    service mysql start
+    wait-for-it 127.0.01:3306
+    sleep 1
 
     mysql -e "create database hss_db;"
     mysql hss_db < scripts/hss_db.sql
@@ -125,9 +129,6 @@ add_subscriptions () {
 }
 
 adjust_conf_files
-
-wait-for-it ${MYSQL_IP_ADDR}:3306
-sleep 1
 
 init_database
 

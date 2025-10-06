@@ -42,7 +42,13 @@ services:
             service: kamailio
         container_name: icscf
         command: icscf
-        depends_on: [volte-dns, mysql, fhoss]
+        depends_on:
+            volte-dns:
+                condition: service_started
+            fhoss:
+                condition: service_started
+            mysql:
+                condition: service_healthy
         networks:
             corenet:
                 ipv4_address: ${ICSCF_IP_ADDR}
@@ -52,7 +58,17 @@ services:
             service: kamailio
         container_name: pcscf
         command: pcscf
-        depends_on: [volte-dns, mysql, rtpengine, icscf, scscf]
+        depends_on:
+            volte-dns:
+                condition: service_started
+            rtpengine:
+                condition: service_started
+            icscf:
+                condition: service_started
+            scscf:
+                condition: service_started
+            mysql:
+                condition: service_healthy
         networks:
             corenet:
                 ipv4_address: ${PCSCF_IP_ADDR}
@@ -62,7 +78,13 @@ services:
             service: kamailio
         container_name: scscf
         command: scscf
-        depends_on: [volte-dns, mysql, fhoss]
+        depends_on:
+            volte-dns:
+                condition: service_started
+            mysql:
+                condition: service_healthy
+            fhoss:
+                condition: service_healthy
         networks:
             corenet:
                 ipv4_address: ${SCSCF_IP_ADDR}
@@ -73,7 +95,11 @@ services:
         profiles: ["smsc"]
         container_name: smsc
         command: smsc
-        depends_on: [volte-dns, mysql]
+        depends_on:
+            volte-dns:
+                condition: service_started
+            mysql:
+                condition: service_healthy
         networks:
             corenet:
                 ipv4_address: ${SMSC_IP_ADDR}
@@ -95,7 +121,7 @@ services:
             service: base
         image: o5gc/volte-fhoss
         container_name: fhoss
-        depends_on: [volte-dns, mysql]
+        depends_on: [volte-dns]
         labels:
             o5gc.link.title: "FHOSS"
             o5gc.link.url: "http://{{host}}:${FHOSS_HOST_PORT}/"
@@ -109,6 +135,8 @@ services:
             - SMS_DOMAIN=${SMS_DOMAIN:-SMS-over-IMS}
         entrypoint: ["/mnt/volte/fhoss/entrypoint.sh"]
         dns: ${VOLTE_DNS_IP_ADDR}
+        healthcheck:
+            test: bash -c "exec 6<> /dev/tcp/localhost/8080"
 
     pyhss:
         extends:

@@ -55,6 +55,7 @@ services:
             - ME_CONFIG_BASICAUTH=false
             - ME_CONFIG_BASICAUTH_USERNAME=
             - ME_CONFIG_MONGODB_URL=mongodb://${MONGO_IP_ADDR}:27017
+        depends_on: [mongo]
 
     init:
         extends:
@@ -67,6 +68,7 @@ services:
         entrypoint: /mnt/open5gs/init-subscribers.sh
         networks:
             - corenet
+        depends_on: [open5gs-webui]
 
     webui:
         extends:
@@ -86,6 +88,7 @@ services:
             o5gc:
         ports:
             - ${OPEN5GS_WEBUI_HOST_PORT}:3000
+        depends_on: [mongo]
         healthcheck:
             test: /bin/bash -c "curl --fail http://${OPEN5GS_WEBUI_IP_ADDR}:3000 || exit 1"
             interval: 10s
@@ -182,6 +185,7 @@ services:
         networks:
             corenet:
                 ipv4_address: ${HSS_IP_ADDR}
+        depends_on: [mongo]
 
     sgwc:
         extends:
@@ -192,6 +196,7 @@ services:
         networks:
             corenet:
                 ipv4_address: ${SPGWC_IP_ADDR}
+        depends_on: [smf, upf]
 
     sgwu:
         extends:
@@ -204,6 +209,7 @@ services:
         networks:
             corenet:
                 ipv4_address: ${SPGWU_IP_ADDR}
+        depends_on: [smf, upf]
 
     smf:
         extends:
@@ -241,6 +247,7 @@ services:
                     - monitor-capture-host
             extnet:
                 ipv4_address: ${UPF_EXT_IP_ADDR}
+        depends_on: [smf]
 
     amf:
         extends:
@@ -285,6 +292,7 @@ services:
         networks:
             corenet:
                 ipv4_address: ${PCRF_IP_ADDR}
+        depends_on: [mongo]
 
     scp:
         extends:
