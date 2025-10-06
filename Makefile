@@ -265,7 +265,7 @@ lazydocker:
 
 lint:
 	$(MAKE) --ignore-errors shellcheck yamllint codespell hadolint            \
-	    markdownlint space-end-check cargo-machete
+	    dclint markdownlint space-end-check cargo-machete
 
 SHELLCHECK_FILES = $(filter-out %-healthcheck.sh %/wait-for-it.sh,            \
                        $(shell find modules/ etc/ scripts/ -name '*.sh' -not -path '*/node_modules/*'))
@@ -277,9 +277,9 @@ shellcheck:
 	    -e SHELLCHECK_OPTS="$(foreach rule,${SHELLCHECK_IGNORE},-e ${rule})"  \
 	  koalaman/shellcheck:stable ${SHELLCHECK_FILES}
 
-YAMLLINT_FILES = $(wildcard modules/*/stacks/*/docker-compose.yaml)           \
-                 $(shell find modules/*/docker/ -name services.yaml)          \
-                 etc/networks.yaml Doc/mkdocs.yml
+DC_FILES = $(wildcard modules/*/stacks/*/docker-compose.yaml)                 \
+           $(shell find modules/*/docker/ -name services.yaml)
+YAMLLINT_FILES = ${DC_FILES} etc/networks.yaml Doc/mkdocs.yml
 YAMLLINT_CONFIG = "{extends: default, rules: {comments-indentation: disable,  \
     document-start: {present: false}, line-length: {max: 120}}}"
 yamllint:
@@ -296,6 +296,11 @@ hadolint:
 	@docker run --rm --volume ${BASE_DIR}:${BASE_DIR}                         \
 	  hadolint/hadolint hadolint                                              \
 	    $(foreach rule,${HADOLINT_IGNORE},--ignore ${rule}) ${DOCKER_FILES}
+
+dclint:
+	@echo Running dclint
+	@docker run --rm --volume ${BASE_DIR}:/app                                \
+	  zavoloklom/dclint -c scripts/dclintrc ${DC_FILES}
 
 MD_FILES = $(wildcard ${BASE_DIR}/Doc/*.md)
 MD_IGNORE = ~MD001,~MD002,~MD022,~MD031,~MD032,~MD041

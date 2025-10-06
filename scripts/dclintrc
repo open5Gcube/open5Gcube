@@ -1,0 +1,32 @@
+{
+  "rules": {
+    "services-alphabetical-order": 0,
+    "service-image-require-explicit-tag": 0,
+    "require-project-name-field": 0,
+    "no-unbound-port-interfaces": 0,
+    "require-quotes-in-ports": 0,
+    "service-keys-order": [ 2, {
+        "groupOrder": [
+          "Core Definitions",
+          "Service Dependencies",
+          "Runtime Behavior",
+          "Environment Configuration",
+          "Data Management and Configuration",
+          "Networking",
+          "Operational Metadata",
+          "Security and Execution Context",
+          "Others"
+        ],
+        "groups": {
+          "Core Definitions": [ "extends", "image", "build", "container_name" ],
+          "Environment Configuration": [ "env_file", "environment" ],
+          "Networking": [ "domainname", "hostname", "networks", "network_mode", "ports", "extra_hosts" ],
+          "Runtime Behavior": [ "entrypoint", "command", "init", "privileged", "working_dir" ],
+          "Others": [ "profiles", "restart", "healthcheck" ]
+        }
+    } ],
+    "top-level-properties-order": [ 2, {
+        "customOrder": ["x-properties", "networks", "services", "volumes", "configs", "secrets" ]
+    } ]
+  }
+}

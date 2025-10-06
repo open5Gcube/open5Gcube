@@ -1,208 +1,208 @@
 services:
-    mysql:
-        extends:
-            file: ${DOCKER}/mysql/services.yaml
-            service: mysql
-        profiles: ["core"]
-        volumes:
-            - ./mysql-healthcheck.sh:/tmp/mysql-healthcheck.sh:ro
-            - ./oai_db.${OAI_CN5G_TYPE:-none}.sql:/docker-entrypoint-initdb.d/oai_db.sql:ro
-            - ./cn5g-init.sh:/docker-entrypoint-initdb.d/zz_cn5g-init.sh:ro
-        environment:
-            - MYSQL_DATABASE=oai_db
-            - OAI_CN5G_TYPE
-        healthcheck:
-            test: /bin/bash -c "/tmp/mysql-healthcheck.sh"
-            interval: 10s
-            timeout: 5s
-            retries: 5
+  mysql:
+    extends:
+      file: ${DOCKER}/mysql/services.yaml
+      service: mysql
+    environment:
+      - MYSQL_DATABASE=oai_db
+      - OAI_CN5G_TYPE
+    volumes:
+      - ./mysql-healthcheck.sh:/tmp/mysql-healthcheck.sh:ro
+      - ./oai_db.${OAI_CN5G_TYPE:-none}.sql:/docker-entrypoint-initdb.d/oai_db.sql:ro
+      - ./cn5g-init.sh:/docker-entrypoint-initdb.d/zz_cn5g-init.sh:ro
+    profiles: [ "core" ]
+    healthcheck:
+      test: /bin/bash -c "/tmp/mysql-healthcheck.sh"
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-    core-base:
-        profiles: ["core"]
-        labels:
-            o5gc.corenetwork-function: true
-            o5gc.stack: ${O5GC_STACK}
-            o5gc.webui.priority: ${WEBUI_PRIO_CORE_DEFAULT}
-        env_file: ["${ENV_FILE}"]
-        init: true
-        entrypoint: ["/mnt/oai/cn5g-entrypoint.sh"]
-        volumes:
-            - ./cn5g-entrypoint.sh:/mnt/oai/cn5g-entrypoint.sh:ro
-            - ./cn5g.yaml:/mnt/oai/cn5g.yaml:ro
+  core-base:
+    entrypoint: [ "/mnt/oai/cn5g-entrypoint.sh" ]
+    init: true
+    env_file: [ "${ENV_FILE}" ]
+    volumes:
+      - ./cn5g-entrypoint.sh:/mnt/oai/cn5g-entrypoint.sh:ro
+      - ./cn5g.yaml:/mnt/oai/cn5g.yaml:ro
+    labels:
+      o5gc.corenetwork-function: true
+      o5gc.stack: ${O5GC_STACK}
+      o5gc.webui.priority: ${WEBUI_PRIO_CORE_DEFAULT}
+    profiles: [ "core" ]
 
-    nrf:
-        extends:
-            service: core-base
-        container_name: "nrf"
-        image: o5gc/oai-nrf:${OAI_CN5G_VERSION:-latest}
-        command: nrf
-        networks:
-            corenet:
-                ipv4_address: ${NRF_IP_ADDR}
+  nrf:
+    extends:
+      service: core-base
+    image: o5gc/oai-nrf:${OAI_CN5G_VERSION:-latest}
+    container_name: "nrf"
+    command: nrf
+    networks:
+      corenet:
+        ipv4_address: ${NRF_IP_ADDR}
 
-    amf:
-        extends:
-            service: core-base
-        container_name: "amf"
-        image: o5gc/oai-amf:${OAI_CN5G_VERSION:-latest}
-        command: amf
-        labels:
-            o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
-        networks:
-            corenet:
-                ipv4_address: ${AMF_IP_ADDR}
+  amf:
+    extends:
+      service: core-base
+    image: o5gc/oai-amf:${OAI_CN5G_VERSION:-latest}
+    container_name: "amf"
+    command: amf
+    networks:
+      corenet:
+        ipv4_address: ${AMF_IP_ADDR}
+    labels:
+      o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
 
-    smf:
-        extends:
-            service: core-base
-        container_name: "smf"
-        image: o5gc/oai-smf:${OAI_CN5G_VERSION:-latest}
-        command: smf
-        labels:
-            o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
-        networks:
-            corenet:
-                ipv4_address: ${SMF_IP_ADDR}
+  smf:
+    extends:
+      service: core-base
+    image: o5gc/oai-smf:${OAI_CN5G_VERSION:-latest}
+    container_name: "smf"
+    command: smf
+    networks:
+      corenet:
+        ipv4_address: ${SMF_IP_ADDR}
+    labels:
+      o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
 
-    udr:
-        extends:
-            service: core-base
-        container_name: "udr"
-        image: o5gc/oai-udr:${OAI_CN5G_VERSION:-latest}
-        command: udr
-        networks:
-            corenet:
-                ipv4_address: ${UDR_IP_ADDR}
+  udr:
+    extends:
+      service: core-base
+    image: o5gc/oai-udr:${OAI_CN5G_VERSION:-latest}
+    container_name: "udr"
+    command: udr
+    networks:
+      corenet:
+        ipv4_address: ${UDR_IP_ADDR}
 
-    udm:
-        extends:
-            service: core-base
-        container_name: "udm"
-        image: o5gc/oai-udm:${OAI_CN5G_VERSION:-latest}
-        command: udm
-        networks:
-            corenet:
-                ipv4_address: ${UDM_IP_ADDR}
+  udm:
+    extends:
+      service: core-base
+    image: o5gc/oai-udm:${OAI_CN5G_VERSION:-latest}
+    container_name: "udm"
+    command: udm
+    networks:
+      corenet:
+        ipv4_address: ${UDM_IP_ADDR}
 
-    ausf:
-        extends:
-            service: core-base
-        container_name: "ausf"
-        image: o5gc/oai-ausf:${OAI_CN5G_VERSION:-latest}
-        command: ausf
-        networks:
-            corenet:
-                ipv4_address: ${AUSF_IP_ADDR}
+  ausf:
+    extends:
+      service: core-base
+    image: o5gc/oai-ausf:${OAI_CN5G_VERSION:-latest}
+    container_name: "ausf"
+    command: ausf
+    networks:
+      corenet:
+        ipv4_address: ${AUSF_IP_ADDR}
 
-    upf:
-        extends:
-            service: core-base
-        container_name: "upf"
-        image: o5gc/oai-upf:${OAI_CN5G_VERSION:-latest}
-        command: upf
-        privileged: true
-        networks:
-            extnet:
-                ipv4_address: ${UPF_EXT_IP_ADDR}  # eth0
-            corenet:
-                ipv4_address: ${UPF_IP_ADDR}  # eth1
-                aliases:
-                    - monitor-capture-host
+  upf:
+    extends:
+      service: core-base
+    image: o5gc/oai-upf:${OAI_CN5G_VERSION:-latest}
+    container_name: "upf"
+    command: upf
+    privileged: true
+    networks:
+      extnet:
+        ipv4_address: ${UPF_EXT_IP_ADDR} # eth0
+      corenet:
+        ipv4_address: ${UPF_IP_ADDR} # eth1
+        aliases:
+          - monitor-capture-host
 
-    oai-ran:
-        image: o5gc/oai-ran
-        privileged: true
-        profiles: ["oai-ran"]
-        init: true
-        labels:
-            o5gc.stack: ${O5GC_STACK}
-            o5gc.webui.priority: ${WEBUI_PRIO_RAN}
-        volumes:
-            - ./ran-entrypoint.sh:/o5gc/openairinterface5g/ran-entrypoint.sh:ro
-            - ${BASE}/scripts/band_helper.py:/o5gc/openairinterface5g/scripts/band_helper.py:ro
-            - ${BASE}/scripts/docker-remote.sh:/docker-remote.sh:ro
-            - ${BASE}:/tmp/o5gc:ro
-            - ${HOME}/.ssh:/mnt/.ssh:ro
-            - /var/run/docker.sock:/var/run/docker.sock:ro
-            - /dev/bus/usb:/dev/bus/usb
-        env_file: ["${ENV_FILE}"]
-        environment:
-            - OAI_RFSIM_ENABLE
-            - OAI_TRACER_ENABLE
-            - UHD_IMAGE_LOADER
-        entrypoint: /o5gc/openairinterface5g/ran-entrypoint.sh
+  oai-ran:
+    image: o5gc/oai-ran
+    entrypoint: /o5gc/openairinterface5g/ran-entrypoint.sh
+    init: true
+    privileged: true
+    env_file: [ "${ENV_FILE}" ]
+    environment:
+      - OAI_RFSIM_ENABLE
+      - OAI_TRACER_ENABLE
+      - UHD_IMAGE_LOADER
+    volumes:
+      - ./ran-entrypoint.sh:/o5gc/openairinterface5g/ran-entrypoint.sh:ro
+      - ${BASE}/scripts/band_helper.py:/o5gc/openairinterface5g/scripts/band_helper.py:ro
+      - ${BASE}/scripts/docker-remote.sh:/docker-remote.sh:ro
+      - ${BASE}:/tmp/o5gc:ro
+      - ${HOME}/.ssh:/mnt/.ssh:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /dev/bus/usb:/dev/bus/usb
+    labels:
+      o5gc.stack: ${O5GC_STACK}
+      o5gc.webui.priority: ${WEBUI_PRIO_RAN}
+    profiles: [ "oai-ran" ]
 
-    enb:
-        extends:
-            service: oai-ran
-        container_name: enb
-        profiles: ["enb"]
-        environment:
-            - DOCKER_TARGET_HOSTNAME=${ENB_HOSTNAME}
-        networks:
-            rfnet:
-                ipv4_address: ${ENB_RF_IP_ADDR}
-            corenet:
-                ipv4_address: ${ENB_IP_ADDR}
+  enb:
+    extends:
+      service: oai-ran
+    container_name: enb
+    environment:
+      - DOCKER_TARGET_HOSTNAME=${ENB_HOSTNAME}
+    networks:
+      rfnet:
+        ipv4_address: ${ENB_RF_IP_ADDR}
+      corenet:
+        ipv4_address: ${ENB_IP_ADDR}
+    profiles: [ "enb" ]
 
-    gnb:
-        extends:
-            service: oai-ran
-        container_name: gnb
-        profiles: ["gnb"]
-        environment:
-            - DOCKER_TARGET_HOSTNAME=${GNB_HOSTNAME}
-        networks:
-            rfnet:
-                ipv4_address: ${GNB_RF_IP_ADDR}
-            corenet:
-                ipv4_address: ${GNB_IP_ADDR}
+  gnb:
+    extends:
+      service: oai-ran
+    container_name: gnb
+    environment:
+      - DOCKER_TARGET_HOSTNAME=${GNB_HOSTNAME}
+    networks:
+      rfnet:
+        ipv4_address: ${GNB_RF_IP_ADDR}
+      corenet:
+        ipv4_address: ${GNB_IP_ADDR}
+    profiles: [ "gnb" ]
 
-    ue:
-        image: o5gc/oai-ran
-        privileged: true
-        container_name: ue
-        profiles: ["ue"]
-        volumes:
-            - ./ran-entrypoint.sh:/o5gc/openairinterface5g/ran-entrypoint.sh:ro
-            - ${BASE}/scripts/band_helper.py:/o5gc/openairinterface5g/scripts/band_helper.py:ro
-            - /dev/bus/usb:/dev/bus/usb
-        env_file: ["${ENV_FILE}"]
-        environment:
-            - OAI_RFSIM_ENABLE
-        entrypoint: /o5gc/openairinterface5g/ran-entrypoint.sh
+  ue:
+    image: o5gc/oai-ran
+    container_name: ue
+    entrypoint: /o5gc/openairinterface5g/ran-entrypoint.sh
+    privileged: true
+    env_file: [ "${ENV_FILE}" ]
+    environment:
+      - OAI_RFSIM_ENABLE
+    volumes:
+      - ./ran-entrypoint.sh:/o5gc/openairinterface5g/ran-entrypoint.sh:ro
+      - ${BASE}/scripts/band_helper.py:/o5gc/openairinterface5g/scripts/band_helper.py:ro
+      - /dev/bus/usb:/dev/bus/usb
+    profiles: [ "ue" ]
 
-    oai-ran-tracer:
-        image: o5gc/oai-ran
-        privileged: true
-        container_name: oai-ran-tracer
-        profiles: ["oai-ran-tracer"]
-        entrypoint: /o5gc/openairinterface5g/ran-entrypoint.sh
-        command: tracer ${OAI_TRACEE:-}
-        volumes:
-            - ./ran-entrypoint.sh:/o5gc/openairinterface5g/ran-entrypoint.sh:ro
-            - ${BASE}/scripts/band_helper.py:/o5gc/openairinterface5g/scripts/band_helper.py:ro
-            - /tmp/.X11-unix:/tmp/.X11-unix
-            - ${HOME}/.Xauthority:/root/.Xauthority:rw
-        env_file: ["${ENV_FILE}"]
-        environment:
-            - DISPLAY
-        networks:
-            - corenet
+  oai-ran-tracer:
+    image: o5gc/oai-ran
+    container_name: oai-ran-tracer
+    entrypoint: /o5gc/openairinterface5g/ran-entrypoint.sh
+    command: tracer ${OAI_TRACEE:-}
+    privileged: true
+    env_file: [ "${ENV_FILE}" ]
+    environment:
+      - DISPLAY
+    volumes:
+      - ./ran-entrypoint.sh:/o5gc/openairinterface5g/ran-entrypoint.sh:ro
+      - ${BASE}/scripts/band_helper.py:/o5gc/openairinterface5g/scripts/band_helper.py:ro
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ${HOME}/.Xauthority:/root/.Xauthority:rw
+    networks:
+      - corenet
+    profiles: [ "oai-ran-tracer" ]
 
-    oai-ran-macpdu2wireshark:
-        image: o5gc/oai-ran
-        privileged: true
-        container_name: oai-ran-macpdu2wireshark
-        profiles: ["oai-ran-macpdu2wireshark"]
-        entrypoint: /o5gc/openairinterface5g/ran-entrypoint.sh
-        command: macpdu2wireshark ${OAI_TRACEE:-}
-        volumes:
-            - ./ran-entrypoint.sh:/o5gc/openairinterface5g/ran-entrypoint.sh:ro
-            - ${BASE}/scripts/band_helper.py:/o5gc/openairinterface5g/scripts/band_helper.py:ro
-        env_file: ["${ENV_FILE}"]
-        environment:
-            - TARGET_IP_ADDR=${IP:-$EXTNET_HOST_IP_ADDR}
-        networks:
-            - corenet
-            - extnet
+  oai-ran-macpdu2wireshark:
+    image: o5gc/oai-ran
+    container_name: oai-ran-macpdu2wireshark
+    entrypoint: /o5gc/openairinterface5g/ran-entrypoint.sh
+    command: macpdu2wireshark ${OAI_TRACEE:-}
+    privileged: true
+    env_file: [ "${ENV_FILE}" ]
+    environment:
+      - TARGET_IP_ADDR=${IP:-$EXTNET_HOST_IP_ADDR}
+    volumes:
+      - ./ran-entrypoint.sh:/o5gc/openairinterface5g/ran-entrypoint.sh:ro
+      - ${BASE}/scripts/band_helper.py:/o5gc/openairinterface5g/scripts/band_helper.py:ro
+    networks:
+      - corenet
+      - extnet
+    profiles: [ "oai-ran-macpdu2wireshark" ]

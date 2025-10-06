@@ -1,61 +1,61 @@
 services:
-    mysql:
-        extends:
-            file: ${DOCKER}/oai/services.yaml
-            service: mysql
+  mysql:
+    extends:
+      file: ${DOCKER}/oai/services.yaml
+      service: mysql
 
-    nrf:
-        extends:
-            file: ${DOCKER}/oai/services.yaml
-            service: nrf
+  nrf:
+    extends:
+      file: ${DOCKER}/oai/services.yaml
+      service: nrf
 
-    amf:
-        extends:
-            file: ${DOCKER}/oai/services.yaml
-            service: amf
-        depends_on: [mysql, nrf]
+  amf:
+    extends:
+      file: ${DOCKER}/oai/services.yaml
+      service: amf
+    depends_on: [ mysql, nrf ]
 
-    smf:
-        extends:
-            file: ${DOCKER}/oai/services.yaml
-            service: smf
-        depends_on: [nrf, amf]
+  smf:
+    extends:
+      file: ${DOCKER}/oai/services.yaml
+      service: smf
+    depends_on: [ amf, nrf ]
 
-    gnb:
-        extends:
-            file: ${DOCKER}/oai/services.yaml
-            service: gnb
-        image: o5gc/oai-ran:2023.w23-4.4.0.0
-        volumes:
-            - ./gnb.conf:/o5gc/openairinterface5g/etc/gnb.conf:ro
-        command: gnb --sa
+  gnb:
+    extends:
+      file: ${DOCKER}/oai/services.yaml
+      service: gnb
+    image: o5gc/oai-ran:2023.w23-4.4.0.0
+    command: gnb --sa
+    volumes:
+      - ./gnb.conf:/o5gc/openairinterface5g/etc/gnb.conf:ro
 
-    ue:
-        extends:
-            file: ${DOCKER}/oai/services.yaml
-            service: ue
-        image: o5gc/oai-ran:2023.w23-4.4.0.0
-        volumes:
-            - ./ue.conf:/o5gc/openairinterface5g/etc/ue.conf:ro
-        environment:
-            - OAI_RFSIM_SERVERADDR=${GNB_RF_IP_ADDR}
-        command: nr-ue -r 106 --numerology 1 --band 78 -C 3619200000
-        networks:
-            rfnet:
-                ipv4_address: ${UE_RF_IP_ADDR}
+  ue:
+    extends:
+      file: ${DOCKER}/oai/services.yaml
+      service: ue
+    image: o5gc/oai-ran:2023.w23-4.4.0.0
+    command: nr-ue -r 106 --numerology 1 --band 78 -C 3619200000
+    environment:
+      - OAI_RFSIM_SERVERADDR=${GNB_RF_IP_ADDR}
+    volumes:
+      - ./ue.conf:/o5gc/openairinterface5g/etc/ue.conf:ro
+    networks:
+      rfnet:
+        ipv4_address: ${UE_RF_IP_ADDR}
 
-    o5gc-dns:
-        image: cytopia/bind:stable-0.28
-        privileged: true
-        container_name: o5gc-dns
-        profiles: ["core"]
-        networks:
-            extnet:
-                ipv4_address: ${DNS_EXT_IP_ADDR}
-        environment:
-            # Custom DNS entries:
-            # - bild.de -> tagesschau.de
-            - DNS_A=bild.de=88.215.213.26
-            - DNS_FORWARDER=8.8.8.8,8.8.4.4
-            - DEBUG_ENTRYPOINT=2
-            - DOCKER_LOGS=1
+  o5gc-dns:
+    image: cytopia/bind:stable-0.28
+    container_name: o5gc-dns
+    privileged: true
+    environment:
+      # Custom DNS entries:
+      # - bild.de -> tagesschau.de
+      - DNS_A=bild.de=88.215.213.26
+      - DNS_FORWARDER=8.8.8.8,8.8.4.4
+      - DEBUG_ENTRYPOINT=2
+      - DOCKER_LOGS=1
+    networks:
+      extnet:
+        ipv4_address: ${DNS_EXT_IP_ADDR}
+    profiles: [ "core" ]

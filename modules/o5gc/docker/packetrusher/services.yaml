@@ -1,26 +1,26 @@
 services:
-    gnb-ue:
-        image: o5gc/packetrusher
-        env_file: ["${ENV_FILE}"]
-        labels:
-            o5gc.stack: ${O5GC_STACK}
-            o5gc.webui.priority: ${WEBUI_PRIO_RAN}
-        privileged: true
-        entrypoint: ["/mnt/packetrusher/entrypoint.sh"]
-        volumes:
-            - .:/mnt/packetrusher:ro
-            - ${BASE}/var/ssl:/mnt/o5gc/ssl:ro
-            - /var/run/docker.sock:/var/run/docker.sock:ro
-            - /lib/modules:/lib/modules:ro
-            - /usr/src:/usr/src:ro
-        container_name: gnb-ue
-        environment:
-            - INSTALL_GTP5G_MODULE=${INSTALL_GTP5G_MODULE:-1}
-            - GNB_MCC=${MCC}
-            - GNB_MNC=${MNC}
-            - UE_MCC=${MCC}
-            - UE_MNC=${MNC}
-        profiles: ["gnb-ue"]
-        networks:
-            corenet:
-                ipv4_address: ${GNB_IP_ADDR}
+  gnb-ue:
+    image: o5gc/packetrusher
+    container_name: gnb-ue
+    entrypoint: [ "/mnt/packetrusher/entrypoint.sh" ]
+    privileged: true
+    env_file: [ "${ENV_FILE}" ]
+    environment:
+      - INSTALL_GTP5G_MODULE=${INSTALL_GTP5G_MODULE:-1}
+      - GNB_MCC=${MCC}
+      - GNB_MNC=${MNC}
+      - UE_MCC=${MCC}
+      - UE_MNC=${MNC}
+    volumes:
+      - .:/mnt/packetrusher:ro
+      - ${BASE}/var/ssl:/mnt/o5gc/ssl:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /lib/modules:/lib/modules:ro
+      - /usr/src:/usr/src:ro
+    networks:
+      corenet:
+        ipv4_address: ${GNB_IP_ADDR}
+    labels:
+      o5gc.stack: ${O5GC_STACK}
+      o5gc.webui.priority: ${WEBUI_PRIO_RAN}
+    profiles: [ "gnb-ue" ]

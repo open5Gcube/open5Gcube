@@ -1,9 +1,9 @@
 services:
-    coredns:
-        image: coredns/coredns:1.11.3
-        profiles: ["coredns"]
-        container_name: coredns
-        volumes:
-            - ./coredns.cfg:/home/nonroot/Corefile:ro
-        networks:
-            - corenet
+  coredns:
+    image: coredns/coredns:1.11.3
+    container_name: coredns
+    volumes:
+      - ./coredns.cfg:/home/nonroot/Corefile:ro
+    networks:
+      - corenet
+    profiles: [ "coredns" ]

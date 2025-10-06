@@ -1,44 +1,44 @@
 services:
-    base:
-        image: o5gc/ueransim
-        profiles: ["base"]
-        env_file: ["${ENV_FILE}"]
-        labels:
-            o5gc.stack: ${O5GC_STACK}
-            o5gc.webui.priority: ${WEBUI_PRIO_RAN}
-        privileged: true
-        entrypoint: ["/mnt/ueransim/entrypoint.sh"]
-        volumes:
-            - .:/mnt/ueransim:ro
+  base:
+    image: o5gc/ueransim
+    entrypoint: [ "/mnt/ueransim/entrypoint.sh" ]
+    privileged: true
+    env_file: [ "${ENV_FILE}" ]
+    volumes:
+      - .:/mnt/ueransim:ro
+    labels:
+      o5gc.stack: ${O5GC_STACK}
+      o5gc.webui.priority: ${WEBUI_PRIO_RAN}
+    profiles: [ "base" ]
 
-    ueransim-gnb:
-        extends:
-            service: base
-        container_name: gnb
-        profiles: ["gnb"]
-        command: gnb
-        networks:
-            rfsim:
-                ipv4_address: ${GNB_RF_IP_ADDR}
-            corenet:
-                ipv4_address: ${GNB_IP_ADDR}
-        healthcheck:
-            test: /bin/bash -c "/mnt/ueransim/healthcheck.sh gnb"
-            interval: 10s
-            timeout: 5s
-            retries: 5
+  ueransim-gnb:
+    extends:
+      service: base
+    container_name: gnb
+    command: gnb
+    networks:
+      rfsim:
+        ipv4_address: ${GNB_RF_IP_ADDR}
+      corenet:
+        ipv4_address: ${GNB_IP_ADDR}
+    profiles: [ "gnb" ]
+    healthcheck:
+      test: /bin/bash -c "/mnt/ueransim/healthcheck.sh gnb"
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-    ueransim-ue:
-        extends:
-            service: base
-        container_name: ue
-        profiles: ["ue"]
-        command: ue
-        networks:
-            rfsim:
-                ipv4_address: ${UE_RF_IP_ADDR}
-        healthcheck:
-            test: /bin/bash -c "/mnt/ueransim/healthcheck.sh ue"
-            interval: 10s
-            timeout: 5s
-            retries: 5
+  ueransim-ue:
+    extends:
+      service: base
+    container_name: ue
+    command: ue
+    networks:
+      rfsim:
+        ipv4_address: ${UE_RF_IP_ADDR}
+    profiles: [ "ue" ]
+    healthcheck:
+      test: /bin/bash -c "/mnt/ueransim/healthcheck.sh ue"
+      interval: 10s
+      timeout: 5s
+      retries: 5

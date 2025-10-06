@@ -1,59 +1,59 @@
 x-oai-cn5g-base-version:
-    image: o5gc/oai-cn5g-base:${OAI_CN5G_VERSION:-latest}
+  image: o5gc/oai-cn5g-base:${OAI_CN5G_VERSION:-latest}
 
 services:
-    gnb:
-        extends:
-            file: ${DOCKER}/ueransim/services.yaml
-            service: ueransim-gnb
+  gnb:
+    extends:
+      file: ${DOCKER}/ueransim/services.yaml
+      service: ueransim-gnb
 
-    ue:
-        extends:
-            file: ${DOCKER}/ueransim/services.yaml
-            service: ueransim-ue
+  ue:
+    extends:
+      file: ${DOCKER}/ueransim/services.yaml
+      service: ueransim-ue
 
-    mysql:
-        extends:
-            file: ${DOCKER}/oai/services.yaml
-            service: mysql
+  mysql:
+    extends:
+      file: ${DOCKER}/oai/services.yaml
+      service: mysql
 
-    nrf:
-        extends:
-            file: ${DOCKER}/oai/services.yaml
-            service: nrf
+  nrf:
+    extends:
+      file: ${DOCKER}/oai/services.yaml
+      service: nrf
 
-    amf:
-        extends:
-            file: ${DOCKER}/oai/services.yaml
-            service: amf
-        depends_on: [mysql, nrf, ausf]
+  amf:
+    extends:
+      file: ${DOCKER}/oai/services.yaml
+      service: amf
+    depends_on: [ ausf, mysql, nrf ]
 
-    smf:
-        extends:
-            file: ${DOCKER}/oai/services.yaml
-            service: smf
-        depends_on: [nrf, amf]
+  smf:
+    extends:
+      file: ${DOCKER}/oai/services.yaml
+      service: smf
+    depends_on: [ amf, nrf ]
 
-    upf:
-        extends:
-            file: ${DOCKER}/oai/services.yaml
-            service: upf
-        depends_on: [nrf]
+  upf:
+    extends:
+      file: ${DOCKER}/oai/services.yaml
+      service: upf
+    depends_on: [ nrf ]
 
-    udr:
-        extends:
-            file: ${DOCKER}/oai/services.yaml
-            service: udr
-        depends_on: [mysql, nrf]
+  udr:
+    extends:
+      file: ${DOCKER}/oai/services.yaml
+      service: udr
+    depends_on: [ mysql, nrf ]
 
-    udm:
-        extends:
-            file: ${DOCKER}/oai/services.yaml
-            service: udm
-        depends_on: [udr]
+  udm:
+    extends:
+      file: ${DOCKER}/oai/services.yaml
+      service: udm
+    depends_on: [ udr ]
 
-    ausf:
-        extends:
-            file: ${DOCKER}/oai/services.yaml
-            service: ausf
-        depends_on: [udm]
+  ausf:
+    extends:
+      file: ${DOCKER}/oai/services.yaml
+      service: ausf
+    depends_on: [ udm ]

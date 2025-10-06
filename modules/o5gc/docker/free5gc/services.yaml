@@ -1,149 +1,148 @@
 services:
-    base:
-        image: o5gc/free5gc
-        profiles: ["core"]
-        entrypoint: ["/mnt/free5gc/entrypoint.sh"]
-        env_file: ["${ENV_FILE}"]
-        labels:
-            o5gc.corenetwork-function: true
-            o5gc.stack: ${O5GC_STACK}
-            o5gc.webui.priority: ${WEBUI_PRIO_CORE_DEFAULT}
-        environment:
-            GIN_MODE: release
-        volumes:
-            - .:/mnt/free5gc/:ro
-        privileged: true
-        healthcheck:
-            test: /bin/bash -c "/mnt/free5gc/healthcheck.sh"
-            interval: 10s
-            timeout: 5s
-            retries: 5
+  base:
+    image: o5gc/free5gc
+    entrypoint: [ "/mnt/free5gc/entrypoint.sh" ]
+    privileged: true
+    env_file: [ "${ENV_FILE}" ]
+    environment:
+      GIN_MODE: release
+    volumes:
+      - .:/mnt/free5gc/:ro
+    labels:
+      o5gc.corenetwork-function: true
+      o5gc.stack: ${O5GC_STACK}
+      o5gc.webui.priority: ${WEBUI_PRIO_CORE_DEFAULT}
+    profiles: [ "core" ]
+    healthcheck:
+      test: /bin/bash -c "/mnt/free5gc/healthcheck.sh"
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-    init:
-        extends:
-            service: base
-        container_name: free5gc-init
-        labels:
-            o5gc.initialisation: true
-            o5gc.webui.priority: ${WEBUI_PRIO_INIT}
-        entrypoint: /mnt/free5gc/init-subscribers.sh
-        networks:
-            - corenet
+  init:
+    extends:
+      service: base
+    container_name: free5gc-init
+    entrypoint: /mnt/free5gc/init-subscribers.sh
+    networks:
+      - corenet
+    labels:
+      o5gc.initialisation: true
+      o5gc.webui.priority: ${WEBUI_PRIO_INIT}
 
-    nrf:
-        extends:
-            service: base
-        container_name: nrf
-        hostname: nrf
-        command: nrf
-        networks:
-            corenet:
-                ipv4_address: ${NRF_IP_ADDR}
+  nrf:
+    extends:
+      service: base
+    container_name: nrf
+    command: nrf
+    hostname: nrf
+    networks:
+      corenet:
+        ipv4_address: ${NRF_IP_ADDR}
 
-    upf:
-        extends:
-            service: base
-        container_name: upf
-        hostname: upf
-        command: upf
-        environment:
-            - INSTALL_GTP5G_MODULE=${INSTALL_GTP5G_MODULE:-1}
-        volumes:
-            - /lib/modules:/lib/modules:ro
-            - /usr/src:/usr/src:ro
-            - ${BASE}/var/ssl:/mnt/o5gc/ssl:ro
-        networks:
-            corenet:
-                ipv4_address: ${UPF_IP_ADDR}
-            extnet:
-                ipv4_address: ${UPF_EXT_IP_ADDR}
+  upf:
+    extends:
+      service: base
+    container_name: upf
+    command: upf
+    environment:
+      - INSTALL_GTP5G_MODULE=${INSTALL_GTP5G_MODULE:-1}
+    volumes:
+      - /lib/modules:/lib/modules:ro
+      - /usr/src:/usr/src:ro
+      - ${BASE}/var/ssl:/mnt/o5gc/ssl:ro
+    hostname: upf
+    networks:
+      corenet:
+        ipv4_address: ${UPF_IP_ADDR}
+      extnet:
+        ipv4_address: ${UPF_EXT_IP_ADDR}
 
-    amf:
-        extends:
-            service: base
-        container_name: amf
-        hostname: amf
-        command: amf
-        networks:
-            corenet:
-                ipv4_address: ${AMF_IP_ADDR}
+  amf:
+    extends:
+      service: base
+    container_name: amf
+    command: amf
+    hostname: amf
+    networks:
+      corenet:
+        ipv4_address: ${AMF_IP_ADDR}
 
-    ausf:
-        extends:
-            service: base
-        container_name: ausf
-        hostname: ausf
-        command: ausf
-        networks:
-            corenet:
-                ipv4_address: ${AUSF_IP_ADDR}
+  ausf:
+    extends:
+      service: base
+    container_name: ausf
+    command: ausf
+    hostname: ausf
+    networks:
+      corenet:
+        ipv4_address: ${AUSF_IP_ADDR}
 
-    nssf:
-        extends:
-            service: base
-        container_name: nssf
-        hostname: nssf
-        command: nssf
-        networks:
-            corenet:
-                ipv4_address: ${NSSF_IP_ADDR}
+  nssf:
+    extends:
+      service: base
+    container_name: nssf
+    command: nssf
+    hostname: nssf
+    networks:
+      corenet:
+        ipv4_address: ${NSSF_IP_ADDR}
 
-    pcf:
-        extends:
-            service: base
-        container_name: pcf
-        hostname: pcf
-        command: pcf
-        networks:
-            corenet:
-                ipv4_address: ${PCF_IP_ADDR}
+  pcf:
+    extends:
+      service: base
+    container_name: pcf
+    command: pcf
+    hostname: pcf
+    networks:
+      corenet:
+        ipv4_address: ${PCF_IP_ADDR}
 
-    smf:
-        extends:
-            service: base
-        container_name: smf
-        hostname: smf
-        command: smf
-        networks:
-            corenet:
-                ipv4_address: ${SMF_IP_ADDR}
+  smf:
+    extends:
+      service: base
+    container_name: smf
+    command: smf
+    hostname: smf
+    networks:
+      corenet:
+        ipv4_address: ${SMF_IP_ADDR}
 
-    udm:
-        extends:
-            service: base
-        container_name: udm
-        hostname: udm
-        command: udm
-        networks:
-            corenet:
-                ipv4_address: ${UDM_IP_ADDR}
+  udm:
+    extends:
+      service: base
+    container_name: udm
+    command: udm
+    hostname: udm
+    networks:
+      corenet:
+        ipv4_address: ${UDM_IP_ADDR}
 
-    udr:
-        extends:
-            service: base
-        container_name: udr
-        hostname: udr
-        command: udr
-        networks:
-            corenet:
-                ipv4_address: ${UDR_IP_ADDR}
+  udr:
+    extends:
+      service: base
+    container_name: udr
+    command: udr
+    hostname: udr
+    networks:
+      corenet:
+        ipv4_address: ${UDR_IP_ADDR}
 
-
-    webui:
-        extends:
-            service: base
-        container_name: free5gc-webui
-        hostname: free5gc-webui
-        command: webui
-        labels:
-            o5gc.link.title: "free5GC WebUI"
-            o5gc.link.url: "http://{{host}}:${FREE5GC_WEBUI_HOST_PORT}/"
-            o5gc.webui.priority: 0
-        environment:
-            - DB_URI=mongodb://${MONGO_IP_ADDR}/open5gs
-        networks:
-            corenet:
-                ipv4_address: ${FREE5GC_WEBUI_IP_ADDR}
-            o5gc:
-        ports:
-            - ${FREE5GC_WEBUI_HOST_PORT}:5000
+  webui:
+    extends:
+      service: base
+    container_name: free5gc-webui
+    command: webui
+    environment:
+      - DB_URI=mongodb://${MONGO_IP_ADDR}/open5gs
+    hostname: free5gc-webui
+    networks:
+      corenet:
+        ipv4_address: ${FREE5GC_WEBUI_IP_ADDR}
+      o5gc:
+    ports:
+      - ${FREE5GC_WEBUI_HOST_PORT}:5000
+    labels:
+      o5gc.link.title: "free5GC WebUI"
+      o5gc.link.url: "http://{{host}}:${FREE5GC_WEBUI_HOST_PORT}/"
+      o5gc.webui.priority: 0

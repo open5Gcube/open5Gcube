@@ -1,36 +1,36 @@
 services:
-    base:
-        profiles: [srsran]
-        image: o5gc/srsran-project
-        entrypoint: ["/mnt/srsran/entrypoint.sh"]
-        env_file: ["${ENV_FILE}"]
-        labels:
-            o5gc.stack: ${O5GC_STACK}
-            o5gc.webui.priority: ${WEBUI_PRIO_RAN}
-        volumes:
-            - .:/mnt/srsran/:ro
-            - ${DEVELOP_VOLUME_SRSRAN:-${BASE}/var/empty:/var/empty}
-        privileged: true
+  base:
+    image: o5gc/srsran-project
+    entrypoint: [ "/mnt/srsran/entrypoint.sh" ]
+    privileged: true
+    env_file: [ "${ENV_FILE}" ]
+    volumes:
+      - .:/mnt/srsran/:ro
+      - ${DEVELOP_VOLUME_SRSRAN:-${BASE}/var/empty:/var/empty}
+    labels:
+      o5gc.stack: ${O5GC_STACK}
+      o5gc.webui.priority: ${WEBUI_PRIO_RAN}
+    profiles: [ srsran ]
 
-    gnb:
-        extends:
-            service: base
-        container_name: gnb
-        profiles: ["gnb"]
-        command: gnb
-        privileged: true
-        environment:
-            - DOCKER_TARGET_HOSTNAME=${GNB_HOSTNAME}
-        volumes:
-            - ${BASE}/scripts/docker-remote.sh:/docker-remote.sh:ro
-            - ${BASE}:/tmp/o5gc:ro
-            - ${HOME}/.ssh:/mnt/.ssh:ro
-            - /var/run/docker.sock:/var/run/docker.sock:ro
-            - /dev/bus/usb:/dev/bus/usb
-        networks:
-            rfnet:
-                ipv4_address: ${GNB_RF_IP_ADDR}
-            corenet:
-                ipv4_address: ${GNB_IP_ADDR}
-        labels:
-            o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
+  gnb:
+    extends:
+      service: base
+    container_name: gnb
+    command: gnb
+    privileged: true
+    environment:
+      - DOCKER_TARGET_HOSTNAME=${GNB_HOSTNAME}
+    volumes:
+      - ${BASE}/scripts/docker-remote.sh:/docker-remote.sh:ro
+      - ${BASE}:/tmp/o5gc:ro
+      - ${HOME}/.ssh:/mnt/.ssh:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /dev/bus/usb:/dev/bus/usb
+    networks:
+      rfnet:
+        ipv4_address: ${GNB_RF_IP_ADDR}
+      corenet:
+        ipv4_address: ${GNB_IP_ADDR}
+    labels:
+      o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
+    profiles: [ "gnb" ]

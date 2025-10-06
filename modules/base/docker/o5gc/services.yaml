@@ -1,104 +1,104 @@
 services:
-    build-cacher:
-        image: o5gc/build-cacher
-        container_name: o5gc-build-cacher
-        profiles: ["build-cacher"]
-        network_mode: bridge
-        ports:
-            - 40862:8123
-            - 40861:3142
-            - 40860:873
-        volumes:
-            - ${BASE_DIR}/var/cache:/var/cache
-            - /etc/passwd:/etc/passwd:ro
-            - /etc/group:/etc/group:ro
-        user: ${HOST_USER_GROUP_ID}
-        restart: always
+  build-cacher:
+    image: o5gc/build-cacher
+    container_name: o5gc-build-cacher
+    volumes:
+      - ${BASE_DIR}/var/cache:/var/cache
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/group:/etc/group:ro
+    network_mode: bridge
+    ports:
+      - 40860:873
+      - 40861:3142
+      - 40862:8123
+    user: ${HOST_USER_GROUP_ID}
+    profiles: [ "build-cacher" ]
+    restart: always
 
-    docker-etc-hosts-updater:
-        profiles: ["docker-etc-hosts-updater"]
-        image: dvdarias/docker-hoster
-        container_name: docker-etc-hosts-updater
-        volumes:
-            - /var/run/docker.sock:/tmp/docker.sock
-            - /etc/hosts:/tmp/hosts
-        network_mode: none
-        restart: always
+  docker-etc-hosts-updater:
+    image: dvdarias/docker-hoster
+    container_name: docker-etc-hosts-updater
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock
+      - /etc/hosts:/tmp/hosts
+    network_mode: none
+    profiles: [ "docker-etc-hosts-updater" ]
+    restart: always
 
-    webui:
-        image: o5gc/o5gc-webui
-        container_name: o5gc-webui
-        profiles: ["webui"]
-        entrypoint: ["/mnt/webui/entrypoint.sh"]
-        # No env-file, because this would override the settings when calling run-* inside the container
-        # env_file:
-        networks:
-            - o5gc
-        ports:
-            - ${O5GC_WEBUI_HOST_PORT}:80
-        volumes:
-            - ./webui:/mnt/webui:ro
-            - ${BASE}/Doc/html:/mnt/doc/html:ro
-            - ${BASE}:${BASE}
-            - ${HOME}/.ssh:/mnt/.ssh:ro
-            - /var/run/docker.sock:/var/run/docker.sock:ro
-        environment:
-            - BASE=${BASE}
-            - HOST_HOME=${HOME}
-            - HOST_USER=${HOST_USER}
-            - ENB_HOSTNAME=${ENB_HOSTNAME}
-            - GNB_HOSTNAME=${GNB_HOSTNAME}
-        privileged: true
-        init: true
-        restart: always
-        healthcheck:
-            test: nc -z 127.0.0.1 80 && nc -z 127.0.0.1 5000
-            interval: 10s
-            timeout: 1s
-            retries: 2
-            start_period: 5s
-            start_interval: 1s
+  webui:
+    image: o5gc/o5gc-webui
+    container_name: o5gc-webui
+    entrypoint: [ "/mnt/webui/entrypoint.sh" ]
+    init: true
+    privileged: true
+    # No env-file, because this would override the settings when calling run-* inside the container
+    # env_file:
+    environment:
+      - BASE=${BASE}
+      - HOST_HOME=${HOME}
+      - HOST_USER=${HOST_USER}
+      - ENB_HOSTNAME=${ENB_HOSTNAME}
+      - GNB_HOSTNAME=${GNB_HOSTNAME}
+    volumes:
+      - ./webui:/mnt/webui:ro
+      - ${BASE}/Doc/html:/mnt/doc/html:ro
+      - ${BASE}:${BASE}
+      - ${HOME}/.ssh:/mnt/.ssh:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - o5gc
+    ports:
+      - ${O5GC_WEBUI_HOST_PORT}:80
+    profiles: [ "webui" ]
+    restart: always
+    healthcheck:
+      test: nc -z 127.0.0.1 80 && nc -z 127.0.0.1 5000
+      interval: 10s
+      timeout: 1s
+      retries: 2
+      start_period: 5s
+      start_interval: 1s
 
-    documentation:
-        image: o5gc/o5gc-mkdocs
-        container_name: o5gc-docu
-        profiles: ["docu"]
-        working_dir: /Doc
-        entrypoint: mkdocs
-        command: serve -a 0.0.0.0:8000
-        volumes:
-            - ${BASE}/Doc:/Doc/docs
-            - ${BASE}/Doc/mkdocs.yml:/Doc/mkdocs.yml
-            - ${BASE}/Doc/html:/Doc/html
-            - ${BASE}/Doc/pdf:/Doc/pdf
-        network_mode: bridge
-        ports:
-            - ${DOCUMENTATION_SERVE_HOST_PORT}:8000
-        user: ${HOST_USER_GROUP_ID}
+  documentation:
+    image: o5gc/o5gc-mkdocs
+    container_name: o5gc-docu
+    entrypoint: mkdocs
+    command: serve -a 0.0.0.0:8000
+    working_dir: /Doc
+    volumes:
+      - ${BASE}/Doc:/Doc/docs
+      - ${BASE}/Doc/mkdocs.yml:/Doc/mkdocs.yml
+      - ${BASE}/Doc/html:/Doc/html
+      - ${BASE}/Doc/pdf:/Doc/pdf
+    network_mode: bridge
+    ports:
+      - ${DOCUMENTATION_SERVE_HOST_PORT}:8000
+    user: ${HOST_USER_GROUP_ID}
+    profiles: [ "docu" ]
 
-    coredns:
-        image: coredns/coredns:1.11.3
-        profiles: ["coredns"]
-        container_name: coredns
-        volumes:
-            - ./coredns.cfg:/home/nonroot/Corefile:ro
-        networks:
-            - corenet
+  coredns:
+    image: coredns/coredns:1.11.3
+    container_name: coredns
+    volumes:
+      - ./coredns.cfg:/home/nonroot/Corefile:ro
+    networks:
+      - corenet
+    profiles: [ "coredns" ]
 
-    develop:
-        profiles: ["develop"]
-        image: o5gc/o5gc-base:jammy
-        volumes:
-            - ./develop-entrypoint.sh:/entrypoint.sh:ro
-            - ${VAR}/ssh/:/var/run/ssh/
-            - develop:/o5gc/
-        env_file: ["${ENV_FILE}"]
-        entrypoint: /entrypoint.sh
-        init: true
-        privileged: true
-        networks:
-            - corenet
-            - rfnet
-            - extnet
-        extra_hosts:
-            - "o5gc-build-cacher:${DOCKER_HOST_BRIDGE}"
+  develop:
+    image: o5gc/o5gc-base:jammy
+    entrypoint: /entrypoint.sh
+    init: true
+    privileged: true
+    env_file: [ "${ENV_FILE}" ]
+    volumes:
+      - ./develop-entrypoint.sh:/entrypoint.sh:ro
+      - ${VAR}/ssh/:/var/run/ssh/
+      - develop:/o5gc/
+    networks:
+      - corenet
+      - rfnet
+      - extnet
+    extra_hosts:
+      - "o5gc-build-cacher:${DOCKER_HOST_BRIDGE}"
+    profiles: [ "develop" ]

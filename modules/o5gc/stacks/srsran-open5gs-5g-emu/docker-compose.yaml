@@ -1,120 +1,120 @@
 services:
-    gnb:
-        extends:
-            file: ${DOCKER}/srsran/project/services.yaml
-            service: gnb
-        environment:
-            - RF_DEVICE_NAME=zmq
-            - RF_DEVICE_ARGS=fail_on_disconnect=true,tx_port=tcp://${GNB_RF_IP_ADDR}:2000,rx_port=tcp://${UE_RF_IP_ADDR}:2001,id=enb,base_srate=23.04e6
+  gnb:
+    extends:
+      file: ${DOCKER}/srsran/project/services.yaml
+      service: gnb
+    environment:
+      - RF_DEVICE_NAME=zmq
+      - RF_DEVICE_ARGS=fail_on_disconnect=true,tx_port=tcp://${GNB_RF_IP_ADDR}:2000,rx_port=tcp://${UE_RF_IP_ADDR}:2001,id=enb,base_srate=23.04e6
 
-    ue:
-        extends:
-            file: ${DOCKER}/srsran/4g/services.yaml
-            service: ue
-        environment:
-            - RF_DEVICE_NAME=zmq
-            - RF_DEVICE_ARGS=tx_port=tcp://${UE_RF_IP_ADDR}:2001,rx_port=tcp://${GNB_RF_IP_ADDR}:2000,id=ue,base_srate=23.04e6"
-            - TX_GAIN=50
-            - RX_GAIN=40
-            - RF_SRATE=23.04e6
-            - USIM_MODE=soft
-            - USIM_ALGO=milenage
-            - USIM_OPC=${UE_SOFT_OPC}
-            - USIM_KEY=${UE_SOFT_KEY}
-            - USIM_IMSI=${MCC}${MNC}${UE_SOFT_MSIN}
-            - USIM_IMEI=353490069873319
-            - NR_NOF_CARRIERS=1
-            - UE_RELEASE=15
-        depends_on: [gnb]
+  ue:
+    extends:
+      file: ${DOCKER}/srsran/4g/services.yaml
+      service: ue
+    depends_on: [ gnb ]
+    environment:
+      - RF_DEVICE_NAME=zmq
+      - RF_DEVICE_ARGS=tx_port=tcp://${UE_RF_IP_ADDR}:2001,rx_port=tcp://${GNB_RF_IP_ADDR}:2000,id=ue,base_srate=23.04e6"
+      - TX_GAIN=50
+      - RX_GAIN=40
+      - RF_SRATE=23.04e6
+      - USIM_MODE=soft
+      - USIM_ALGO=milenage
+      - USIM_OPC=${UE_SOFT_OPC}
+      - USIM_KEY=${UE_SOFT_KEY}
+      - USIM_IMSI=${MCC}${MNC}${UE_SOFT_MSIN}
+      - USIM_IMEI=353490069873319
+      - NR_NOF_CARRIERS=1
+      - UE_RELEASE=15
 
-    mongo:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: mongo
-    mongo-express:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: mongo-express
-        depends_on: [mongo]
+  mongo:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: mongo
+  mongo-express:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: mongo-express
+    depends_on: [ mongo ]
 
-    open5gs-webui:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: webui
-        depends_on: [mongo]
+  open5gs-webui:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: webui
+    depends_on: [ mongo ]
 
-    open5gs-init:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: init
-        depends_on: [open5gs-webui]
+  open5gs-init:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: init
+    depends_on: [ open5gs-webui ]
 
-    nrf:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: nrf
+  nrf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: nrf
 
-    ausf:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: ausf
-        depends_on: [nrf]
+  ausf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: ausf
+    depends_on: [ nrf ]
 
-    udr:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: udr
-        depends_on: [mongo, nrf]
+  udr:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: udr
+    depends_on: [ mongo, nrf ]
 
-    udm:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: udm
-        depends_on: [nrf]
+  udm:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: udm
+    depends_on: [ nrf ]
 
-    pcf:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: pcf
-        depends_on: [mongo, nrf]
+  pcf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: pcf
+    depends_on: [ mongo, nrf ]
 
-    bsf:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: bsf
-        depends_on: [mongo, nrf]
+  bsf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: bsf
+    depends_on: [ mongo, nrf ]
 
-    nssf:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: nssf
-        depends_on: [nrf]
+  nssf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: nssf
+    depends_on: [ nrf ]
 
-    smf:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: smf
-        depends_on: [nrf]
+  smf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: smf
+    depends_on: [ nrf ]
 
-    upf:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: upf
-        depends_on: [nrf, smf]
+  upf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: upf
+    depends_on: [ nrf, smf ]
 
-    amf:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: amf
-        depends_on: [smf, upf, nrf, ausf, udm, udr, pcf, bsf]
+  amf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: amf
+    depends_on: [ ausf, bsf, nrf, pcf, smf, udm, udr, upf ]
 
-    pcrf:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: pcrf
-        depends_on: [mongo]
+  pcrf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: pcrf
+    depends_on: [ mongo ]
 
-    scp:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: scp
+  scp:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: scp

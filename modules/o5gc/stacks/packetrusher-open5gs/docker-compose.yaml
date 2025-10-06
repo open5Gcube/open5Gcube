@@ -1,107 +1,107 @@
 services:
-    gnb-ue:
-        extends:
-            file: ${DOCKER}/packetrusher/services.yaml
-            service: gnb-ue
+  gnb-ue:
+    extends:
+      file: ${DOCKER}/packetrusher/services.yaml
+      service: gnb-ue
 
-    mongo:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: mongo
-    mongo-express:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: mongo-express
-        depends_on: [mongo]
+  mongo:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: mongo
+  mongo-express:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: mongo-express
+    depends_on: [ mongo ]
 
-    open5gs-webui:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: webui
-        depends_on: [mongo]
+  open5gs-webui:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: webui
+    depends_on: [ mongo ]
 
-    open5gs-init:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: init
-        depends_on: [open5gs-webui]
+  open5gs-init:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: init
+    depends_on: [ open5gs-webui ]
 
-    nrf:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: nrf
+  nrf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: nrf
 
-    ausf:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: ausf
-        depends_on: [nrf]
+  ausf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: ausf
+    depends_on: [ nrf ]
 
-    udr:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: udr
-        depends_on: [mongo, nrf]
+  udr:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: udr
+    depends_on: [ mongo, nrf ]
 
-    udm:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: udm
-        depends_on: [nrf]
+  udm:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: udm
+    depends_on: [ nrf ]
 
-    pcf:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: pcf
-        depends_on: [mongo, nrf]
+  pcf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: pcf
+    depends_on: [ mongo, nrf ]
 
-    bsf:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: bsf
-        depends_on: [mongo, nrf]
+  bsf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: bsf
+    depends_on: [ mongo, nrf ]
 
-    nssf:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: nssf
-        depends_on: [nrf]
+  nssf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: nssf
+    depends_on: [ nrf ]
 
-    smf:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: smf
-        depends_on: [nrf]
+  smf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: smf
+    depends_on: [ nrf ]
 
-    upf:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: upf
-        depends_on: [nrf, smf]
+  upf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: upf
+    depends_on: [ nrf, smf ]
 
-    amf:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: amf
-        depends_on: [smf, upf, nrf, ausf, udm, udr, pcf, bsf]
+  amf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: amf
+    depends_on: [ ausf, bsf, nrf, pcf, smf, udm, udr, upf ]
 
-    pcrf:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: pcrf
-        depends_on: [mongo]
+  pcrf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: pcrf
+    depends_on: [ mongo ]
 
-    scp:
-        extends:
-            file: ${DOCKER}/open5gs/services.yaml
-            service: scp
+  scp:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: scp
 
-    prometheus:
-        extends:
-            file: ${DOCKER}/open5gs/metrics/services.yaml
-            service: prometheus
+  prometheus:
+    extends:
+      file: ${DOCKER}/open5gs/metrics/services.yaml
+      service: prometheus
 
-    grafana:
-        extends:
-            file: ${DOCKER}/open5gs/metrics/services.yaml
-            service: grafana
+  grafana:
+    extends:
+      file: ${DOCKER}/open5gs/metrics/services.yaml
+      service: grafana
