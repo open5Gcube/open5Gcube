@@ -28,7 +28,7 @@ FROM develop
 # Clone and build srsRAN
 RUN git clone https://github.com/srsran/srsRAN_Project .
 
-ARG SRSRAN_VERSION=24_10_1
+ARG SRSRAN_VERSION=25_04
 
 RUN if [[ "${SRSRAN_VERSION}" == *_* ]]; then                                 \
         SRSRAN_VERSION="release_${SRSRAN_VERSION}";                           \
