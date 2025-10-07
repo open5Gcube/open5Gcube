@@ -1,8 +1,9 @@
 *** Settings ***
 Documentation  Common keywords
-Library        OperatingSystem
-Library        Process
-Library        String
+Library  OperatingSystem
+Library  Process
+Library  String
+Library  get_env.py
 
 
 *** Keywords ***
@@ -58,8 +59,8 @@ Containers Should Running
     [Arguments]  @{containers}
     FOR  ${container}  IN  @{containers}
         ${result} =  Run Process  docker  ps  -q  --filter  status\=running  --filter  name\=${container}
-        Should Be Equal  ${result.rc}  ${0}
-        Should Not Be Empty  ${result.stdout}
+        Should Be Equal  ${result.rc}  ${0}  
+        Should Not Be Empty  ${result.stdout}  ${container} not running
     END
 
 Container Log Should Match Regexp

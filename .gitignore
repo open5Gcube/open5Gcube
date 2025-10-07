@@ -2,5 +2,6 @@ develop/
 tests/.venv.build
 tests/venv
 tests/results
+tests/__pycache__
 scripts/.venv.build
 .vscode

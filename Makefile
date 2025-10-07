@@ -129,7 +129,7 @@ image_versions = $(sort $(foreach i,$(filter o5gc/$1:%,${IMAGES}),$(shell echo $
 DEFAULT_MODULES = base o5gc
 DEFAULT_MODULE_TARGET_FILES = $(foreach module,${DEFAULT_MODULES},modules/${module}/targets.mk) 
 MODULE_TARGET_FILES = ${DEFAULT_MODULE_TARGET_FILES} $(sort $(filter-out ${DEFAULT_MODULE_TARGET_FILES},$(wildcard modules/*/targets.mk)))
-include ${MODULE_TARGET_FILES}
+include ${MODULE_TARGET_FILES} tests/targets.mk
 
 .develop-%-build:
 	$(call docker-build,$*,,,develop)

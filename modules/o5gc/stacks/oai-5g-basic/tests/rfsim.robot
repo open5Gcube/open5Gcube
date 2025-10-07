@@ -1,20 +1,27 @@
 *** Settings ***
 Documentation   OAI 5G SA basic rfsim
 Force Tags      Emulated
-Resource        ../../../tests/common.resource
+Resource        ../../../../../tests/common.resource
 
 Suite Setup     Setup Suite
 Suite Teardown  Teardown Suite
 
 
+*** Variables ***
+${STACK}  oai-5g-basic-rfsim
+
+
 *** Test Cases ***
 Verify Successful Startup
-    Containers Should Running  spgwu  smf  amf  nrf  gnb  ue  mysql
+    Containers Should Running  upf  smf  amf  nrf  gnb  ue  mysql
     No Running Container Should Be  unhealthy
     No Running Container Should Be  starting
     No Container Should Be Failed
 
 Verify UE Is Registered At AMF
+    ${MCC}=  Get Env  MCC
+    ${MNC}=  Get Env  MNC
+    ${UE_SOFT_MSIN}=  Get Env  UE_SOFT_MSIN
     Container Log Should Match Regexp  amf  5GMM-REGISTERED\\|\\s+%${MCC}${MNC}${UE_SOFT_MSIN}
 
 Verify UE Connectivity
@@ -32,8 +39,8 @@ Collect Test Data
 
 *** Keywords ***
 Setup Suite
-    Log To Console  Setup Suite: run 'make run-oai-5g-sa-basic-rfsim'
-    Start Process   make  run-oai-5g-sa-basic-rfsim
+    Log To Console  Setup Suite: run 'make run-oai-5g-basic-rfsim'
+    Start Process   make  run-oai-5g-basic-rfsim
     Sleep  5s
     Process Should Be Running
     Wait  45s  to complete core network, gNB and UE startup
