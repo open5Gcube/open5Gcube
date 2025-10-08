@@ -29,7 +29,7 @@ configuration files, which are mounted explicitly for the corresponding service:
         extends:
             file: ${DOCKER}/oai/services.yaml
             service: gnb
-        image: o5gc/oai-ran:2023.w23-4.4.0.0
+        image: o5gc/oai-ran:2024.w23-4.4.0.0
         volumes:
             - ./gnb.conf:/o5gc/openairinterface5g/etc/gnb.conf:ro
 ```

@@ -3,7 +3,7 @@ services:
     extends:
       file: ${DOCKER}/oai/services.yaml
       service: gnb
-    image: o5gc/oai-ran:2023.w23-4.4.0.0
+    image: o5gc/oai-ran:2024.w23-4.4.0.0
     command: gnb --sa
     volumes:
       - ./gnb.conf:/o5gc/openairinterface5g/etc/gnb.conf:ro
