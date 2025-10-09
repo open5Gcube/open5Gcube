@@ -146,12 +146,8 @@ amf:
       tac: ${TAC}
       nssai:
         - *custom_slice
-  supported_integrity_algorithms:
-    - "NIA1"
-    - "NIA2"
-  supported_encryption_algorithms:
-    - "NEA1"
-    - "NEA2"
+  supported_integrity_algorithms: [ ${FIVEG_INTEGRITY_ORDER} ]
+  supported_encryption_algorithms: [ ${FIVEG_CIPHERING_ORDER} ]
 
 smf:
   ue_mtu: 1500

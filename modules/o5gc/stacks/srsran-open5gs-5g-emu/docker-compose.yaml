@@ -11,7 +11,6 @@ services:
     extends:
       file: ${DOCKER}/srsran/4g/services.yaml
       service: ue
-    depends_on: [ gnb ]
     environment:
       - RF_DEVICE_NAME=zmq
       - RF_DEVICE_ARGS=tx_port=tcp://${UE_RF_IP_ADDR}:2001,rx_port=tcp://${GNB_RF_IP_ADDR}:2000,id=ue,base_srate=23.04e6"
@@ -26,6 +25,7 @@ services:
       - USIM_IMEI=353490069873319
       - NR_NOF_CARRIERS=1
       - UE_RELEASE=15
+    depends_on: [ gnb ]
 
   mongo:
     extends:

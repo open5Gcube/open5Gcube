@@ -5,7 +5,7 @@ set -e
 service=$(hostname)
 case "${service}" in
     free5gc-webui)
-        wait-for-it -t 30 ${FREE5GC_WEBUI_IP_ADDR}:5000
+        wait-for-it -t 60 ${FREE5GC_WEBUI_IP_ADDR}:5000
         ;;
     nrf | amf | ausf | nssf | pcf | smf | udm | udr)
         service_ip=${service^^}_IP_ADDR

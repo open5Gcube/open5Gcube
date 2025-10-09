@@ -9,7 +9,7 @@ if [[ -z "${service}" ]]; then
     exit 1;
 fi
 
-[[ "${service}" == "gnb" ]] && wait-for-it -t 30 ${AMF_IP_ADDR}:7777
+[[ "${service}" == "gnb" ]] && wait-for-it -t 60 ${AMF_IP_ADDR}:7777
 [[ "${service}" == "ue" ]] && retry --until=success --times=10 --delay=5 -- nc -v -z -u ${GNB_RF_IP_ADDR} 4997
 
 # wait until 'init' container is finished

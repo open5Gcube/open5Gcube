@@ -51,6 +51,13 @@ services:
         ipv4_address: ${AMF_IP_ADDR}
     labels:
       o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      nrf:
+        condition: service_healthy
+      upf:
+        condition: service_healthy
 
   smf:
     extends:
@@ -63,6 +70,13 @@ services:
         ipv4_address: ${SMF_IP_ADDR}
     labels:
       o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
+    depends_on:
+      amf:
+        condition: service_healthy
+      nrf:
+        condition: service_healthy
+      upf:
+        condition: service_healthy
 
   udr:
     extends:
@@ -73,6 +87,11 @@ services:
     networks:
       corenet:
         ipv4_address: ${UDR_IP_ADDR}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      nrf:
+        condition: service_healthy
 
   udm:
     extends:
@@ -83,6 +102,11 @@ services:
     networks:
       corenet:
         ipv4_address: ${UDM_IP_ADDR}
+    depends_on:
+      nrf:
+        condition: service_healthy
+      udr:
+        condition: service_started
 
   ausf:
     extends:
@@ -93,6 +117,11 @@ services:
     networks:
       corenet:
         ipv4_address: ${AUSF_IP_ADDR}
+    depends_on:
+      nrf:
+        condition: service_healthy
+      udm:
+        condition: service_started
 
   upf:
     extends:
@@ -108,6 +137,9 @@ services:
         ipv4_address: ${UPF_IP_ADDR} # eth1
         aliases:
           - monitor-capture-host
+    depends_on:
+      nrf:
+        condition: service_healthy
 
   oai-ran:
     image: o5gc/oai-ran
@@ -159,17 +191,12 @@ services:
     profiles: [ "gnb" ]
 
   ue:
-    image: o5gc/oai-ran
+    extends:
+      service: oai-ran
     container_name: ue
-    entrypoint: /o5gc/openairinterface5g/ran-entrypoint.sh
-    privileged: true
-    env_file: [ "${ENV_FILE}" ]
-    environment:
-      - OAI_RFSIM_ENABLE
-    volumes:
-      - ./ran-entrypoint.sh:/o5gc/openairinterface5g/ran-entrypoint.sh:ro
-      - ${BASE}/scripts/band_helper.py:/o5gc/openairinterface5g/scripts/band_helper.py:ro
-      - /dev/bus/usb:/dev/bus/usb
+    networks:
+      rfnet:
+        ipv4_address: ${UE_RF_IP_ADDR}
     profiles: [ "ue" ]
 
   oai-ran-tracer:

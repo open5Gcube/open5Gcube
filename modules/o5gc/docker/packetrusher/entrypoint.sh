@@ -18,7 +18,7 @@ if [[ "${OPEN5GS_ROAMING}" == "1" ]]; then
     export GNB_IP_ADDR=$(ip route get ${!var} | sed -n 's|.* src \([0-9.]*\) .*|\1|p')
 fi
 
-wait-for-it -t 30 ${AMF_IP_ADDR}:7777
+wait-for-it -t 60 ${AMF_IP_ADDR}:7777
 
 # wait until all initialisation containers are completed
 { set +x; } 2>/dev/null

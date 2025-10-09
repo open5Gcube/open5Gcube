@@ -8,13 +8,13 @@
     "service-keys-order": [ 2, {
         "groupOrder": [
           "Core Definitions",
-          "Service Dependencies",
           "Runtime Behavior",
           "Environment Configuration",
           "Data Management and Configuration",
           "Networking",
           "Operational Metadata",
           "Security and Execution Context",
+          "Service Dependencies",
           "Others"
         ],
         "groups": {

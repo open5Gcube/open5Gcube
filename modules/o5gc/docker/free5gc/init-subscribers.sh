@@ -2,7 +2,7 @@
 
 set -e
 
-wait-for-it -t 30 ${FREE5GC_WEBUI_IP_ADDR}:5000
+wait-for-it -t 60 ${FREE5GC_WEBUI_IP_ADDR}:5000
 sleep 1
 
 WEBUI_URL=http://${FREE5GC_WEBUI_IP_ADDR}:5000

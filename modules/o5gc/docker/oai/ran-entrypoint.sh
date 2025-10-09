@@ -16,7 +16,8 @@ case "${srv}" in
         # wait until all core network functions are healthy
         while sleep 1; do
             nonhealthy_containers=$(docker container ls --filter label=o5gc.corenetwork-function --filter health=unhealthy --filter health=starting --format '{{.Names}}' | tr '\n' ' ')
-            if [[ -n "${nonhealthy_containers}" ]]; then echo "Wait until the core network containers are healthy: ${nonhealthy_containers}";
+            created_containers=$(docker container ls --filter label=o5gc.corenetwork-function --filter status=created --format '{{.Names}}' | tr '\n' ' ')
+            if [[ -n "${nonhealthy_containers}${created_containers}" ]]; then echo "Wait until the core network containers are healthy: ${nonhealthy_containers} ${created_containers}";
             else break; fi
         done
         if [ "${srv}" == "gnb" ] && [ -n "$(dig +short enb)" ]; then
@@ -58,8 +59,11 @@ case "${srv}" in
         else
             [ -f etc/${srv}.x310.conf ] && cfg_file=etc/${srv}.x310.conf
         fi
+        export FIVEG_INTEGRITY_ORDER="$(echo \"${FIVEG_INTEGRITY_ORDER//, /\", \"}\" | tr '[:upper:]' '[:lower:]')"
+        export FIVEG_CIPHERING_ORDER="$(echo \"${FIVEG_CIPHERING_ORDER//, /\", \"}\" | tr '[:upper:]' '[:lower:]')"
         envsubst.sh ${cfg_file} ${cfg_file%.*}.run.${cfg_file##*.}
         cfg_file=${cfg_file%.*}.run.${cfg_file##*.}
+        cat ${cfg_file}
         ;;
 esac
 
@@ -67,7 +71,6 @@ cat /etc/image_version
 
 case "${srv}" in
     gnb)
-        [ -n "${OAI_RFSIM_ENABLE}" ] && sleep 20
         [ -n "${OAI_TRACER_ENABLE}" ] && SOFTMODEM_ARGS+=" --T_stdout 2 --T_nowait"
         SOFTMODEM_ARGS+=" -E --continuous-tx"
         build/nr-softmodem                                                    \
@@ -82,12 +85,16 @@ case "${srv}" in
         exit 1
         ;;
     nr-ue)
-        [ -n "${OAI_RFSIM_ENABLE}" ] && sleep 30
-        [ -n "${OAI_RFSIM_ENABLE}" ] && SOFTMODEM_ARGS+=" --rfsimulator.serveraddr ${OAI_RFSIM_SERVERADDR}"
+        if [ -n "${OAI_RFSIM_ENABLE}" ]; then
+            sleep 10
+            SOFTMODEM_ARGS+=" --rfsimulator.serveraddr ${OAI_RFSIM_SERVERADDR}"
+            SOFTMODEM_ARGS+=" -E"
+        fi
         [ -n "${B210_DETECTED}" ] && SOFTMODEM_ARGS+=" -E"
+        args=$(eval echo ${@:2})
         build/nr-uesoftmodem --sa --nokrnmod                                  \
             --usrp-args ${USRP_ARGS} --clock-source 1 ${SOFTMODEM_ARGS}       \
-            -O ${cfg_file} "${@:2}" &
+            -O ${cfg_file} ${args}  
         wait_pid=$!
         ;;
     lte-ue)

@@ -26,34 +26,28 @@ services:
     extends:
       file: ${DOCKER}/oai/services.yaml
       service: amf
-    depends_on: [ ausf, mysql, nrf ]
 
   smf:
     extends:
       file: ${DOCKER}/oai/services.yaml
       service: smf
-    depends_on: [ amf, nrf ]
 
   upf:
     extends:
       file: ${DOCKER}/oai/services.yaml
       service: upf
-    depends_on: [ nrf ]
 
   udr:
     extends:
       file: ${DOCKER}/oai/services.yaml
       service: udr
-    depends_on: [ mysql, nrf ]
 
   udm:
     extends:
       file: ${DOCKER}/oai/services.yaml
       service: udm
-    depends_on: [ udr ]
 
   ausf:
     extends:
       file: ${DOCKER}/oai/services.yaml
       service: ausf
-    depends_on: [ udm ]

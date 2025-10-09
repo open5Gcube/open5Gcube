@@ -41,41 +41,41 @@ services:
     extends:
       service: kamailio
     container_name: icscf
-    depends_on: [ fhoss, mysql, volte-dns ]
     command: icscf
     networks:
       corenet:
         ipv4_address: ${ICSCF_IP_ADDR}
+    depends_on: [ fhoss, mysql, volte-dns ]
 
   pcscf:
     extends:
       service: kamailio
     container_name: pcscf
-    depends_on: [ icscf, mysql, rtpengine, scscf, volte-dns ]
     command: pcscf
     networks:
       corenet:
         ipv4_address: ${PCSCF_IP_ADDR}
+    depends_on: [ icscf, mysql, rtpengine, scscf, volte-dns ]
 
   scscf:
     extends:
       service: kamailio
     container_name: scscf
-    depends_on: [ fhoss, mysql, volte-dns ]
     command: scscf
     networks:
       corenet:
         ipv4_address: ${SCSCF_IP_ADDR}
+    depends_on: [ fhoss, mysql, volte-dns ]
 
   smsc:
     extends:
       service: kamailio
     container_name: smsc
-    depends_on: [ mysql, volte-dns ]
     command: smsc
     networks:
       corenet:
         ipv4_address: ${SMSC_IP_ADDR}
+    depends_on: [ mysql, volte-dns ]
     profiles: [ "smsc" ]
     dns: ${VOLTE_DNS_IP_ADDR}
 
@@ -95,7 +95,6 @@ services:
       service: base
     image: o5gc/volte-fhoss
     container_name: fhoss
-    depends_on: [ mysql, volte-dns ]
     entrypoint: [ "/mnt/volte/fhoss/entrypoint.sh" ]
     environment:
       - SMS_DOMAIN=${SMS_DOMAIN:-SMS-over-IMS}
@@ -108,6 +107,7 @@ services:
     labels:
       o5gc.link.title: "FHOSS"
       o5gc.link.url: "http://{{host}}:${FHOSS_HOST_PORT}/"
+    depends_on: [ mysql, volte-dns ]
     dns: ${VOLTE_DNS_IP_ADDR}
 
   pyhss:
@@ -115,10 +115,10 @@ services:
       service: base
     image: o5gc/volte-pyhss
     container_name: pyhss
-    depends_on: [ mysql, volte-dns ]
     entrypoint: [ "/mnt/volte/pyhss/entrypoint.sh" ]
     networks:
       corenet:
         ipv4_address: ${VOLTE_HSS_IP_ADDR}
       o5gc:
+    depends_on: [ mysql, volte-dns ]
     dns: ${VOLTE_DNS_IP_ADDR}

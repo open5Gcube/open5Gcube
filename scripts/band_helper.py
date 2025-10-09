@@ -23,7 +23,7 @@ def abs_freq_point_a_arfcn(arfcn):
     nof_prb, nr.get_frequency(arfcn) * 1000000) / 1000000)
 
 def arfcn_to_freq(arfcn):
-  return nr.get_frequency(int(arfcn)) * 1000000
+  return int(nr.get_frequency(int(arfcn)) * 1000000)
 
 
 # ----------------------------------------------------------------------------

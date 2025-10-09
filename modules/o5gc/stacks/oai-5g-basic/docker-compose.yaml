@@ -13,37 +13,31 @@ services:
     extends:
       file: ${DOCKER}/oai/services.yaml
       service: amf
-    depends_on: [ ausf, mysql, nrf ]
 
   smf:
     extends:
       file: ${DOCKER}/oai/services.yaml
       service: smf
-    depends_on: [ amf, nrf ]
 
   upf:
     extends:
       file: ${DOCKER}/oai/services.yaml
       service: upf
-    depends_on: [ nrf ]
 
   udr:
     extends:
       file: ${DOCKER}/oai/services.yaml
       service: udr
-    depends_on: [ mysql, nrf ]
 
   udm:
     extends:
       file: ${DOCKER}/oai/services.yaml
       service: udm
-    depends_on: [ udr ]
 
   ausf:
     extends:
       file: ${DOCKER}/oai/services.yaml
       service: ausf
-    depends_on: [ udm ]
 
   gnb:
     extends:
@@ -59,14 +53,11 @@ services:
       file: ${DOCKER}/oai/services.yaml
       service: ue
     image: o5gc/oai-ran:2024.w23-4.4.0.0
-    command: nr-ue -r 106 --numerology 1 --band 78 -C 3619200000
+    command: nr-ue -r 106 --numerology 1 --band ${NR_BAND} -C $(scripts/band_helper.py arfcn_to_freq ${NR_ARFCN})
     environment:
       - OAI_RFSIM_SERVERADDR=${GNB_RF_IP_ADDR}
     volumes:
-      - ./ue.conf:/o5gc/openairinterface5g/etc/ue.conf:ro
-    networks:
-      rfnet:
-        ipv4_address: ${UE_RF_IP_ADDR}
+      - ./ue.conf:/o5gc/openairinterface5g/etc/nr-ue.conf:ro
 
   o5gc-dns:
     image: cytopia/bind:stable-0.28

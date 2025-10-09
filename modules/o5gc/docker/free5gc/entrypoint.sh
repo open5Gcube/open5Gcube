@@ -28,17 +28,17 @@ if [[ "${service}" == "upf" ]]; then
     service ssh start
 fi
 
-wait-for-it -t 30 ${MONGO_IP_ADDR}:27017
+wait-for-it -t 60 ${MONGO_IP_ADDR}:27017
 
 case "${service}" in
     webui)
-        wait-for-it -t 30 ${NRF_IP_ADDR}:7777
+        wait-for-it -t 60 ${NRF_IP_ADDR}:7777
         cd webconsole
         exec ./webconsole -c /o5gc/free5gc/config/webuicfg.yaml
         ;;
     nrf | upf | amf | ausf | nssf | pcf | smf | udm | udr)
         if [[ "${service}" != "nrf" ]]; then
-            wait-for-it -t 30 ${NRF_IP_ADDR}:7777
+            wait-for-it -t 60 ${NRF_IP_ADDR}:7777
             while [[ -n "$(dig +short free5gc-init)" ]]; do sleep 2; done
             sleep 1
         fi

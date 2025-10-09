@@ -48,7 +48,7 @@ cat /etc/image_version
 
 case "${service}" in
     webui)
-        wait-for-it -t 30 ${MONGO_IP_ADDR}:27017
+        wait-for-it -t 60 ${MONGO_IP_ADDR}:27017
         cd webui && HOSTNAME=0.0.0.0 PORT=3000 npm run dev
         ;;
 #    upf)

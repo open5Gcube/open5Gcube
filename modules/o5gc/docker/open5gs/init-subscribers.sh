@@ -2,7 +2,7 @@
 
 set -e
 
-wait-for-it -t 30 ${OPEN5GS_WEBUI_IP_ADDR}:3000
+wait-for-it -t 60 ${OPEN5GS_WEBUI_IP_ADDR}:3000
 sleep 5
 
 WEBUI_URL=http://${OPEN5GS_WEBUI_IP_ADDR}:3000
