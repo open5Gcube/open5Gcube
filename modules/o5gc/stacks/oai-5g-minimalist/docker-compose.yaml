@@ -13,13 +13,21 @@ services:
     extends:
       file: ${DOCKER}/oai/services.yaml
       service: amf
-    depends_on: [ mysql, nrf ]
+    depends_on: !override
+      mysql:
+        condition: service_healthy
+      nrf:
+        condition: service_healthy
 
   smf:
     extends:
       file: ${DOCKER}/oai/services.yaml
       service: smf
-    depends_on: [ amf, nrf ]
+    depends_on: !override
+      amf:
+        condition: service_healthy
+      nrf:
+        condition: service_healthy
 
   gnb:
     extends:
