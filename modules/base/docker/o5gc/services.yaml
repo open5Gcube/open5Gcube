@@ -45,6 +45,7 @@ services:
       - ${BASE}:${BASE}
       - ${HOME}/.ssh:/mnt/.ssh:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - o5gc-simcard-scripts:/o5gc-simcard-scripts:rw
     networks:
       - o5gc
     ports:
@@ -102,3 +103,10 @@ services:
     extra_hosts:
       - "o5gc-build-cacher:${DOCKER_HOST_BRIDGE}"
     profiles: [ "develop" ]
+
+volumes:
+    # Volume used by the webui to pass pysim-scripts into the simcard container.
+    # Must be created externally, e.g. by the Makefile when starting the webui.
+    o5gc-simcard-scripts:
+        external: true
+        name: o5gc-simcard-scripts
