@@ -1,6 +1,5 @@
 <template>
     <div class="col column">
-        <q-bar class="bg-primary text-white text-weight-bold">SIM Writer</q-bar>
         <q-card flat bordered square class="column col q-pa-sm" style="font-family: monospace;">
             <q-select dense outlined v-model="simWriterContent.type" :options="types" ref="typeRef" :rules="[val => checkTypeFormat || '']" label="Type" class="q-pa-xs" />
             <div class="row">

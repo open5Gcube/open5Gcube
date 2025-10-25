@@ -9,9 +9,40 @@
           </template>
           <template v-slot:after>
             <div class="row full-height q-mx-xs">
-              <div class="col-xs-12 col-md-4">
-                <div class="q-pa-xs"><SimReaderComponent /></div>
-                <div class="q-pa-xs"><SimWriterComponent /></div>
+              <div class="col-xs-12 col-md-4 full-height">
+                <q-list class="q-pa-xs">
+                  <q-expansion-item
+                    dense
+                    dense-toggle
+                    group="sim-writer"
+                    icon="sim_card"
+                    label="SIM Reader"
+                    default-opened
+                    header-class="bg-primary text-subtitle1 text-weight-bold"
+                  >
+                    <SimReaderComponent />
+                  </q-expansion-item>
+                  <q-expansion-item
+                    dense
+                    dense-toggle
+                    group="sim-writer"
+                    icon="sim_card_download"
+                    label="SIM Writer"
+                    header-class="bg-primary text-subtitle1 text-weight-bold"
+                  >
+                    <SimWriterComponent />
+                  </q-expansion-item>
+                  <q-expansion-item
+                    dense
+                    dense-toggle
+                    group="sim-writer"
+                    icon="code"
+                    label="SIM Scripts"
+                    header-class="bg-primary text-subtitle1 text-weight-bold"
+                  >
+                    <SimScriptsComponent />
+                  </q-expansion-item>
+                </q-list>
               </div>
               <div class="col-xs-12 col-md-8 full-height q-pa-xs">
                 <SimConsoleOutComponent />
@@ -26,6 +57,7 @@
 import UeDbComponent from 'src/components/UeDbComponent.vue'
 import SimReaderComponent from 'src/components/SimReaderComponent.vue'
 import SimWriterComponent from 'src/components/SimWriterComponent.vue'
+import SimScriptsComponent from 'src/components/SimScriptsComponent.vue'
 import SimConsoleOutComponent from 'src/components/SimConsoleOutComponent.vue'
 import {ref} from 'vue';
 
@@ -57,8 +89,7 @@ export default {
     this.$emit('tabs', [])
     this.$emit('toolbarTitleContent', 'SIM Writer')
   },
-  components: { UeDbComponent, SimReaderComponent, SimWriterComponent, SimConsoleOutComponent }
-
+  components: { UeDbComponent, SimReaderComponent, SimWriterComponent, SimScriptsComponent, SimConsoleOutComponent }
 }
 
 </script>
