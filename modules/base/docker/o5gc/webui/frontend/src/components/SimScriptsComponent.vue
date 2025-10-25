@@ -1,7 +1,20 @@
 <template>
     <div class="">
         <q-card flat bordered square class="q-pa-sm" style="font-family: monospace;">
-            <q-select dense outlined v-model="simScriptFormContent.scriptName" :options="scriptNames" ref="scriptNameRef" :rules="[val => checkScriptNameFormat || '']" label="Select Script" class="q-pa-xs" />
+            <q-select
+                dense
+                outlined
+                v-model="simScriptFormContent.scriptName"
+                :options="scriptNameOptionsRef"
+                ref="scriptNameRef"
+                :rules="[val => checkScriptNameFormat || '']"
+                label="Select Script"
+                class="q-pa-xs"
+                use-input
+                input-debounce="0"
+                @filter="filterScriptNames"
+                behavior="menu"
+            />
             <q-card flat bordered square class="q-pa-sm" style="white-space: pre; font-family: monospace">
                 <q-scroll-area style="height: 150px"><div style="height: 100%">
                     {{ scriptContent }}
@@ -48,6 +61,7 @@ export default {
 
         const scriptDialogActive = ref(false);
 
+        const scriptNameOptionsRef = ref([]);
         const scriptNameRef = ref(null);
         const admRef = ref(null);
 
@@ -55,7 +69,10 @@ export default {
             simWriterStore.loadScripts();
         }
 
-        onMounted(() => loadScripts());
+        onMounted(() => {
+            loadScripts();
+            scriptNameOptionsRef.value = Object.keys(scripts.value);
+        });
 
         function resetValidation() {
             nextTick(() => {
@@ -63,12 +80,26 @@ export default {
             });
         }
 
+        function filterScriptNames (val, update) {
+            if(val === '') {
+                update(() => {
+                    scriptNameOptionsRef.value = Object.keys(scripts.value);
+                });
+                return;
+            }
+
+            update(() => {
+                const needle = val.toLowerCase();
+                scriptNameOptionsRef.value = Object.keys(scripts.value).filter(v => v.toLowerCase().indexOf(needle) > -1);
+            });
+        }
+
         return {
             scripts, simScriptFormContent, _busy, consoleOutBusy,
             loadScripts, deleteScript, executeScript,
             scriptDialogActive,
-            scriptNameRef, admRef,
-            resetValidation
+            scriptNameOptionsRef, scriptNameRef, admRef,
+            filterScriptNames, resetValidation
         };
     },
     computed: {
