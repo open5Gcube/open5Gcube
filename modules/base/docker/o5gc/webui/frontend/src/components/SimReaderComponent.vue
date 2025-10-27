@@ -1,6 +1,5 @@
 <template>
     <div class="col column">
-        <q-bar class="bg-primary text-white text-weight-bold">SIM Reader</q-bar>
         <q-card flat bordered square class="column col q-pa-sm" style="font-family: monospace;">
             <q-btn icon="search" :loading="_busy.detectReader" :disable="consoleOutBusy" color="primary" label="Detect Reader" @click="detectReader()" class="q-ma-xs" />
             <q-btn :icon="symOutlinedSimCard" :loading="_busy.detectCard" :disable="consoleOutBusy" color="primary" label="Detect Card" @click="detectCard()" class="q-ma-xs" />
