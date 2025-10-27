@@ -121,7 +121,7 @@ export const useSimWriterStore = defineStore('simWriter', {
       }
     },
     getters: {
-        consoleOutBusy: (state) => (state._busy.detectReader || state._busy.detectCard || state._busy.readCard || state._busy.writeCard || state._busy.deleteScript || state._busy.executeScript)
+        consoleOutBusy: (state) => (state._busy.detectReader || state._busy.detectCard || state._busy.readCard || state._busy.writeCard || state._busy.deleteScript || state._busy.uploadScript || state._busy.executeScript)
     },
     actions: {
         async _httpRequestWithErrorReporting(requestCb: () => Promise<any>, errorMessageTemplate: string) {
@@ -160,7 +160,7 @@ export const useSimWriterStore = defineStore('simWriter', {
         async loadScripts() {
             this._busy.loadScripts = true;
             try {
-                this.scripts = (await this._getDataWithErrorReporting('http://localhost/api/pysim/scripts', 'Error: {{ error_detail }} when trying to fetch pysim scripts.'));
+                this.scripts = (await this._getDataWithErrorReporting('/api/pysim/scripts', 'Error: {{ error_detail }} when trying to fetch pysim scripts.'));
             } catch {};
             this._busy.loadScripts = false;
         },
@@ -212,15 +212,23 @@ export const useSimWriterStore = defineStore('simWriter', {
         async deleteScript() {
             this._busy.deleteScript = true;
             try {
-                this.consoleOut = (await this._httpRequestWithErrorReporting(async () => (await api.delete(`http://localhost/api/pysim/script/${this.simScriptFormContent.scriptName}`)).data, 'Error: {{ error_detail }} when trying to delete script.'));
+                this.consoleOut = (await this._httpRequestWithErrorReporting(async () => (await api.delete(`/api/pysim/script/${this.simScriptFormContent.scriptName}`)).data, 'Error: {{ error_detail }} when trying to delete script.'));
             } catch {};
             this._busy.deleteScript = false;
+            this.loadScripts();
+        },
+        async uploadScript(name: string, content: string) {
+            this._busy.uploadScript = true;
+            try {
+                this.consoleOut = (await this._httpRequestWithErrorReporting(async () => (await api.put(`/api/pysim/script/${name}`, content)).data, 'Error: {{ error_detail }} when trying to upload script.'));
+            } catch {}
+            this._busy.uploadScript = false;
             this.loadScripts();
         },
         async executeScript() {
             this._busy.executeScript = true;
             try {
-                this.consoleOut = (await this._httpRequestWithErrorReporting(async () => (await api.post(`http://localhost/api/pysim/run_script/${this.simScriptFormContent.scriptName}`, {adm: this.simScriptFormContent.adm})).data, 'Error: {{ error_detail }} when trying to write to SIM.'));
+                this.consoleOut = (await this._httpRequestWithErrorReporting(async () => (await api.post(`/api/pysim/run_script/${this.simScriptFormContent.scriptName}`, {adm: this.simScriptFormContent.adm})).data, 'Error: {{ error_detail }} when trying to write to SIM.'));
             } catch {}
             this._busy.executeScript = false;
         },

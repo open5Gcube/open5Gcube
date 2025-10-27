@@ -1,6 +1,10 @@
 <template>
     <div class="">
         <q-card flat bordered square class="q-pa-sm" style="font-family: monospace;">
+            <div class="row">
+                <div class="col-md-6 col-xs-12 q-pa-xs"><q-btn color="primary" label="New Script" class="full-width" icon="add" @click="editScriptContent=''; editScriptName=''; editDialogActive=true;" /></div>
+                <div class="col-md-6 col-xs-12 q-pa-xs"><q-btn color="primary" label="Edit Script" class="full-width" icon="edit" @click="editScriptContent=scriptContent; editScriptName=simScriptFormContent.scriptName; editDialogActive=true;" :disable="simScriptFormContent.scriptName === null" /></div>
+            </div>
             <q-select
                 dense
                 outlined
@@ -16,7 +20,7 @@
                 behavior="menu"
             >
                 <template v-slot:append>
-                    <q-icon v-if="simScriptFormContent.scriptName !== null" name="info" style="cursor: help" @click.stop.prevent>
+                    <q-icon v-if="scriptComment" name="info" style="cursor: help" @click.stop.prevent>
                         <q-tooltip style="white-space: pre-wrap; font-family: monospace; background-color: #333333; font-size: 15px;">
                             {{ scriptComment }}
                         </q-tooltip>
@@ -70,6 +74,27 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+    <q-dialog v-model="editDialogActive" persistent>
+        <q-card style="width: 1000px; max-width: 80vw;">
+            <q-card-section><div class="text-h6">Script Editor</div></q-card-section>
+            <q-card-section>
+                <q-input v-model="editScriptContent" filled type="textarea" style="white-space: pre; font-family: monospace;" dense input-style="height: 400px; max-height: 70vh" />
+            </q-card-section>
+            <q-card-actions class="q-pa-sm">
+                <div class="row q-col-gutter-sm items-start full-width">
+                    <div class="col-md-6 col-xs-12">
+                        <q-input dense outlined v-model="editScriptName" ref="editScriptNameRef" :rules="[val => checkEditScriptNameFormat || 'Script name cannot be empty and can only contain alphanumeric characters, _, - and .']" label="Script Name" style="font-family: monospace;" />
+                    </div>
+                    <div class="col-md-3 col-xs-6">
+                        <q-btn class="full-width" color="positive" icon="save" label="Save Script" @click="uploadScript(editScriptName, editScriptContent); editDialogActive = false;" :loading="_busy.uploadScript" :disable="!uploadButtonActive" />
+                    </div>
+                    <div class="col-md-3 col-xs-6">
+                        <q-btn class="full-width" color="negative" icon="cancel" label="Discard Changes" @click="editDialogActive = false" />
+                    </div>
+                </div>
+            </q-card-actions>
+        </q-card>
+    </q-dialog>
 </template>
 
 <script>
@@ -82,13 +107,18 @@ export default {
         const simWriterStore = useSimWriterStore();
         const { scripts, simScriptFormContent, _busy, consoleOutBusy } = storeToRefs(simWriterStore);
 
-        const { deleteScript, executeScript } = simWriterStore;
+        const { deleteScript, uploadScript, executeScript } = simWriterStore;
 
         const scriptDialogActive = ref(false);
+        const editDialogActive = ref(false);
 
         const scriptNameOptionsRef = ref([]);
         const scriptNameRef = ref(null);
         const admRef = ref(null);
+        const editScriptNameRef = ref(null);
+
+        const editScriptContent = ref('');
+        const editScriptName = ref('');
 
         async function loadScripts() {
             simWriterStore.loadScripts();
@@ -122,18 +152,24 @@ export default {
 
         return {
             scripts, simScriptFormContent, _busy, consoleOutBusy,
-            loadScripts, deleteScript, executeScript,
-            scriptDialogActive,
-            scriptNameOptionsRef, scriptNameRef, admRef,
+            loadScripts, deleteScript, uploadScript, executeScript,
+            scriptDialogActive, editDialogActive,
+            scriptNameOptionsRef, scriptNameRef, admRef, editScriptNameRef,
+            editScriptContent, editScriptName,
             filterScriptNames, resetValidation
         };
     },
     computed: {
         checkScriptNameFormat: (state) => state.simScriptFormContent.scriptName?.length > 0 && state.simScriptFormContent.scriptName in state.scripts,
         checkAdmFormat: (state) => /^[0-9A-Fa-f]{1,32}$/.test(state.simScriptFormContent.adm),
+        checkEditScriptNameFormat: (state) => /^[0-9A-Za-z_\-.]+$/.test(state.editScriptName),
         executeButtonActive: (state) => (
             state.checkScriptNameFormat &&
             state.checkAdmFormat &&
+            !state.consoleOutBusy
+        ),
+        uploadButtonActive: (state) => (
+            state.checkEditScriptNameFormat &&
             !state.consoleOutBusy
         ),
         scriptNames: (state) => Object.keys(state.scripts),
