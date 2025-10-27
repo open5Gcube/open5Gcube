@@ -212,9 +212,10 @@ export const useSimWriterStore = defineStore('simWriter', {
         async deleteScript() {
             this._busy.deleteScript = true;
             try {
-                this.scripts = (await this._httpRequestWithErrorReporting(async () => (await api.delete(`http://localhost/api/pysim/script/${this.simScriptFormContent.scriptName}`)).data, 'Error: {{ error_detail }} when trying to delete script.'));
+                this.consoleOut = (await this._httpRequestWithErrorReporting(async () => (await api.delete(`http://localhost/api/pysim/script/${this.simScriptFormContent.scriptName}`)).data, 'Error: {{ error_detail }} when trying to delete script.'));
             } catch {};
             this._busy.deleteScript = false;
+            this.loadScripts();
         },
         async executeScript() {
             this._busy.executeScript = true;

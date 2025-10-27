@@ -14,7 +14,32 @@
                 input-debounce="0"
                 @filter="filterScriptNames"
                 behavior="menu"
-            />
+            >
+                <template v-slot:append>
+                    <q-icon v-if="simScriptFormContent.scriptName !== null" name="info" style="cursor: help" @click.stop.prevent>
+                        <q-tooltip style="white-space: pre-wrap; font-family: monospace; background-color: #333333; font-size: 15px;">
+                            {{ scriptComment }}
+                        </q-tooltip>
+                    </q-icon>
+                    <q-icon v-if="simScriptFormContent.scriptName !== null" name="delete" class="cursor-pointer" color="negative" @click.stop.prevent="">
+                        <q-menu>
+                          <q-list dense>
+                              <q-item clickable @click="deleteScript(); simScriptFormContent.scriptName = null; resetValidation()" v-close-popup>
+                                  <q-item-section avatar><q-icon name="delete" class="text-negative" /></q-item-section>
+                                  <q-item-section>Delete Script</q-item-section>
+                              </q-item>
+                          </q-list>
+                      </q-menu>
+                    </q-icon>
+                </template>
+                <template v-slot:no-option>
+                    <q-item>
+                        <q-item-section class="text-italic text-grey">
+                            No scripts found - upload your first one today!
+                        </q-item-section>
+                    </q-item>
+                </template>
+            </q-select>
             <q-card flat bordered square class="q-pa-sm" style="white-space: pre; font-family: monospace">
                 <q-scroll-area style="height: 150px"><div style="height: 100%">
                     {{ scriptContent }}
@@ -76,6 +101,7 @@ export default {
 
         function resetValidation() {
             nextTick(() => {
+                if(scriptNameRef.value) scriptNameRef.value.resetValidation();
                 if(admRef.value) admRef.value.resetValidation();
             });
         }
