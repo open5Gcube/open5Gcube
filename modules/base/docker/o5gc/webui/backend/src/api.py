@@ -8,7 +8,7 @@ from datetime import datetime
 from pathlib import Path
 from types import ModuleType
 from http import HTTPStatus
-from requests.exceptions import ReadTimeout
+from requests.exceptions import ReadTimeout, ConnectionError
 
 import pytz
 import dotenv
@@ -289,31 +289,41 @@ def get_uedb():
 
 
 def run_simcard_container(cmd):
+    """
+    Return Value: (digest: str, timeout: bool, exitcode: int|None, log: str)
+    """
     client = docker.from_env()
     try:
         container = client.containers.run('o5gc/simcard', cmd,
                                        volumes=["/dev/bus/usb:/dev/bus/usb", "o5gc-simcard-scripts:/o5gc-simcard-scripts:ro"],
                                        stderr=True, privileged=True, detach=True)
-        exitcode = None
+        response = None
+        timeout = None
         try:
-            exitcode = container.wait(timeout=120)
+            response = container.wait(timeout=120)
+            timeout = False
+        except (ReadTimeout, ConnectionError):
+            timeout = True
         finally:
             logs = container.logs(stdout=True, stderr=True).decode("utf8", "surrogateescape")
             container.reload()
-            if container.status == "exited":
-                container.remove()
-            return str(cmd) + '\n' + logs + '\n' + (f'Exited with {exitcode}.' if exitcode is not None else 'Not exited yet.')
+            container.remove(force=True)
+            exitcode = response.get("StatusCode", None) if response else None
+            digest = str(cmd) + '\n' + logs + '\n' + (f'Exited with code {response.get("StatusCode", response)}.' if response else f'Forced removal of container after timeout was reached. Last state: {container.status}.')
+            return digest, timeout, exitcode, logs
 
     except docker.errors.ContainerError as err:
-        return str(err)
+        return str(cmd) + '\n' + "ContainerError during execution:\n" + str(err), None, -1, ""
 
 @bp.get('/pcsc_scan/readers')
 def get_pcsc_scan_readers():
-    return Response(run_simcard_container("pcsc_scan -r -t1"), content_type="text/plain")
+    digest, _, _, _ = run_simcard_container("pcsc_scan -r -t1")
+    return Response(digest, content_type="text/plain")
 
 @bp.get('/pcsc_scan/cards')
 def get_pcsc_scan_cards():
-    return Response(run_simcard_container("pcsc_scan -c -t1"), content_type="text/plain")
+    digest, _, _, _ = run_simcard_container("pcsc_scan -c -t1")
+    return Response(digest, content_type="text/plain")
 
 @bp.get('/kiopcgen')
 def kiopcgen():
@@ -326,11 +336,18 @@ def kiopcgen():
 
 @bp.get('/pysim/prog_types')
 def get_pysim_prog_types():
-    return run_simcard_container("./pySim-prog.py -t list").split()
+    _, timeout, exitcode, log = run_simcard_container("./pySim-prog.py -t list")
+    if timeout:
+        return "SIM Card types could not be loaded since command timed out.", HTTPStatus.GATEWAY_TIMEOUT
+    elif exitcode:
+        return f"SIM Card types could not be loaded since the command failed with exitcode {exitcode}.", HTTPStatus.INTERNAL_SERVER_ERROR
+
+    return log.split()
 
 @bp.get('/pysim/read')
 def get_pysim_read():
-    return Response(run_simcard_container("./pySim-read.py -p0"), content_type="text/plain")
+    digest, _, _, _ = run_simcard_container("./pySim-read.py -p0")
+    return Response(digest, content_type="text/plain")
 
 @bp.post('/pysim/prog')
 def get_pysim_prog():
@@ -362,16 +379,19 @@ def get_pysim_prog():
         jsonschema.validate(payload, payload_schema)
     except jsonschema.exceptions.ValidationError as e:
         return str(e), HTTPStatus.BAD_REQUEST
-    return Response(run_simcard_container(
-            f"./pySim-prog.py -p 0 --num 0"
-            f" --type={payload.get('type')}"
-            f" --pin-adm={payload.get('adm')}"
-            f" --mcc={payload.get('mcc')}"
-            f" --mnc={payload.get('mnc')}"
-            f" --imsi={payload.get('imsi')}"
-            f" --ki={payload.get('ki')}"
-            f" --opc={payload.get('opc')}"),
-        content_type="text/plain")
+
+    digest, _, _, _ = run_simcard_container(
+        f"./pySim-prog.py -p 0 --num 0"
+        f" --type={payload.get('type')}"
+        f" --pin-adm={payload.get('adm')}"
+        f" --mcc={payload.get('mcc')}"
+        f" --mnc={payload.get('mnc')}"
+        f" --imsi={payload.get('imsi')}"
+        f" --ki={payload.get('ki')}"
+        f" --opc={payload.get('opc')}"
+    )
+
+    return Response(digest, content_type="text/plain")
 
 
 class IsNotRegularFileError(Exception):
@@ -506,8 +526,10 @@ def run_pysim_script(script_name: str):
 
     script_path_volume = Path("/o5gc-simcard-scripts") / script_name
 
-    return Response(run_simcard_container([
-            f"./pySim-shell.py",
-            "-a", payload.get('adm'),
-            "--script", script_path_volume.as_posix()
-        ]), content_type="text/plain")
+    digest, timeout, exitcode, log = run_simcard_container([
+        f"./pySim-shell.py",
+        "-a", payload.get('adm'),
+        "--script", script_path_volume.as_posix()
+    ])
+
+    return Response(digest, content_type="text/plain")

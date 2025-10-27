@@ -128,6 +128,7 @@ export const useSimWriterStore = defineStore('simWriter', {
             try {
                 return await requestCb();
             } catch(error: any) {
+                console.error('%O', error);
                 const error_msg = errorMessageTemplate.replace('{{ error_detail }}', error.response ? `HTTP Error ${error.response.status}` : 'Unknown error');
                 generateErrorNotification(error_msg);
                 if(error.response) {

@@ -161,7 +161,7 @@ export default {
     },
     computed: {
         checkScriptNameFormat: (state) => state.simScriptFormContent.scriptName?.length > 0 && state.simScriptFormContent.scriptName in state.scripts,
-        checkAdmFormat: (state) => /^[0-9A-Fa-f]{1,32}$/.test(state.simScriptFormContent.adm),
+        checkAdmFormat: (state) => /^[0-9]+$/.test(state.simScriptFormContent.adm),
         checkEditScriptNameFormat: (state) => /^[0-9A-Za-z_\-.]+$/.test(state.editScriptName),
         executeButtonActive: (state) => (
             state.checkScriptNameFormat &&
