@@ -62,9 +62,6 @@ docker-build-volte-%: docker-build-o5gc-base
 docker-build-ueransim: docker-build-o5gc-base
 	$(call docker-build,o5gc,ueransim)
 
-docker-build-simcard: docker-build-o5gc-base
-	$(call docker-build,o5gc,simcard)
-
 docker-build-packetrusher: docker-build-o5gc-base
 	$(call docker-build,o5gc,packetrusher)
 

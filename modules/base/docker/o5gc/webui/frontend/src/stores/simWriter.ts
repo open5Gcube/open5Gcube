@@ -67,41 +67,68 @@ type SimWriterContentType = {
 type SimWriterBusyType = {
     loadUeDb: boolean,
     loadTypes: boolean,
+    loadScripts: boolean,
+    uploadScript: boolean,
+    deleteScript: boolean,
     detectReader: boolean,
     detectCard: boolean,
     readCard: boolean,
     writeCard: boolean,
-    autogen: boolean
+    autogen: boolean,
+    executeScript: boolean
 }
 
 type SimWriterStoreType = {
     ueDb: UeDbType,
     types: string[],
+    scripts: {[scriptName: string]: SimScriptType},
     simWriterContent: SimWriterContentType,
+    simScriptFormContent: {scriptName: string|null, adm: string},
     consoleOut: string,
     _busy: SimWriterBusyType
+};
+
+type SimScriptType = {
+    comment: string[],
+    content: string,
+    error: string
 };
 
 export const useSimWriterStore = defineStore('simWriter', {
     state() : SimWriterStoreType {
       const ueDb: UeDbType = [];
       const types: string[] = [];
+      const scripts: {[scriptName: string]: SimScriptType} = {};
       const simWriterContent: SimWriterContentType = {type: '', mcc: '', mnc: '', imsi: '', ki: '', opc: '', adm: ''};
+      const simScriptFormContent = {scriptName: null, adm: ''};
       const consoleOut = '';
-      const _busy: SimWriterBusyType = {loadUeDb: false, loadTypes: false, detectReader: false, detectCard: false, readCard: false, writeCard: false, autogen: false};
+      const _busy: SimWriterBusyType = {
+        loadUeDb: false,
+        loadTypes: false,
+        loadScripts: false,
+        uploadScript: false,
+        deleteScript: false,
+        detectReader: false,
+        detectCard: false,
+        readCard: false,
+        writeCard: false,
+        autogen: false,
+        executeScript: false
+    };
 
       return {
-        ueDb, types, simWriterContent, consoleOut, _busy
+        ueDb, types, scripts, simWriterContent, simScriptFormContent, consoleOut, _busy
       }
     },
     getters: {
-        consoleOutBusy: (state) => (state._busy.detectReader || state._busy.detectCard || state._busy.readCard || state._busy.writeCard)
+        consoleOutBusy: (state) => (state._busy.detectReader || state._busy.detectCard || state._busy.readCard || state._busy.writeCard || state._busy.deleteScript || state._busy.uploadScript || state._busy.executeScript)
     },
     actions: {
         async _httpRequestWithErrorReporting(requestCb: () => Promise<any>, errorMessageTemplate: string) {
             try {
                 return await requestCb();
             } catch(error: any) {
+                console.error('%O', error);
                 const error_msg = errorMessageTemplate.replace('{{ error_detail }}', error.response ? `HTTP Error ${error.response.status}` : 'Unknown error');
                 generateErrorNotification(error_msg);
                 if(error.response) {
@@ -130,6 +157,13 @@ export const useSimWriterStore = defineStore('simWriter', {
                     this.simWriterContent.type = SIM_DEFAULT_TYPE;
             } catch {};
             this._busy.loadTypes = false;
+        },
+        async loadScripts() {
+            this._busy.loadScripts = true;
+            try {
+                this.scripts = (await this._getDataWithErrorReporting('/api/pysim/scripts', 'Error: {{ error_detail }} when trying to fetch pysim scripts.'));
+            } catch {};
+            this._busy.loadScripts = false;
         },
         async detectReader() {
             this._busy.detectReader = true;
@@ -175,6 +209,29 @@ export const useSimWriterStore = defineStore('simWriter', {
                 this.simWriterContent.opc = opc;
             } catch {}
             this._busy.autogen = false;
+        },
+        async deleteScript() {
+            this._busy.deleteScript = true;
+            try {
+                this.consoleOut = (await this._httpRequestWithErrorReporting(async () => (await api.delete(`/api/pysim/script/${this.simScriptFormContent.scriptName}`)).data, 'Error: {{ error_detail }} when trying to delete script.'));
+            } catch {};
+            this._busy.deleteScript = false;
+            this.loadScripts();
+        },
+        async uploadScript(name: string, content: string) {
+            this._busy.uploadScript = true;
+            try {
+                this.consoleOut = (await this._httpRequestWithErrorReporting(async () => (await api.put(`/api/pysim/script/${name}`, content)).data, 'Error: {{ error_detail }} when trying to upload script.'));
+            } catch {}
+            this._busy.uploadScript = false;
+            this.loadScripts();
+        },
+        async executeScript() {
+            this._busy.executeScript = true;
+            try {
+                this.consoleOut = (await this._httpRequestWithErrorReporting(async () => (await api.post(`/api/pysim/run_script/${this.simScriptFormContent.scriptName}`, {adm: this.simScriptFormContent.adm})).data, 'Error: {{ error_detail }} when trying to write to SIM.'));
+            } catch {}
+            this._busy.executeScript = false;
         },
         clearWriterContent() {
             if(this.types.includes(SIM_DEFAULT_TYPE)) this.simWriterContent.type = SIM_DEFAULT_TYPE;

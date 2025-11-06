@@ -40,6 +40,9 @@ docker-build-o5gc-webui: docker-build-o5gc-base Documentation-build
 	    cp -a $(call get_env,WEBUI_THEME)/* modules/base/docker/o5gc/webui/frontend/theme/
 	$(call docker-build,base,o5gc/webui)
 
+docker-build-simcard: docker-build-o5gc-base
+	$(call docker-build,base,simcard)
+
 docker-build-misc-lbgpsdo: docker-build-o5gc-base
 	$(call docker-build,base,misc,lbgpsdo)
 
@@ -57,7 +60,13 @@ Documentation-serve-stop:
 	cd ${BASE_O5GC_DIR};                                                      \
 	$(DOCKER_COMPOSE) --profile=docu down || true
 
-webui-start:
+docker-volume-simcard-scripts:
+	docker volume create o5gc-simcard-scripts
+	docker container create --name o5gc-tmp -v o5gc-simcard-scripts:/scripts busybox
+	docker cp modules/base/docker/simcard/scripts/ o5gc-tmp:/
+	docker rm -f o5gc-tmp
+
+webui-start: docker-volume-simcard-scripts
 	cd ${BASE_O5GC_DIR};                                                      \
 	$(DOCKER_COMPOSE) --profile=webui up --detach --wait
 	@echo WebUI available at http://${DEFAULT_ROUTE_IFACE_IP}:${O5GC_WEBUI_HOST_PORT}

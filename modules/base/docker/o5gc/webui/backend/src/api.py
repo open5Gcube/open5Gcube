@@ -8,6 +8,7 @@ from datetime import datetime
 from pathlib import Path
 from types import ModuleType
 from http import HTTPStatus
+from requests.exceptions import ReadTimeout, ConnectionError
 
 import pytz
 import dotenv
@@ -288,22 +289,41 @@ def get_uedb():
 
 
 def run_simcard_container(cmd):
+    """
+    Return Value: (digest: str, timeout: bool, exitcode: int|None, log: str)
+    """
     client = docker.from_env()
     try:
-        output = client.containers.run('o5gc/simcard', cmd,
-                                       volumes=["/dev/bus/usb:/dev/bus/usb"],
-                                       stderr=True, privileged=True, auto_remove=True)
-        return cmd + '\n' + output.decode('utf-8')
+        container = client.containers.run('o5gc/simcard', cmd,
+                volumes=["/dev/bus/usb:/dev/bus/usb", "o5gc-simcard-scripts:/o5gc-simcard-scripts:ro"],
+                stderr=True, privileged=True, detach=True)
+        response = None
+        timeout = None
+        try:
+            response = container.wait(timeout=120)
+            timeout = False
+        except (ReadTimeout, ConnectionError):
+            timeout = True
+        finally:
+            logs = container.logs(stdout=True, stderr=True).decode("utf8", "surrogateescape")
+            container.reload()
+            container.remove(force=True)
+            exitcode = response.get("StatusCode", None) if response else None
+            digest = str(cmd) + '\n' + logs + '\n' + (f'Exited with code {response.get("StatusCode", response)}.' if response else f'Forced removal of container after timeout was reached. Last state: {container.status}.')
+            return digest, timeout, exitcode, logs
+
     except docker.errors.ContainerError as err:
-        return str(err)
+        return str(cmd) + '\n' + "ContainerError during execution:\n" + str(err), None, -1, ""
 
 @bp.get('/pcsc_scan/readers')
 def get_pcsc_scan_readers():
-    return Response(run_simcard_container("pcsc_scan -r -t1"), content_type="text/plain")
+    digest, _, _, _ = run_simcard_container("pcsc_scan -r -t1")
+    return Response(digest, content_type="text/plain")
 
 @bp.get('/pcsc_scan/cards')
 def get_pcsc_scan_cards():
-    return Response(run_simcard_container("pcsc_scan -c -t1"), content_type="text/plain")
+    digest, _, _, _ = run_simcard_container("pcsc_scan -c -t1")
+    return Response(digest, content_type="text/plain")
 
 @bp.get('/kiopcgen')
 def kiopcgen():
@@ -316,31 +336,31 @@ def kiopcgen():
 
 @bp.get('/pysim/prog_types')
 def get_pysim_prog_types():
-    return run_simcard_container("./pySim-prog.py -t list").split()
+    _, timeout, exitcode, log = run_simcard_container("./pySim-prog.py -t list")
+    if timeout:
+        return "SIM Card types could not be loaded since command timed out.", HTTPStatus.GATEWAY_TIMEOUT
+    elif exitcode:
+        return f"SIM Card types could not be loaded since the command failed with exitcode {exitcode}.", HTTPStatus.INTERNAL_SERVER_ERROR
+
+    return log.split()
 
 @bp.get('/pysim/read')
 def get_pysim_read():
-    return Response(run_simcard_container("./pySim-read.py -p0"), content_type="text/plain")
+    digest, _, _, _ = run_simcard_container("./pySim-read.py -p0")
+    return Response(digest, content_type="text/plain")
 
 @bp.post('/pysim/prog')
 def get_pysim_prog():
     payload_schema = {
         "type": "object",
         "properties": {
-            "type": {
-                "type": "string" },
-            "mcc": {
-                "type": "string", "minLength": 3, "maxLength": 3 },
-            "mnc": {
-                "type": "string", "minLength": 2, "maxLength": 3 },
-            "imsi": {
-                "type": "string", "minLength": 6 },
-            "ki": {
-                "type": "string", "minLength": 32, "maxLength": 32 },
-            "opc": {
-                "type": "string", "minLength": 32, "maxLength": 32 },
-            "adm": {
-                "type": "string" }
+            "type": { "type": "string" },
+            "mcc": { "type": "string", "minLength": 3, "maxLength": 3 },
+            "mnc": { "type": "string", "minLength": 2, "maxLength": 3 },
+            "imsi": { "type": "string", "minLength": 6 },
+            "ki": { "type": "string", "minLength": 32, "maxLength": 32 },
+            "opc": { "type": "string", "minLength": 32, "maxLength": 32 },
+            "adm": {"type": "string" }
         },
         "required": ["type", "mcc", "mnc", "imsi", "ki", "opc", "adm"]
     }
@@ -352,13 +372,156 @@ def get_pysim_prog():
         jsonschema.validate(payload, payload_schema)
     except jsonschema.exceptions.ValidationError as e:
         return str(e), HTTPStatus.BAD_REQUEST
-    return Response(run_simcard_container(
-            f"./pySim-prog.py -p 0 --num 0"
-            f" --type={payload.get('type')}"
-            f" --pin-adm={payload.get('adm')}"
-            f" --mcc={payload.get('mcc')}"
-            f" --mnc={payload.get('mnc')}"
-            f" --imsi={payload.get('imsi')}"
-            f" --ki={payload.get('ki')}"
-            f" --opc={payload.get('opc')}"),
-        content_type="text/plain")
+
+    digest, _, _, _ = run_simcard_container(
+        f"./pySim-prog.py -p 0 --num 0"
+        f" --type={payload.get('type')}"
+        f" --pin-adm={payload.get('adm')}"
+        f" --mcc={payload.get('mcc')}"
+        f" --mnc={payload.get('mnc')}"
+        f" --imsi={payload.get('imsi')}"
+        f" --ki={payload.get('ki')}"
+        f" --opc={payload.get('opc')}"
+    )
+
+    return Response(digest, content_type="text/plain")
+
+
+class IsNotRegularFileError(Exception):
+    pass
+
+
+class PathTraversalDetectedError(Exception):
+    pass
+
+
+def read_and_parse_pysim_script(filepath: Path):
+    if not filepath.parent == current_app.config["PYSIM_SCRIPTS_PATH"]:
+        raise PathTraversalDetectedError()
+
+    if not filepath.is_file():
+        raise IsNotRegularFileError()
+    # Raises UnicodeDecodeError / PermissionError
+    content = filepath.read_text(encoding="utf-8")
+
+    lines = content.splitlines(keepends=True)
+    comment_lines = []
+
+    # If first line is a comment, we parse it and include it in the result.
+    if lines and lines[0].startswith('#'):
+        for line in lines:
+            if not line.startswith('#'): break
+            comment_lines.append(line[1:].lstrip(" "))
+
+    return {
+        "comment": comment_lines,
+        "content": content,
+        "error": None
+    }
+
+
+@bp.get('/pysim/scripts')
+def get_pysim_scripts():
+    result = {}
+    for scriptfile in current_app.config["PYSIM_SCRIPTS_PATH"].iterdir():
+        if not scriptfile.is_file():
+            continue
+        try:
+            result[scriptfile.name] = read_and_parse_pysim_script(scriptfile)
+        except UnicodeDecodeError:
+            result[scriptfile.name] = {
+                "comment": None,
+                "content": None,
+                "error": "Script contains binary data / invalid unicode characters."
+            }
+        except PermissionError:
+            result[scriptfile.name] = {
+                "comment": None,
+                "content": None,
+                "error": "Script could not be read due to permission error."
+            }
+        except (FileNotFoundError, IsNotRegularFileError):
+            continue
+
+    return result
+
+
+@bp.get('/pysim/script/<string:script_name>')
+def get_pysim_script(script_name: str):
+    try:
+        return read_and_parse_pysim_script(current_app.config["PYSIM_SCRIPTS_PATH"] / script_name)
+    except PathTraversalDetectedError:
+        return "Path traversal detected.", HTTPStatus.FORBIDDEN
+    except PermissionError:
+        return "Permission error.", HTTPStatus.FORBIDDEN
+    except (FileNotFoundError, IsNotRegularFileError):
+        return "Script doesn't exist (or is not a regular file).", HTTPStatus.NOT_FOUND
+    except UnicodeDecodeError:
+        return "Script content is binary / has invalid unicode bytes.", HTTPStatus.INTERNAL_SERVER_ERROR
+
+
+@bp.put('/pysim/script/<string:script_name>')
+def upload_pysim_script(script_name: str):
+    script_path: Path = current_app.config["PYSIM_SCRIPTS_PATH"] / script_name
+    if not script_path.parent == current_app.config["PYSIM_SCRIPTS_PATH"]:
+        return "Path traversal detected.", HTTPStatus.FORBIDDEN
+
+    if script_path.exists() and not script_path.is_file():
+        return "Script file exists, but is not a regular file.", HTTPStatus.INTERNAL_SERVER_ERROR
+
+    existed_before = script_path.is_file()
+    with open(script_path, 'wb') as f:
+        for chunk in iter(lambda: request.stream.read(8192), b''):
+            f.write(chunk)
+
+    return f"Script {script_name} saved.", HTTPStatus.CREATED if not existed_before else HTTPStatus.OK
+
+
+@bp.delete('/pysim/script/<string:script_name>')
+def delete_pysim_script(script_name: str):
+    script_path: Path = current_app.config["PYSIM_SCRIPTS_PATH"] / script_name
+    if not script_path.parent == current_app.config["PYSIM_SCRIPTS_PATH"]:
+        return "Path traversal detected.", HTTPStatus.FORBIDDEN
+    if script_path.is_file():
+        try:
+            script_path.unlink()
+            return "Script deleted.", HTTPStatus.OK
+        except PermissionError:
+            return "No permission to remove script file.", HTTPStatus.FORBIDDEN
+    else:
+        return "Script does not exist.", HTTPStatus.NOT_FOUND
+
+
+@bp.post('/pysim/run_script/<string:script_name>')
+def run_pysim_script(script_name: str):
+    payload_schema = {
+        "type": "object",
+        "properties": {
+            "adm": {"type": "string"}
+        },
+        "required": ["adm"]
+    }
+
+    if not request.content_length or request.content_length == 0:
+        return "Payload missing", HTTPStatus.BAD_REQUEST
+    payload = request.get_json()
+    try:
+        jsonschema.validate(payload, payload_schema)
+    except jsonschema.exceptions.ValidationError as e:
+        return str(e), HTTPStatus.BAD_REQUEST
+
+    script_path: Path = current_app.config["PYSIM_SCRIPTS_PATH"] / script_name
+    if not script_path.parent == current_app.config["PYSIM_SCRIPTS_PATH"]:
+        return "Path traversal detected.", HTTPStatus.FORBIDDEN
+    if not script_path.is_file():
+        return "Script does not exist.", HTTPStatus.NOT_FOUND
+
+    script_path_volume = Path("/o5gc-simcard-scripts") / script_name
+
+    digest, timeout, exitcode, log = run_simcard_container([
+        f"./pySim-shell.py", '-p0',
+        "-a", payload.get('adm'),
+        "--script", script_path_volume.as_posix()
+    ])
+
+    return Response(digest, content_type="text/plain")

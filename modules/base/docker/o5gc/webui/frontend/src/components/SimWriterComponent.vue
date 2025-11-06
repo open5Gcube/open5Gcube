@@ -1,6 +1,5 @@
 <template>
     <div class="col column">
-        <q-bar class="bg-primary text-white text-weight-bold">SIM Writer</q-bar>
         <q-card flat bordered square class="column col q-pa-sm" style="font-family: monospace;">
             <q-select dense outlined v-model="simWriterContent.type" :options="types" ref="typeRef" :rules="[val => checkTypeFormat || '']" label="Type" class="q-pa-xs" />
             <div class="row">
@@ -16,7 +15,7 @@
                 <div class="col-2 row"><q-btn :loading="_busy.autogen" @click="autogenKeyOpc()" color="primary" class="col-11 q-ma-xs">Autogen</q-btn></div>
             </div>
             <div class="row">
-                <q-input dense outlined v-model="simWriterContent.adm" ref="admRef" label="ADM" class="q-pa-xs col-md-9 col-xs-12" />
+                <q-input dense outlined v-model="simWriterContent.adm" ref="admRef" :rules="[val => checkAdmFormat || '']" label="ADM" class="q-pa-xs col-md-9 col-xs-12" />
                 <div class="col-3 row"><q-btn @click="clearWriterContent(); resetValidation();" color="primary" class="col-11 q-ma-xs">Clear&nbsp;Form</q-btn></div>
             </div>
             <div class="row">
@@ -84,6 +83,7 @@ export default {
                 if(imsiRef.value) imsiRef.value.resetValidation();
                 if(kiRef.value) kiRef.value.resetValidation();
                 if(opcRef.value) opcRef.value.resetValidation();
+                if(admRef.value) admRef.value.resetValidation();
             });
         }
 
@@ -101,6 +101,7 @@ export default {
         checkImsiFormat: (state) => /^\d{5,15}$/.test(state.simWriterContent.imsi) && state.simWriterContent.imsi.startsWith(`${state.simWriterContent.mcc}${state.simWriterContent.mnc}`),
         checkKiFormat: (state) => /^[0-9A-Fa-f]{32}$/.test(state.simWriterContent.ki),
         checkOpcFormat: (state) => /^[0-9A-Fa-f]{32}$/.test(state.simWriterContent.opc),
+        checkAdmFormat: (state) => /^[0-9]+$/.test(state.simWriterContent.adm),
         writeButtonActive: (state) => (
             state.checkTypeFormat &&
             state.checkMccFormat &&
