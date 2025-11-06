@@ -1,0 +1,8 @@
+# Provision the Open Mobile Network Toolkit fingerprint
+
+set echo true
+set debug true
+
+select ADF.ARA-M
+aram_delete_all 
+aram_store_ref_ar_do --aid ffffffffffff --device-app-id E849B63A7B96E571F788FC5845C4AA3C520D18E8 --android-permissions 0000000000000001

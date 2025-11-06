@@ -295,8 +295,8 @@ def run_simcard_container(cmd):
     client = docker.from_env()
     try:
         container = client.containers.run('o5gc/simcard', cmd,
-                                       volumes=["/dev/bus/usb:/dev/bus/usb", "o5gc-simcard-scripts:/o5gc-simcard-scripts:ro"],
-                                       stderr=True, privileged=True, detach=True)
+                volumes=["/dev/bus/usb:/dev/bus/usb", "o5gc-simcard-scripts:/o5gc-simcard-scripts:ro"],
+                stderr=True, privileged=True, detach=True)
         response = None
         timeout = None
         try:
@@ -354,20 +354,13 @@ def get_pysim_prog():
     payload_schema = {
         "type": "object",
         "properties": {
-            "type": {
-                "type": "string" },
-            "mcc": {
-                "type": "string", "minLength": 3, "maxLength": 3 },
-            "mnc": {
-                "type": "string", "minLength": 2, "maxLength": 3 },
-            "imsi": {
-                "type": "string", "minLength": 6 },
-            "ki": {
-                "type": "string", "minLength": 32, "maxLength": 32 },
-            "opc": {
-                "type": "string", "minLength": 32, "maxLength": 32 },
-            "adm": {
-                "type": "string" }
+            "type": { "type": "string" },
+            "mcc": { "type": "string", "minLength": 3, "maxLength": 3 },
+            "mnc": { "type": "string", "minLength": 2, "maxLength": 3 },
+            "imsi": { "type": "string", "minLength": 6 },
+            "ki": { "type": "string", "minLength": 32, "maxLength": 32 },
+            "opc": { "type": "string", "minLength": 32, "maxLength": 32 },
+            "adm": {"type": "string" }
         },
         "required": ["type", "mcc", "mnc", "imsi", "ki", "opc", "adm"]
     }
@@ -429,7 +422,6 @@ def read_and_parse_pysim_script(filepath: Path):
 
 @bp.get('/pysim/scripts')
 def get_pysim_scripts():
-
     result = {}
     for scriptfile in current_app.config["PYSIM_SCRIPTS_PATH"].iterdir():
         if not scriptfile.is_file():
@@ -527,7 +519,7 @@ def run_pysim_script(script_name: str):
     script_path_volume = Path("/o5gc-simcard-scripts") / script_name
 
     digest, timeout, exitcode, log = run_simcard_container([
-        f"./pySim-shell.py",
+        f"./pySim-shell.py", '-p0',
         "-a", payload.get('adm'),
         "--script", script_path_volume.as_posix()
     ])
