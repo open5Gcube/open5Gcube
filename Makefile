@@ -10,7 +10,8 @@ export BASE_DIR DOCKER_HOST_BRIDGE OAI_TRACER_ENABLE HOST_USER_GROUP_ID DEFAULT_
 EXPORT_ENV = export BASE_DIR=${BASE_DIR} DOCKER_HOST_BRIDGE=${DOCKER_HOST_BRIDGE} HOST_USER_GROUP_ID=${HOST_USER_GROUP_ID}
 
 O5GC_ENV = ${ENV_DIR}/base/o5gc.env
-get_env = $(shell env=$(or ${2},${O5GC_ENV}); make --no-print-directory -s $${env}; source $${env}; echo $(foreach v,${1},$$${v}))
+MAKE_ENV = MAKEFLAGS= make --no-print-directory -s ENV_DIR=${ENV_DIR}
+get_env = $(shell env=$(or ${2},${O5GC_ENV}); $(MAKE_ENV) $${env}; source $${env}; echo $(foreach v,${1},$$${v}))
 
 # thanks to https://news.ycombinator.com/item?id=11195539
 help:  ## This help
@@ -116,7 +117,7 @@ DOCKER_COMPOSE = $(EXPORT_DEVELOP_VOLUMES); $(EXPORT_ENV);                    \
     export O5GC_STACK=$$(basename $${PWD});                                   \
     export MODULE=$$(realpath --relative-to=${BASE_DIR} $${PWD}|cut -d / -f2);\
     export ENV_FILE=${ENV_DIR}/$${MODULE}/$${O5GC_STACK}.env;                 \
-    $(MAKE) --no-print-directory -s -C ${BASE_DIR} $${ENV_FILE};              \
+    $(MAKE_ENV) -C ${BASE_DIR} $${ENV_FILE};                                  \
     docker compose --env-file=$${ENV_FILE}                                    \
         --file $$(ls | grep -E "docker-compose.yaml|services.yaml")           \
         --file ${BASE_DIR}/etc/networks.yaml
