@@ -31,7 +31,7 @@ plugins:
   - open-in-new-tab
   - glightbox:
       zoomable: false
-  - with-pdf:
+  - to-pdf:
       cover_subtitle: Technical Reference Documentation
       author: !ENV DATE
       exclude_pages:

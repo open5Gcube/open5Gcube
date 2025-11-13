@@ -6,6 +6,6 @@ RUN pip install --no-cache-dir                                                \
 
 RUN apk upgrade --no-cache                                                    \
     && apk --no-cache add build-base python3-dev pango                        \
-    && pip install --no-cache-dir mkdocs-with-pdf
+    && pip install --no-cache-dir mkdocs-to-pdf
 
 RUN mkdocs -V | sed -E 's|.*version ([0-9.]+).*|\1|' > /etc/image_version
