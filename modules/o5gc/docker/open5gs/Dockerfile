@@ -1,4 +1,4 @@
-FROM o5gc/o5gc-base:jammy
+FROM o5gc/o5gc-base:jammy AS develop
 
 LABEL org.opencontainers.image.title='Open5GS'
 
@@ -23,7 +23,11 @@ RUN pip3 install --upgrade --no-cache-dir pip                                 \
     && pip3 install --no-cache-dir click==8.0.4                               \
     && ln -s /o5gc/open5gs/ -t /
 
+RUN echo develop > /etc/image_version
+
 WORKDIR /o5gc/open5gs
+
+FROM develop
 
 ARG OPEN5GS_VERSION=2.7.2
 RUN git clone --branch v${OPEN5GS_VERSION} --depth 1                          \
