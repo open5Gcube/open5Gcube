@@ -90,9 +90,11 @@ endef
 DOCKER_RAN_HOSTS = $(sort $(call get_env,ENB_HOSTNAME GNB_HOSTNAME))
 DOCKER_ALL_HOSTS = $(sort localhost ${DOCKER_RAN_HOSTS})
 
+DOCKER_FILES = $(filter-out ${DOCKER_FILES_IGNORE},$(shell cd modules; find -L */docker/ -name *Dockerfile -not -path '*/node_modules/*'))
+
 DOCKER_BUILD_ALL = $(filter-out %-build-cacher,$(filter-out %-base,$(sort     \
-    $(shell cd modules; find -L ./ -name *Dockerfile                          \
-        | sed -E "s|./.*/docker/(.*)/([^.]*).?Dockerfile|docker-build-\1-\2|" \
+    $(shell echo ${DOCKER_FILES} | tr ' ' '\n'                                \
+        | sed -E "s|.*/docker/(.*)/([^.]*).?Dockerfile|docker-build-\1-\2|"   \
         | sed -E "s|/|-|" | sed -E "s|(.*)-$$|\1|"))))
 docker-build-all: clean build-cacher-restart docker-build-o5gc-base  ## Build all Docker images
 	$(MAKE) ${PARALLEL_JOBS} RUN_PARALLEL=1 ${DOCKER_BUILD_ALL} pull-all-external-images
@@ -289,14 +291,13 @@ yamllint:
 	  cytopia/yamllint:latest                                                 \
 	    -s -d ${YAMLLINT_CONFIG} ${YAMLLINT_FILES}
 
-DOCKER_FILES = $(filter-out ${DOCKER_FILES_IGNORE},$(shell find ${BASE_DIR}/modules/*/docker/ -name *Dockerfile -not -path '*/node_modules/*'))
 HADOLINT_IGNORE = DL3003 DL3007 DL3008 DL3009 SC3010 DL3013 DL3018 DL3059     \
                   DL4006  ${SHELLCHECK_IGNORE}
 hadolint:
 	@echo Running hadolint
-	@docker run --rm --volume ${BASE_DIR}:${BASE_DIR}                         \
+	@docker run --rm --volume ${BASE_DIR}:${BASE_DIR}:ro                      \
 	  hadolint/hadolint hadolint                                              \
-	    $(foreach rule,${HADOLINT_IGNORE},--ignore ${rule}) ${DOCKER_FILES}
+	    $(foreach rule,${HADOLINT_IGNORE},--ignore ${rule}) $(addprefix ${MODULES_DIR}/,${DOCKER_FILES})
 
 dclint:
 	@echo Running dclint
