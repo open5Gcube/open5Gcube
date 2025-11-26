@@ -33,6 +33,8 @@ services:
       service: base
     container_name: ue
     command: ue
+    environment:
+      - SUCI_SCHEME=${SUCI_SCHEME:-0}
     networks:
       rfsim:
         ipv4_address: ${UE_RF_IP_ADDR}

@@ -5,6 +5,13 @@ mcc: '${MCC}'
 # Mobile Network Code value of HPLMN (2 or 3 digits)
 mnc: '${MNC}'
 
+# SUCI Protection Scheme : 0 for Null-scheme, 1 for Profile A and 2 for Profile B
+protectionScheme: ${SUCI_SCHEME}
+# Home Network Public Key for protecting with SUCI Profile A
+homeNetworkPublicKey: '28ea6090c84ba15d44cb19123a5d1a28c1aa560af6cad33f12afa660b821fa13'
+# Home Network Public Key ID for protecting with SUCI Profile A
+homeNetworkPublicKeyId: 30
+
 # Permanent subscription key
 key: '${UE_SOFT_KEY}'
 # Operator code (OP or OPC) of the UE
