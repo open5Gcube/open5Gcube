@@ -15,37 +15,31 @@ services:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
       service: mongo-express
-    depends_on: [ mongo ]
 
   open5gs-webui:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
       service: webui
-    depends_on: [ mongo ]
 
   open5gs-init:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
       service: init
-    depends_on: [ open5gs-webui ]
 
   hss:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
       service: hss
-    depends_on: [ mongo ]
 
   sgwc:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
       service: sgwc
-    depends_on: [ smf, upf ]
 
   sgwu:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
       service: sgwu
-    depends_on: [ smf, upf ]
 
   smf:
     extends:
@@ -56,7 +50,6 @@ services:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
       service: upf
-    depends_on: [ smf ]
 
   nrf:
     extends:
@@ -67,13 +60,11 @@ services:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
       service: mme
-    depends_on: [ hss, sgwc, sgwu, smf, upf ]
 
   pcrf:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
       service: pcrf
-    depends_on: [ mongo ]
 
   scp:
     extends:

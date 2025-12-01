@@ -35,19 +35,16 @@ services:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
       service: mongo-express
-    depends_on: [ mongo ]
 
   open5gs-webui:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
       service: webui
-    depends_on: [ mongo ]
 
   open5gs-init:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
       service: init
-    depends_on: [ open5gs-webui ]
 
   nrf:
     extends:
@@ -58,61 +55,51 @@ services:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
       service: ausf
-    depends_on: [ nrf ]
 
   udr:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
       service: udr
-    depends_on: [ mongo, nrf ]
 
   udm:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
       service: udm
-    depends_on: [ nrf ]
 
   pcf:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
       service: pcf
-    depends_on: [ mongo, nrf ]
 
   bsf:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
       service: bsf
-    depends_on: [ mongo, nrf ]
 
   nssf:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
       service: nssf
-    depends_on: [ nrf ]
 
   smf:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
       service: smf
-    depends_on: [ nrf ]
 
   upf:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
       service: upf
-    depends_on: [ nrf, smf ]
 
   amf:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
       service: amf
-    depends_on: [ ausf, bsf, nrf, pcf, smf, udm, udr, upf ]
 
   pcrf:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
       service: pcrf
-    depends_on: [ mongo ]
 
   scp:
     extends:

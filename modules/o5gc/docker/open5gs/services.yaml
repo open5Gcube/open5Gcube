@@ -53,6 +53,7 @@ services:
       o5gc.webui.hide: true
       o5gc.link.title: "Mongo Express"
       o5gc.link.url: "http://{{host}}:${MONGO_EXPRESS_HOST_PORT}/"
+    depends_on: [ mongo ]
     profiles: [ "core" ]
 
   init:
@@ -65,6 +66,7 @@ services:
     labels:
       o5gc.initialisation: true
       o5gc.webui.priority: ${WEBUI_PRIO_INIT}
+    depends_on: [ open5gs-webui ]
     profiles: [ "core" ]
 
   webui:
@@ -84,6 +86,7 @@ services:
       o5gc.link.title: "Open5GS WebUI"
       o5gc.link.url: "http://{{host}}:${OPEN5GS_WEBUI_HOST_PORT}/"
       o5gc.webui.priority: 0
+    depends_on: [ mongo ]
     profiles: [ "core" ]
     healthcheck:
       test: /bin/bash -c "curl --fail http://${OPEN5GS_WEBUI_IP_ADDR}:3000 || exit 1"
@@ -109,6 +112,7 @@ services:
     networks:
       corenet:
         ipv4_address: ${AUSF_IP_ADDR}
+    depends_on: [ nrf, scp ]
     profiles: [ "core" ]
 
   udr:
@@ -121,6 +125,7 @@ services:
     networks:
       corenet:
         ipv4_address: ${UDR_IP_ADDR}
+    depends_on: [ mongo, nrf, scp ]
     profiles: [ "core" ]
 
   udm:
@@ -131,6 +136,7 @@ services:
     networks:
       corenet:
         ipv4_address: ${UDM_IP_ADDR}
+    depends_on: [ nrf, scp ]
     profiles: [ "core" ]
 
   pcf:
@@ -143,6 +149,7 @@ services:
     networks:
       corenet:
         ipv4_address: ${PCF_IP_ADDR}
+    depends_on: [ mongo, nrf, scp ]
     profiles: [ "core" ]
 
   bsf:
@@ -155,6 +162,7 @@ services:
     networks:
       corenet:
         ipv4_address: ${BSF_IP_ADDR}
+    depends_on: [ mongo, nrf, scp ]
     profiles: [ "core" ]
 
   nssf:
@@ -165,6 +173,7 @@ services:
     networks:
       corenet:
         ipv4_address: ${NSSF_IP_ADDR}
+    depends_on: [ mongo, nrf, scp ]
     profiles: [ "core" ]
 
   hss:
@@ -180,6 +189,7 @@ services:
         ipv4_address: ${HSS_IP_ADDR}
     labels:
       o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
+    depends_on: [ mongo ]
     profiles: [ "core" ]
 
   sgwc:
@@ -190,6 +200,7 @@ services:
     networks:
       corenet:
         ipv4_address: ${SPGWC_IP_ADDR}
+    depends_on: [ smf, upf ]
     profiles: [ "core" ]
 
   sgwu:
@@ -202,6 +213,7 @@ services:
     networks:
       corenet:
         ipv4_address: ${SPGWU_IP_ADDR}
+    depends_on: [ smf, upf ]
     profiles: [ "core" ]
 
   smf:
@@ -235,6 +247,7 @@ services:
         ipv4_address: ${UPF_EXT_IP_ADDR}
     labels:
       o5gc.webui.priority: ${WEBUI_PRIO_CORE_DEFAULT}
+    depends_on: [ nrf, scp, smf ]
     profiles: [ "core" ]
     cap_add:
       - NET_ADMIN
@@ -253,6 +266,7 @@ services:
         ipv4_address: ${AMF_IP_ADDR}
     labels:
       o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
+    depends_on: [ ausf, bsf, nrf, pcf, scp, udm, udr ]
     profiles: [ "core" ]
 
   mme:
@@ -269,6 +283,7 @@ services:
         ipv4_address: ${MME_IP_ADDR}
     labels:
       o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
+    depends_on: [ hss, sgwc, sgwu, smf, upf ]
     profiles: [ "core" ]
 
   pcrf:
@@ -283,6 +298,7 @@ services:
     networks:
       corenet:
         ipv4_address: ${PCRF_IP_ADDR}
+    depends_on: [ nrf ]
     profiles: [ "core" ]
 
   scp:
@@ -293,6 +309,7 @@ services:
     networks:
       corenet:
         ipv4_address: ${SCP_IP_ADDR}
+    depends_on: [ nrf ]
     profiles: [ "core" ]
 
   develop:

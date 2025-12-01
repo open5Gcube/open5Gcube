@@ -105,8 +105,8 @@ services:
     profiles: [ "develop" ]
 
 volumes:
-    # Volume used by the webui to pass pysim-scripts into the simcard container.
-    # Must be created externally, e.g. by the Makefile when starting the webui.
-    o5gc-simcard-scripts:
-        external: true
-        name: o5gc-simcard-scripts
+  # Volume used by the webui to pass pysim-scripts into the simcard container.
+  # Must be created externally, e.g. by the Makefile when starting the webui.
+  o5gc-simcard-scripts:
+    external: true
+    name: o5gc-simcard-scripts

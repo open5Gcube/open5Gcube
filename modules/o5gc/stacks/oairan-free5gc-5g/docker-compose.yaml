@@ -16,7 +16,6 @@ services:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
       service: mongo-express
-    depends_on: [ mongo ]
 
   nrf:
     extends:
