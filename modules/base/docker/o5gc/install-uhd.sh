@@ -18,7 +18,7 @@ cmake -DENABLE_TESTS=OFF -DENABLE_EXAMPLES=OFF -DENABLE_B100=OFF              \
       -DENABLE_MAN_PAGE_COMPRESSION=OFF -DENABLE_OCTOCLOCK=ON                 \
       -DENABLE_X400=OFF -DENABLE_USRP1=OFF -DENABLE_USRP2=OFF                 \
       -DCMAKE_CXX_FLAGS="-march=native"                                       \
-    ../                                                                   
+    ../
 make -j $(nproc)
 make install
 make clean

@@ -94,7 +94,7 @@ case "${srv}" in
         args=$(eval echo ${@:2})
         build/nr-uesoftmodem --sa --nokrnmod                                  \
             --usrp-args ${USRP_ARGS} --clock-source 1 ${SOFTMODEM_ARGS}       \
-            -O ${cfg_file} ${args}  
+            -O ${cfg_file} ${args}
         wait_pid=$!
         ;;
     lte-ue)

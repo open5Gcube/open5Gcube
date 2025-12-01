@@ -130,7 +130,7 @@ IMAGES = $(eval IMAGES := $(sort $(foreach s,${STACKS},$(shell cd ${s}; $(DOCKER
 image_versions = $(sort $(foreach i,$(filter o5gc/$1:%,${IMAGES}),$(shell echo ${i} | sed "s|o5gc/$1:\(.*\)|\1|")))
 
 DEFAULT_MODULES = base o5gc
-DEFAULT_MODULE_TARGET_FILES = $(foreach module,${DEFAULT_MODULES},modules/${module}/targets.mk) 
+DEFAULT_MODULE_TARGET_FILES = $(foreach module,${DEFAULT_MODULES},modules/${module}/targets.mk)
 MODULE_TARGET_FILES = ${DEFAULT_MODULE_TARGET_FILES} $(sort $(filter-out ${DEFAULT_MODULE_TARGET_FILES},$(wildcard modules/*/targets.mk)))
 include ${MODULE_TARGET_FILES}
 
@@ -302,7 +302,7 @@ dclint:
 	@docker run --rm --volume ${BASE_DIR}:/app                                \
 	  zavoloklom/dclint -c scripts/dclintrc ${DC_FILES}
 
-MD_FILES = $(wildcard ${BASE_DIR}/Doc/*.md)
+MD_FILES = $(filter-out ${BASE_DIR}/Doc/README.md,$(wildcard ${BASE_DIR}/Doc/*.md))
 MD_IGNORE = ~MD001,~MD002,~MD022,~MD031,~MD032,~MD041
 markdownlint:
 	@echo Running markdownlint
@@ -314,7 +314,8 @@ cargo-machete:
 	docker run -v $(BASE_DIR)/modules:/src ghcr.io/bnjbvr/cargo-machete:latest
 
 CODESPELL_FILES += $(shell find etc/ -name *.env)                             \
-                  ${SHELLCHECK_FILES} ${DOCKER_FILES} ${MD_FILES} ${YAMLLINT_FILES} Makefile
+                   $(addprefix ${MODULES_DIR}/,${DOCKER_FILES}) ${MD_FILES}   \
+                   ${SHELLCHECK_FILES} ${YAMLLINT_FILES} Makefile
 CODESPELL_IGNORE_WORDS = ue,ues,leas,bund,te
 codespell: scripts-install-venv
 	@echo Running codespell

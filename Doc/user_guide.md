@@ -1,16 +1,16 @@
 ## Directory Structure
 The main structure is as follows:
 
-|                  |                                                                                  |
-| ---------------: | :------------------------------------------------------------------------------- |
-| ``Makefile``     | Central entry point for all commands on the console                              |
-| ``modules/base`` | Base module: Files for the base Docker image and services                        |
-| ``modules/o5gc`` | Main module: Files for all the open-source projects integrated in open5Gcube     |
-| ``etc/``         | Central configuration files                                                      |
-| ``scripts/``     | Boot-Startup as well as other helper scripts                                     |
-| ``var/``         | Cache files to build the Docker images and run the Stacks                        |
-| ``Doc/``         | This documentation                                                               |
-| ``tests/``       | Automated (emulated) function tests - still under development                    |
+|                  |                                                                              |
+| ---------------: | :--------------------------------------------------------------------------- |
+| ``Makefile``     | Central entry point for all commands on the console                          |
+| ``modules/base`` | Base module: Files for the base Docker image and services                    |
+| ``modules/o5gc`` | Main module: Files for all the open-source projects integrated in open5Gcube |
+| ``etc/``         | Central configuration files                                                  |
+| ``scripts/``     | Boot-Startup as well as other helper scripts                                 |
+| ``var/``         | Cache files to build the Docker images and run the Stacks                    |
+| ``Doc/``         | This documentation                                                           |
+| ``tests/``       | Automated (emulated) function tests - still under development                |
 
 ## Configuration
 The configuration of the installation and the global settings across the Stacks is done via
@@ -122,7 +122,7 @@ make docker-purge-all-images
 ```
 
 ### Running Stacks
-For each Stack defined in the modules, there is a ``make run-<stackname>`` command. So for 
+For each Stack defined in the modules, there is a ``make run-<stackname>`` command. So for
 example, to run the 5G-SA Stack composed of OAI-RAN and Open5GS, run
 ```console
 make run-oairan-open5gs-5g

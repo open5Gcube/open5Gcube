@@ -62,7 +62,7 @@ the building of the actual images by incorporating the following features:
   avoiding repeated fetches.
 ``Downloads``: Large downloaded files are cached to accelerate subsequent builds.
 
-The usage of the cacher can be disabled in the installation specific settings file 
+The usage of the cacher can be disabled in the installation specific settings file
   [``etc/local.env``](user_guide.md#localenv) by setting
 ```shell
 USE_BUILD_CACHER=0

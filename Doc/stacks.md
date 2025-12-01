@@ -132,4 +132,3 @@ To test VoLTE make sure the APN settings of the Ue are correct:
     * Then, create ims APN, APN name: ims, APN type: ims –> Save APN
 
 Contrary to the tutorial, it does not seem necessary to disable the SQN check for Sysmocom SIM cards.
-
