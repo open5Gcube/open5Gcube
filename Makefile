@@ -283,13 +283,11 @@ shellcheck:
 DC_FILES = $(wildcard modules/*/stacks/*/docker-compose.yaml)                 \
            $(shell find modules/*/docker/ -name services.yaml)
 YAMLLINT_FILES = ${DC_FILES} etc/networks.yaml Doc/mkdocs.yml
-YAMLLINT_CONFIG = "{extends: default, rules: {comments-indentation: disable,  \
-    document-start: {present: false}, line-length: {max: 120}}}"
 yamllint:
 	@echo Running yamllint
 	@docker run --rm --volume="${PWD}:/data"                                  \
 	  cytopia/yamllint:latest                                                 \
-	    -s -d ${YAMLLINT_CONFIG} ${YAMLLINT_FILES}
+	    -s -c scripts/yamllint.yaml ${YAMLLINT_FILES}
 
 HADOLINT_IGNORE = DL3003 DL3007 DL3008 DL3009 SC3010 DL3013 DL3018 DL3059     \
                   DL4006  ${SHELLCHECK_IGNORE}
