@@ -7,7 +7,7 @@ cf=$1
 envsubst.sh /mnt/volte/kamailio/kamctlrc.cfg /usr/local/etc/kamailio/kamctlrc
 envsubst.sh /mnt/volte/kamailio/kamailio.cfg /usr/local/etc/kamailio/kamailio.cfg
 
-wait-for-it ${MYSQL_IP_ADDR}:3306
+wait-for-it -t 30 ${MYSQL_IP_ADDR}:3306
 
 export MYSQL_HOST=mysql
 export MYSQL_USER=root
