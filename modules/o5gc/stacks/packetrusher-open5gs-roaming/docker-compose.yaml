@@ -107,7 +107,7 @@ services:
     networks:
       - o5gc
     ports:
-      - ${HOME_OPEN5GS_WEBUI_HOST_PORT}:3000
+      - ${O5GC_WEBUI_HOST_ADDR}:${HOME_OPEN5GS_WEBUI_HOST_PORT}:3000
     labels:
       o5gc.link.title: "Home Open5GS WebUI"
       o5gc.link.url: "http://{{host}}:${HOME_OPEN5GS_WEBUI_HOST_PORT}/"
@@ -373,7 +373,7 @@ services:
     networks:
       - o5gc
     ports:
-      - ${VISITED_OPEN5GS_WEBUI_HOST_PORT}:3000
+      - ${O5GC_WEBUI_HOST_ADDR}:${VISITED_OPEN5GS_WEBUI_HOST_PORT}:3000
     labels:
       o5gc.link.title: "Home Open5GS WebUI"
       o5gc.link.url: "http://{{host}}:${VISITED_OPEN5GS_WEBUI_HOST_PORT}/"

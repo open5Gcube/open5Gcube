@@ -141,7 +141,7 @@ services:
         ipv4_address: ${FREE5GC_WEBUI_IP_ADDR}
       o5gc:
     ports:
-      - ${FREE5GC_WEBUI_HOST_PORT}:5000
+      - ${O5GC_WEBUI_HOST_ADDR}:${FREE5GC_WEBUI_HOST_PORT}:5000
     labels:
       o5gc.link.title: "free5GC WebUI"
       o5gc.link.url: "http://{{host}}:${FREE5GC_WEBUI_HOST_PORT}/"

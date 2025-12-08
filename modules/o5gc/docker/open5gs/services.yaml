@@ -47,7 +47,7 @@ services:
       - corenet
       - o5gc
     ports:
-      - ${MONGO_EXPRESS_HOST_PORT}:8081
+      - ${O5GC_WEBUI_HOST_ADDR}:${MONGO_EXPRESS_HOST_PORT}:8081
     labels:
       o5gc.stack: ${O5GC_STACK}
       o5gc.webui.hide: true
@@ -81,7 +81,7 @@ services:
         ipv4_address: ${OPEN5GS_WEBUI_IP_ADDR}
       o5gc:
     ports:
-      - ${OPEN5GS_WEBUI_HOST_PORT}:3000
+      - ${O5GC_WEBUI_HOST_ADDR}:${OPEN5GS_WEBUI_HOST_PORT}:3000
     labels:
       o5gc.link.title: "Open5GS WebUI"
       o5gc.link.url: "http://{{host}}:${OPEN5GS_WEBUI_HOST_PORT}/"

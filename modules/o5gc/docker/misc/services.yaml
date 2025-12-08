@@ -63,5 +63,5 @@ services:
       - corenet
       - o5gc
     ports:
-      - ${SWAGGER_UI_HOST_PORT}:8288
+      - ${O5GC_WEBUI_HOST_ADDR}:${SWAGGER_UI_HOST_PORT}:8288
     profiles: [ "swagger-ui" ]

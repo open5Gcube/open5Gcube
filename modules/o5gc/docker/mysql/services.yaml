@@ -24,7 +24,7 @@ services:
       - corenet
       - o5gc
     ports:
-      - ${PHPMYADMIN_HOST_PORT}:80
+      - ${O5GC_WEBUI_HOST_ADDR}:${PHPMYADMIN_HOST_PORT}:80
     labels:
       o5gc.stack: ${O5GC_STACK}
       o5gc.webui.hide: true

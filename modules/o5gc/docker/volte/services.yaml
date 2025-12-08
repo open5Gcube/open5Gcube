@@ -130,7 +130,7 @@ services:
                 ipv4_address: ${VOLTE_HSS_IP_ADDR}
             o5gc:
         ports:
-            - ${FHOSS_HOST_PORT}:8080
+            - ${O5GC_WEBUI_HOST_ADDR}:${FHOSS_HOST_PORT}:8080
         environment:
             - SMS_DOMAIN=${SMS_DOMAIN:-SMS-over-IMS}
         entrypoint: ["/mnt/volte/fhoss/entrypoint.sh"]
