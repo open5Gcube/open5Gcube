@@ -159,13 +159,24 @@ ${ENV_DIR}/%.env:                                                             \
         ${ENV_OVERRIDES_PATH} ${BASE_DIR}/etc/uedb.env
 	mkdir -p $(dir $@)
 	awk 1 $^ > $@
-	$(if $(findstring ${BASE_DIR}/etc/local.env,$?),$(MAKE) --no-print-directory -s ignore-localenv-changes)
+	$(if $(findstring ${BASE_DIR}/etc/local.env,$?),$(MAKE) --no-print-directory -s git-localenv-ignore)
 
-ignore-localenv-changes:
+git-localenv-ignore:
 ifneq ($(shell id -u), 0)
 	git -C ${BASE_DIR} rev-parse --is-inside-work-tree &>/dev/null &&         \
 	git update-index --skip-worktree ${BASE_DIR}/etc/local.env
 endif
+git-localenv-no-ignore:
+ifneq ($(shell id -u), 0)
+	git -C ${BASE_DIR} rev-parse --is-inside-work-tree &>/dev/null &&         \
+	git update-index --no-skip-worktree ${BASE_DIR}/etc/local.env
+endif
+
+NON_DEFAULT_MODULES = $(filter-out $(foreach m,${DEFAULT_MODULES},modules/${m}/),$(dir $(wildcard modules/*/.)))
+git-update-modules:
+	for module in ${NON_DEFAULT_MODULES}; do                                  \
+	    git -C $${module} pull --rebase;                                                \
+	done
 
 .create-running-env: docker-cleanup
 
