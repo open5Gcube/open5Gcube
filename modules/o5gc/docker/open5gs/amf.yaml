@@ -46,8 +46,8 @@ amf:
           - sst: ${NSSAI_SST}
             sd: ${NSSAI_SD}
     security:
-        integrity_order : [ NIA2, NIA1, NIA0 ]
-        ciphering_order : [ NEA2, NEA1, NEA0 ]
+        integrity_order : [ ${FIVEG_INTEGRITY_ORDER} ]
+        ciphering_order : [ ${FIVEG_CIPHERING_ORDER} ]
     network_name:
         full: Open5GS
     amf_name: open5gs-amf

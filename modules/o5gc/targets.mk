@@ -154,6 +154,13 @@ stop-srsran-open5gs-5g: .create-running-env  ##
 run-srsran-open5gs-5g-gnb run-srsran-open5gs-5g-core: .create-running-env
 	$(call run_stack,o5gc,srsran-open5gs-5g,$(subst run-srsran-open5gs-5g-,,$@))
 
+run-srsran-open5gs-5g-emu: .create-running-env  ##
+	$(call run_stack,o5gc,srsran-open5gs-5g-emu,gnb core ue)
+stop-srsran-open5gs-5g-emu: .create-running-env  ##
+	$(call stop_stack,o5gc,srsran-open5gs-5g-emu,gnb core ue)
+run-srsran-open5gs-5g-emu-gnb run-srsran-open5gs-5g-emu-core run-srsran-open5gs-5g-emu-ue: .create-running-env
+	$(call run_stack,o5gc,srsran-open5gs-5g-emu,$(subst run-srsran-open5gs-5g-emu-,,$@))
+
 run-ueransim-open5gs run-ueransim-free5gc run-ueransim-oai: .create-running-env  ##
 	export OAI_CN5G_TYPE=basic;                                               \
 	$(call run_stack,o5gc,$(subst run-,,$@),core gnb ue metrics)
