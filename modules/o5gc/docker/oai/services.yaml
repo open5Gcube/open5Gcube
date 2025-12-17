@@ -142,11 +142,12 @@ services:
         condition: service_healthy
 
   oai-ran:
+    extends:
+      file: ${MODULES}/base/docker/o5gc/services.yaml
+      service: base-ran
     image: o5gc/oai-ran
     entrypoint: /o5gc/openairinterface5g/ran-entrypoint.sh
     init: true
-    privileged: true
-    env_file: [ "${ENV_FILE}" ]
     environment:
       - OAI_RFSIM_ENABLE
       - OAI_TRACER_ENABLE
@@ -154,14 +155,6 @@ services:
     volumes:
       - ./ran-entrypoint.sh:/o5gc/openairinterface5g/ran-entrypoint.sh:ro
       - ${BASE}/scripts/band_helper.py:/o5gc/openairinterface5g/scripts/band_helper.py:ro
-      - ${BASE}/scripts/docker-remote.sh:/docker-remote.sh:ro
-      - ${BASE}:/tmp/o5gc:ro
-      - ${HOME}/.ssh:/mnt/.ssh:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /dev/bus/usb:/dev/bus/usb
-    labels:
-      o5gc.stack: ${O5GC_STACK}
-      o5gc.webui.priority: ${WEBUI_PRIO_RAN}
     profiles: [ "oai-ran" ]
 
   enb:

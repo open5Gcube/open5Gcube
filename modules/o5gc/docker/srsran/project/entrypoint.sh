@@ -16,7 +16,7 @@ case "${srv}" in
     gnb)
         envsubst.sh /mnt/srsran/gnb.yaml gnb.yaml
         wait-for-it -t 60 ${AMF_IP_ADDR}:7777
-        exec ./build/apps/gnb/gnb -c gnb.yaml -c /mnt/srsran/qos.yaml
+        exec /perf-wrapper.sh ./build/apps/gnb/gnb -c gnb.yaml -c /mnt/srsran/qos.yaml
         ;;
     uhd_image_loader)
         (set +x;

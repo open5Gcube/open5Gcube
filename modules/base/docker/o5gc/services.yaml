@@ -86,6 +86,20 @@ services:
       - corenet
     profiles: [ "coredns" ]
 
+  base-ran:
+    privileged: true
+    env_file: [ "${ENV_FILE}" ]
+    labels:
+      o5gc.stack: ${O5GC_STACK}
+      o5gc.webui.priority: ${WEBUI_PRIO_RAN}
+    volumes:
+      - ${BASE}/scripts/docker-remote.sh:/docker-remote.sh:ro
+      - ${BASE}/scripts/perf-wrapper.sh:/perf-wrapper.sh:ro
+      - ${BASE}:/tmp/o5gc:ro
+      - ${HOME}/.ssh:/mnt/.ssh:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /dev/bus/usb:/dev/bus/usb
+
   develop:
     image: o5gc/o5gc-base:jammy
     entrypoint: /entrypoint.sh

@@ -73,9 +73,8 @@ case "${srv}" in
     gnb)
         [ -n "${OAI_TRACER_ENABLE}" ] && SOFTMODEM_ARGS+=" --T_stdout 2 --T_nowait"
         SOFTMODEM_ARGS+=" -E --continuous-tx"
-        build/nr-softmodem                                                    \
+        exec /perf-wrapper.sh build/nr-softmodem                              \
             -O ${cfg_file} ${SOFTMODEM_ARGS} "${@:2}"
-        exit 1
         ;;
     enb)
         [ -n "${OAI_RFSIM_ENABLE}" ] && sleep 50
