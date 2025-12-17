@@ -62,6 +62,8 @@ define docker-build
         --tag o5gc/${$@_TAG}                                                  \
 		$(if ${5},--target=${5})                                              \
         $(foreach arg,${4},--build-arg $(arg))                                \
+		$(if ${http_proxy},--build-arg http_proxy=${http_proxy},)             \
+		$(if ${https_proxy},--build-arg https_proxy=${https_proxy},)          \
         --label ${OCI_IMG_KEY}.created="$(shell date --rfc-3339=seconds)"     \
         --secret id=id_ed25519,src=${BASE_DIR}/var/ssh/id_ed25519             \
         --secret id=id_ed25519.pub,src=${BASE_DIR}/var/ssh/id_ed25519.pub     \
@@ -175,7 +177,7 @@ endif
 NON_DEFAULT_MODULES = $(filter-out $(foreach m,${DEFAULT_MODULES},modules/${m}/),$(dir $(wildcard modules/*/.)))
 git-update-modules:
 	for module in ${NON_DEFAULT_MODULES}; do                                  \
-	    git -C $${module} pull --rebase;                                                \
+	    git -C $${module} pull --rebase;                                      \
 	done
 
 .create-running-env: docker-cleanup
