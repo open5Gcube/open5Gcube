@@ -15,16 +15,6 @@ services:
     profiles: [ "build-cacher" ]
     restart: always
 
-  docker-etc-hosts-updater:
-    image: dvdarias/docker-hoster
-    container_name: docker-etc-hosts-updater
-    volumes:
-      - /var/run/docker.sock:/tmp/docker.sock
-      - /etc/hosts:/tmp/hosts
-    network_mode: none
-    profiles: [ "docker-etc-hosts-updater" ]
-    restart: always
-
   webui:
     image: o5gc/o5gc-webui
     container_name: o5gc-webui

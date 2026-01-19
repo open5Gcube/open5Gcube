@@ -76,15 +76,6 @@ webui-stop:
 webui-restart:
 	$(MAKE) webui-stop webui-start
 
-docker-etc-hosts-updater-start:
-	cd ${BASE_O5GC_DIR};                                                      \
-	$(DOCKER_COMPOSE) --profile=docker-etc-hosts-updater up --detach
-docker-etc-hosts-updater-stop:
-	cd ${BASE_O5GC_DIR};                                                      \
-	$(DOCKER_COMPOSE) --profile=docker-etc-hosts-updater down || true
-docker-etc-hosts-updater-restart:
-	$(MAKE) docker-etc-hosts-updater-stop docker-etc-hosts-updater-start
-
 WEBUI_SRC_DIR = ${BASE_O5GC_DIR}/webui
 CODESPELL_FILES += $(shell find ${WEBUI_SRC_DIR}/frontend/src/ -name *.ts)    \
                    $(shell find ${WEBUI_SRC_DIR}/frontend/src/ -name *.vue)   \

@@ -217,7 +217,7 @@ docker-purge-old-images:
 	$(MAKE) docker-cleanup clean
 
 
-docker-purge-all-images: build-cacher-stop webui-stop docker-etc-hosts-updater-stop ## purge all project related Docker images
+docker-purge-all-images: build-cacher-stop webui-stop  ## purge all project related Docker images
 	@echo -n 'Purge all o5gc images? [y/n] ' && read 'x' && [ $$x == 'y' ]
 	images=$$(docker images o5gc/* -q | sort -u);                           \
 	[ -z "$${images}" ] || docker image rm --force $${images}
