@@ -99,6 +99,7 @@ services:
     labels:
       o5gc.stack: ${O5GC_STACK}
       o5gc.webui.priority: ${WEBUI_PRIO_RAN}
+    profiles: [ "base-ran" ]
 
   develop:
     image: o5gc/o5gc-base:jammy
