@@ -25,6 +25,7 @@
 
       <q-expansion-item label="Stacks" dense default-opened>
         <q-list>
+          <!-- Favourites Section -->
           <q-expansion-item v-if="stackLinks.favourites.length > 0"  label="&nbsp;&nbsp;&nbsp;Favourites" dense default-opened>
             <q-list>
               <q-item clickable :active="$route.path == link.to" v-for="(link, i) in stackLinks.favourites" :key="i" @click="routeTo(link.to);">
@@ -43,38 +44,32 @@
               </q-item>
             </q-list>
           </q-expansion-item>
-          <q-expansion-item v-if="stackLinks.favourites.length > 0 && stackLinks.nonFavourites.length > 0" label="&nbsp;&nbsp;&nbsp;Others" dense default-opened>
-            <q-list>
-              <q-item clickable :active="$route.path == link.to" v-for="(link, i) in stackLinks.nonFavourites" :key="i" @click="routeTo(link.to);">
-                <q-item-section avatar>
-                  <div class="icon-container" @click.stop="settingsStore.addFavouriteStack(link.label);">
-                    <q-icon :name="link.icon" size="md" class="default-icon" />
-                    <q-icon :name="symOutlinedStar" size="md" class="hovered-icon" />
-                  </div>
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>{{ link.label }}</q-item-label>
-                </q-item-section>
-                <q-item-section side>
-                  <q-item-label>{{ link.value }}</q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-list>
-          </q-expansion-item>
-          <q-item v-else clickable :active="$route.path == link.to" v-for="(link, i) in stackLinks.nonFavourites" :key="i" @click="routeTo(link.to);">
-            <q-item-section avatar>
-              <div class="icon-container" @click.stop="settingsStore.addFavouriteStack(link.label);">
-                <q-icon :name="link.icon" size="md" class="default-icon" />
-                <q-icon :name="symOutlinedStar" size="md" class="hovered-icon" />
-              </div>
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>{{ link.label }}</q-item-label>
-            </q-item-section>
-            <q-item-section side>
-              <q-item-label>{{ link.value }}</q-item-label>
-            </q-item-section>
-          </q-item>
+          <!-- Modules Section (Grouped Non-Favourites) -->
+          <div v-for="(links, moduleName) in stackLinks.modules" :key="moduleName">
+            <q-expansion-item
+              :label="`&nbsp;&nbsp;&nbsp;${moduleName}`"
+              dense
+              :default-opened="Object.keys(stackLinks.modules).length === 1 || links.some(link => $route.path == link.to)"
+            >
+              <q-list>
+                <q-item clickable :active="$route.path == link.to" v-for="(link, i) in links" :key="i" @click="routeTo(link.to);">
+                  <q-item-section avatar>
+                    <div class="icon-container" @click.stop="settingsStore.addFavouriteStack(link.label);">
+                      <q-icon :name="link.icon" size="md" class="default-icon" />
+                      <q-icon :name="symOutlinedStar" size="md" class="hovered-icon" />
+                    </div>
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label>{{ link.label }}</q-item-label>
+                  </q-item-section>
+                  <q-item-section side>
+                    <q-item-label>{{ link.value }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-expansion-item>
+          </div>
+
         </q-list>
       </q-expansion-item>
 
@@ -150,7 +145,7 @@ export default {
     const { serviceNames, healthStatusForAllServices, externalLinksFromLabels, runningVisibleServiceNames } = storeToRefs(serviceStore);
 
     const stackStore = useStackStore();
-    const { favouriteStackNames, nonFavouriteStackNames } = storeToRefs(stackStore);
+    const { favouriteStackNames, nonFavouriteStackNames, stacks } = storeToRefs(stackStore);
 
     const settingsStore = useSettingsStore();
     const { toggleDark } = settingsStore;
@@ -183,6 +178,7 @@ export default {
       settingsStore,
       favouriteStackNames,
       nonFavouriteStackNames,
+      stacks,
       externalLinksFromLabels,
       toggleDark,
       settingsDialog,
@@ -192,19 +188,27 @@ export default {
   },
   computed: {
     stackLinks() {
+      const createLink = (name) => ({
+        label: name,
+        value: '',
+        icon: 'cell_tower',
+        to: `/stack/${name}`
+      });
+      const groupedModules = {};
+      this.nonFavouriteStackNames.forEach((name) => {
+        const moduleName = this.stacks[name].module;
+        if (!groupedModules[moduleName]) {
+          groupedModules[moduleName] = [];
+        }
+        groupedModules[moduleName].push(createLink(name));
+      });
+      const sortedModules = {};
+      Object.keys(groupedModules).sort().forEach(key => {
+        sortedModules[key] = groupedModules[key];
+      });
       return {
-        favourites: this.favouriteStackNames.map((name) => ({
-          label: name,
-          value: '',
-          icon: 'cell_tower',
-          to: `/stack/${name}`
-        })),
-        nonFavourites: this.nonFavouriteStackNames.map((name) => ({
-          label: name,
-          value: '',
-          icon: 'cell_tower',
-          to: `/stack/${name}`
-        })),
+        favourites: this.favouriteStackNames.map(createLink),
+        modules: sortedModules,
       }
     },
     serviceOverviewBackgroundColor() {

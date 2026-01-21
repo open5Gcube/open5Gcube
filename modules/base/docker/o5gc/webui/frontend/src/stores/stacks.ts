@@ -11,6 +11,7 @@ import { useSettingsStore } from './settings';
  *   "stacks": {
  *     "stack_name1": {
  *       "description": "Description of Stack 1",
+ *       "module_name": "o5gc",
  *       "stackEnv": "ENV1=VAL1_modified\nENV3=VAL3\n...",
  *       "envOverrides": "ENV4=VAL4\n...",
  *       "starting": true,
@@ -91,7 +92,7 @@ export const useStackStore = defineStore('stacks', {
     },
     async loadStackNames() {
         // Get stack names from API
-        let stackNames: {stacks: [{stack_name: string}]}|null = null;
+        let stackNames: {stacks: [{stack_name: string, module_name: string}]}|null = null;
         try {
           stackNames = (await api.get('api/stacks')).data
         } catch(error: any) {
@@ -115,10 +116,22 @@ export const useStackStore = defineStore('stacks', {
             }
         }
 
-        // Add stacks that are new on server
-        for(const s of stacksNew) {
-            if (!stacksBefore.has(s)) {
-                this.stacks[s] = {'description': null, 'stackEnv': null, 'envOverrides': null, 'starting': false, 'stopping': false}
+        // Add stacks that are new on server or update existing ones with module info
+        for(const s of stackNames.stacks) {
+            const name = s.stack_name;
+            const moduleName = s.module_name;
+            if (!stacksBefore.has(name)) {
+                this.stacks[name] = {
+                  'description': null,
+                  'stackEnv': null,
+                  'envOverrides': null,
+                  'starting': false,
+                  'stopping': false,
+                  'module': moduleName
+                }
+            } else {
+                // Update module if it changed
+                this.stacks[name].module = moduleName;
             }
         }
     },
