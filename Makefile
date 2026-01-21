@@ -92,10 +92,13 @@ endef
 DOCKER_RAN_HOSTS = $(sort $(call get_env,ENB_HOSTNAME GNB_HOSTNAME))
 DOCKER_ALL_HOSTS = $(sort localhost ${DOCKER_RAN_HOSTS})
 
-DOCKER_FILES = $(filter-out ${DOCKER_FILES_IGNORE},$(shell cd modules; find -L */docker/ -name *Dockerfile -not -path '*/node_modules/*'))
+GIT_SUBMODULES = $(strip $(foreach m,$(wildcard modules/*),$(shell git config --file ${m}/.gitmodules --get-regexp path | awk -v m=${m} '{print m"/"$$2}')))
+
+DOCKER_FILES_IGNORE += $(foreach m,${GIT_SUBMODULES},${m}/%)
+DOCKER_FILES = $(filter-out ${DOCKER_FILES_IGNORE},$(shell find -L modules/*/docker/ -name *Dockerfile))
 
 DOCKER_BUILD_ALL = $(filter-out %-build-cacher,$(filter-out %-base,$(sort     \
-    $(shell echo ${DOCKER_FILES} | tr ' ' '\n'                                \
+    $(shell echo ${DOCKER_FILES} | tr ' ' '\n' | cut -d '/' -f2-              \
         | sed -E "s|.*/docker/(.*)/([^.]*).?Dockerfile|docker-build-\1-\2|"   \
         | sed -E "s|/|-|" | sed -E "s|(.*)-$$|\1|"))))
 docker-build-all: clean build-cacher-restart docker-build-o5gc-base  ## Build all Docker images
@@ -281,10 +284,10 @@ lazydocker:
 
 lint:
 	$(MAKE) --ignore-errors shellcheck yamllint codespell hadolint            \
-	    dclint markdownlint space-end-check cargo-machete
+	    dclint markdownlint space-end-check
 
-SHELLCHECK_FILES = $(filter-out %-healthcheck.sh %/wait-for-it.sh,            \
-                       $(shell find modules/ etc/ scripts/ -name '*.sh' -not -path '*/node_modules/*'))
+SHELLCHECK_FILES = $(filter-out ${SHELLCHECK_FILES_IGNORE}, $(shell find modules/ etc/ scripts/ -name '*.sh'))
+SHELLCHECK_FILES_IGNORE += $(foreach m,${GIT_SUBMODULES},${m}/%) %-healthcheck.sh %/wait-for-it.sh
 SHELLCHECK_IGNORE = SC1091 SC2016 SC2046 SC3037 SC2086 SC2059 SC2155 SC2153   \
                     SC2291 SC3040 SC1090 SC2317
 shellcheck:
@@ -302,20 +305,20 @@ yamllint:
 	  cytopia/yamllint:latest                                                 \
 	    -s -c scripts/yamllint.yaml ${YAMLLINT_FILES}
 
-HADOLINT_IGNORE = DL3003 DL3007 DL3008 DL3009 SC3010 DL3013 DL3018 DL3059     \
-                  DL4006  ${SHELLCHECK_IGNORE}
+HADOLINT_IGNORE = DL3003 DL3007 DL3008 DL3009 DL3013 DL3018 DL3059 DL4006     \
+                  SC3010 SC3044 SC3060 ${SHELLCHECK_IGNORE}
 hadolint:
 	@echo Running hadolint
 	@docker run --rm --volume ${BASE_DIR}:${BASE_DIR}:ro                      \
 	  hadolint/hadolint hadolint                                              \
-	    $(foreach rule,${HADOLINT_IGNORE},--ignore ${rule}) $(addprefix ${MODULES_DIR}/,${DOCKER_FILES})
+	    $(foreach rule,${HADOLINT_IGNORE},--ignore ${rule}) $(addprefix ${BASE_DIR}/,${DOCKER_FILES})
 
 dclint:
 	@echo Running dclint
 	@docker run --rm --volume ${BASE_DIR}:/app                                \
 	  zavoloklom/dclint -c scripts/dclintrc ${DC_FILES}
 
-MD_FILES = $(filter-out ${BASE_DIR}/Doc/README.md,$(wildcard ${BASE_DIR}/Doc/*.md))
+MD_FILES += $(filter-out ${BASE_DIR}/Doc/README.md,$(wildcard ${BASE_DIR}/Doc/*.md))
 MD_IGNORE = ~MD001,~MD002,~MD022,~MD031,~MD032,~MD041
 markdownlint:
 	@echo Running markdownlint
@@ -323,11 +326,8 @@ markdownlint:
 	  markdownlint/markdownlint                                               \
 	    --rules ${MD_IGNORE} --style=$(BASE_DIR)/Doc/.mdl.style ${MD_FILES}
 
-cargo-machete:
-	docker run -v $(BASE_DIR)/modules:/src ghcr.io/bnjbvr/cargo-machete:latest
 
-CODESPELL_FILES += $(shell find etc/ -name *.env)                             \
-                   $(addprefix ${MODULES_DIR}/,${DOCKER_FILES}) ${MD_FILES}   \
+CODESPELL_FILES += $(shell find etc/ -name *.env) ${DOCKER_FILES} ${MD_FILES} \
                    ${SHELLCHECK_FILES} ${YAMLLINT_FILES} Makefile
 CODESPELL_IGNORE_WORDS = ue,ues,leas,bund,te
 codespell: scripts-install-venv
