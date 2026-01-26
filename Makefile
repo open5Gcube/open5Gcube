@@ -3,7 +3,6 @@ BASE_DIR := $(realpath $(dir $(realpath $(firstword $(MAKEFILE_LIST)))))
 ENV_DIR = ${BASE_DIR}/var/etc
 MODULES_DIR = ${BASE_DIR}/modules
 DOCKER_HOST_BRIDGE := $(shell docker network inspect bridge -f '{{range .IPAM.Config}}{{.Gateway}}{{end}}')
-DEFAULT_ROUTE_IFACE_IP := $(shell ip route | sed -n 's|.* src \(.*\) metric .*|\1|p' | uniq)
 HOST_USER_GROUP_ID := $(shell echo $$(id -u):$$(id -g))
 
 export BASE_DIR DOCKER_HOST_BRIDGE OAI_TRACER_ENABLE HOST_USER_GROUP_ID DEFAULT_ROUTE_IFACE_IP
@@ -53,7 +52,6 @@ define docker-build
     $(eval $@_IMG = $(subst /,-,${$@_PRJ})$(if ${3},-$(subst docker-build-${2}-,,${3})))
     $(eval $@_TAG = ${$@_IMG}:$(or ${6},latest))
     $(eval $@_BUILD_HOST = $(if $(subst localhost,,${7}),${7}))
-    $(eval $@_BUILD_CACHER = $(if ${$@_BUILD_HOST},$(call docker-src-ip-for-remote,${$@_BUILD_HOST}),${DOCKER_HOST_BRIDGE}))
     $(eval $@_DOCKER = docker $(if ${$@_BUILD_HOST},-H ssh://${$@_BUILD_HOST}))
     mkdir -p $(foreach cache,${SYNC_CACHES},var/cache/${cache}/$(if ${7},${7},localhost)/${$@_IMG})
     $(if ${$@_BUILD_HOST},tar -cf var/tmp/${$@_BUILD_HOST}-${$@_IMG}.tar -C modules/${1}/docker/${$@_PRJ} .)
@@ -67,7 +65,7 @@ define docker-build
         --label ${OCI_IMG_KEY}.created="$(shell date --rfc-3339=seconds)"     \
         --secret id=id_ed25519,src=${BASE_DIR}/var/ssh/id_ed25519             \
         --secret id=id_ed25519.pub,src=${BASE_DIR}/var/ssh/id_ed25519.pub     \
-        --add-host o5gc-build-cacher:${$@_BUILD_CACHER}                       \
+        --add-host o5gc-build-cacher:${DOCKER_HOST_BRIDGE}                    \
         --file $(if ${3},$(subst docker-build-${2}-,,${3}).)Dockerfile        \
         $(if ${$@_BUILD_HOST},- < ${BASE_DIR}/var/tmp/${$@_BUILD_HOST}-${$@_IMG}.tar,.)
     $(if ${$@_BUILD_HOST},rm -f var/tmp/${$@_BUILD_HOST}-${$@_IMG}.tar)

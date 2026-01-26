@@ -8,9 +8,9 @@ services:
       - /etc/group:/etc/group:ro
     network_mode: bridge
     ports:
-      - 40860:873
-      - 40861:3142
-      - 40862:8123
+      - ${DOCKER_HOST_BRIDGE}:40860:873
+      - ${DOCKER_HOST_BRIDGE}:40861:3142
+      - ${DOCKER_HOST_BRIDGE}:40862:8123
     user: ${HOST_USER_GROUP_ID}
     profiles: [ "build-cacher" ]
     restart: always
