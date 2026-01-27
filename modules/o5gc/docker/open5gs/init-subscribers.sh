@@ -143,6 +143,11 @@ logout () {
     rm /tmp/cookies.txt /tmp/csrfToken.txt /tmp/session.json /tmp/curl_output
 }
 
+if [ "${PURGE_SUBSCRIBERS_ONSTART}" == "1" ]; then
+    echo "Purge subscriber database"
+    npx mongosh --host ${MONGO_IP_ADDR} open5gs --eval 'db.subscribers.drop()'
+fi
+
 login
 
 for i in $(seq 0 100); do

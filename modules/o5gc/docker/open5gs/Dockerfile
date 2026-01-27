@@ -2,15 +2,13 @@ FROM o5gc/o5gc-base:jammy AS develop
 
 LABEL org.opencontainers.image.title='Open5GS'
 
-RUN mv /etc/apt/apt.conf.d/01proxy /tmp                                       \
-    && mkdir -p /etc/apt/keyrings                                             \
+RUN mkdir -p /etc/apt/keyrings                                                \
     && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key   \
         | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg                   \
     && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg]"                \
-            "https://deb.nodesource.com/node_16.x nodistro main"              \
+            "https://deb.nodesource.com/node_20.x nodistro main"              \
         > /etc/apt/sources.list.d/nodesource.list                             \
-    && apt-get.sh install nodejs                                              \
-    && mv /tmp/01proxy /etc/apt/apt.conf.d/
+    && apt-get.sh install nodejs nginx
 
 RUN apt-get.sh install                                                        \
         python3-pip python3-setuptools python3-wheel ninja-build              \
@@ -49,6 +47,7 @@ RUN cd webui                                                                  \
     && npm cache clean --force                                                \
     && sed -i server/index.js                                                 \
         -e "s|newAccount.username = 'admin'|newAccount.username = 'o5gc'|"    \
-        -e "s|register(newAccount, '1423'|register(newAccount, 'o5gc'|"
+        -e "s|register(newAccount, '1423'|register(newAccount, 'o5gc'|"       \
+    && npx mongosh --quiet || true
 
 RUN echo ${OPEN5GS_VERSION} > /etc/image_version
