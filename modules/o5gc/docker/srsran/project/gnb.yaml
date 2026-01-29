@@ -26,8 +26,8 @@ ru_sdr:
   rx_gain: 40
 
 cell_cfg:
-  dl_arfcn: 632628
-  band: 78
+  dl_arfcn: ${NR_ARFCN}
+  band: ${NR_BAND}
   channel_bandwidth_MHz: 20
   common_scs: 30
   plmn: "${MCC}${MNC}"
