@@ -6,6 +6,7 @@ ENV_DIR = BASE_DIR / "etc"
 MODULES_DIR = BASE_DIR / "modules"
 GLOBAL_ENV_PATH = ENV_DIR / "settings.env"
 UE_ENV_PATH = ENV_DIR / "uedb.env"
+UE_ENV_D_PATH = ENV_DIR / "uedb.d"
 STACK_ENV_FILENAME = "settings.env"
 ENV_OVERRIDES_DIR = Path("/tmp/")
 STATUS_MODULE_PATH = Path(__file__).resolve().parent / "status.py"

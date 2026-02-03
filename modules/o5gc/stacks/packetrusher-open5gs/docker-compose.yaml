@@ -16,12 +16,12 @@ services:
   open5gs-webui:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
-      service: webui
+      service: open5gs-webui
 
   open5gs-init:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
-      service: init
+      service: open5gs-init
 
   nrf:
     extends:

@@ -114,14 +114,7 @@ login () {
 
 login
 
-UE_0="${MCC}${MNC}${UE_SOFT_MSIN} ${UE_SOFT_KEY} ${UE_SOFT_OPC}"
-count=0
-for i in $(seq 0 100); do
-    ue=UE_$i
-    [[ -z "${!ue}" ]] && continue
-    read -r imsi key opc <<< "${!ue}"
-    add_subscriber $imsi $key $opc
-    count=$((count+1))
-done
+source /mnt/o5gc/core-init.sh
+call_for_each_subscriber add_subscriber
 
-echo "Finished initialization of ${count} subscriptions"
+echo "Finished subscription initialization"

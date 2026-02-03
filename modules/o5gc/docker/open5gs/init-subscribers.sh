@@ -150,20 +150,8 @@ fi
 
 login
 
-for i in $(seq 0 100); do
-    msin=UE_SOFT_MSIN_$i
-    key=UE_SOFT_KEY_$i
-    opc=UE_SOFT_OPC_$i
-    [[ -z "${!msin}" ]] && continue
-    add_subscriber ${MCC}${MNC}${!msin} ${!key} ${!opc}
-done
-UE_0="${MCC}${MNC}${UE_SOFT_MSIN} ${UE_SOFT_KEY} ${UE_SOFT_OPC}"
-for i in $(seq 0 100); do
-    ue=UE_$i
-    [[ -z "${!ue}" ]] && continue
-    read -r imsi key opc <<< "${!ue}"
-    add_subscriber $imsi $key $opc $i
-done
+source /mnt/o5gc/core-init.sh
+call_for_each_subscriber add_subscriber
 
 logout
 

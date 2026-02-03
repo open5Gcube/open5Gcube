@@ -128,12 +128,14 @@ NR_ARFCN=641280
 This file contains the *database* for all SIM Cards, including the IMSI, Key and the OPc. On startup of the Core Networks short-living initialization containers and helper scripts uses this settings to program the corresponding databases of the particular Core Network.
 
 ```shell
-#     IMSI            Key                              OPc
-UE_1="901700000052100 F18E5DB0A8B5B8A0304E9113D121DFE3 E83C9CF73E3B9E82E48005A696E86AD8"
-UE_2="901700000052101 85DAEB272D98D18BEC760FF7AD7A32A5 A7EAD4B9841B099AB2AE75F1F218D85D"
-UE_3="208920000052102 B89266F426DDAADB91830124E69A1D20 4C18A87423F6CD4CD6734B82FC90BD7B"
+UE_DB+="
+#IMSI           Key                              OPc
+# add one subscriper per line, like for example
+001010000052100 F18E5DB0A8B5B8A0304E9113D121DFE3 E83C9CF73E3B9E82E48005A696E86AD8
 ...
+"
 ```
+In addition, each .env file in the optional directory ``etc/uedb.d/`` is included to extend the UE_DB. This can be used to organize the subscriber information in a separate repository.
 
 ### Stack specific settings
 Each Stack can override all of the above settings by providing a separate ``settings.env`` file in its directory. This is useful if a Stack requires fix certain configurations to function correctly, for example if slicing is not supported.

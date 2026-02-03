@@ -19,16 +19,15 @@ services:
       timeout: 5s
       retries: 5
 
-  init:
+  free5gc-init:
     extends:
-      service: base
+      file: ${MODULES}/base/docker/o5gc/services.yaml
+      service: core-init
     container_name: free5gc-init
-    entrypoint: /mnt/free5gc/init-subscribers.sh
-    networks:
-      - corenet
-    labels:
-      o5gc.initialisation: true
-      o5gc.webui.priority: ${WEBUI_PRIO_INIT}
+    entrypoint: /mnt/init-subscribers.sh
+    volumes:
+      - ./init-subscribers.sh:/mnt/init-subscribers.sh:ro
+    depends_on: [ free5gc-webui ]
 
   nrf:
     extends:
@@ -128,7 +127,7 @@ services:
       corenet:
         ipv4_address: ${UDR_IP_ADDR}
 
-  webui:
+  free5gc-webui:
     extends:
       service: base
     container_name: free5gc-webui

@@ -110,6 +110,9 @@ services:
     image: o5gc/osmocom-hlr
     container_name: osmo-hlr
     command: osmo-hlr
+    volumes:
+      - ${MODULES}/base/docker/o5gc/core-init.sh:/mnt/o5gc/core-init.sh:ro
+      - ${BASE}/etc:/mnt/o5gc/etc:ro
     hostname: osmo-hlr
     networks:
       corenet:

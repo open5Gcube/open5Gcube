@@ -17,7 +17,6 @@ services:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
       service: mongo-express
-    depends_on: [ mongo ]
 
   nrf:
     extends:
@@ -67,10 +66,9 @@ services:
   free5gc-webui:
     extends:
       file: ${DOCKER}/free5gc/services.yaml
-      service: webui
+      service: free5gc-webui
 
   free5gc-init:
     extends:
       file: ${DOCKER}/free5gc/services.yaml
-      service: init
-    depends_on: [ free5gc-webui ]
+      service: free5gc-init

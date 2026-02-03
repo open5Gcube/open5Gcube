@@ -124,6 +124,9 @@ services:
     entrypoint: [ "/mnt/volte/fhoss/entrypoint.sh" ]
     environment:
       - SMS_DOMAIN=${SMS_DOMAIN:-SMS-over-IMS}
+    volumes:
+      - ${MODULES}/base/docker/o5gc/core-init.sh:/mnt/o5gc/core-init.sh:ro
+      - ${BASE}/etc:/mnt/o5gc/etc:ro
     networks:
       corenet:
         ipv4_address: ${VOLTE_HSS_IP_ADDR}

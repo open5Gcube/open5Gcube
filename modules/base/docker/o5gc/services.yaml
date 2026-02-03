@@ -76,6 +76,20 @@ services:
       - corenet
     profiles: [ "coredns" ]
 
+  core-init:
+    image: o5gc/o5gc-base:jammy
+    container_name: core-init
+    env_file: [ "${ENV_FILE}" ]
+    volumes:
+      - ./core-init.sh:/mnt/o5gc/core-init.sh:ro
+      - ${BASE}/etc:/mnt/o5gc/etc:ro
+    networks:
+      - corenet
+    labels:
+      o5gc.initialisation: true
+      o5gc.webui.priority: ${WEBUI_PRIO_INIT}
+    profiles: [ "core" ]
+
   base-ran:
     privileged: true
     env_file: [ "${ENV_FILE}" ]

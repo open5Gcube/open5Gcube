@@ -20,6 +20,7 @@ iproute2
 iptables
 iputils-ping
 isc-dhcp-client
+jq
 less
 libc-ares-dev
 libconfig-dev

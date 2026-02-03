@@ -21,21 +21,19 @@ esac
 
 HLR_DB=/o5gc/osmo-hlr/hlr.db
 
+function add_subscriber () {
+    imsi=$1; key=$2; opc=$3; i=$4
+    msisdn=${imsi: -5}
+    sqlite3 -echo ${HLR_DB} "INSERT INTO subscriber (id, imsi, msisdn) VALUES (${i}, '${imsi}', '${msisdn}');"
+    sqlite3 -echo ${HLR_DB} "INSERT INTO auc_2g (subscriber_id, algo_id_2g, ki) VALUES(${i}, 1, '${key}');"
+    sqlite3 -echo ${HLR_DB} "INSERT INTO auc_3g (subscriber_id, algo_id_3g, k, op, opc) VALUES(${i}, 5, '${key}', NULL, '${opc}');"
+}
+
 function init_hlr () {
     osmo-hlr-db-tool -l ${HLR_DB} create
     { set +x; } 2>/dev/null
-    UE_0="${MCC}${MNC}${UE_SOFT_MSIN} ${UE_SOFT_KEY} ${UE_SOFT_OPC}"
-    count=0
-    for i in $(seq 0 100); do
-        ue=UE_$i
-        [[ -z "${!ue}" ]] && continue
-        read -r imsi key opc <<< "${!ue}"
-        msisdn=${imsi: -5}
-        sqlite3 -echo ${HLR_DB} "INSERT INTO subscriber (id, imsi, msisdn) VALUES (${i}, '${imsi}', '${msisdn}');"
-        sqlite3 -echo ${HLR_DB} "INSERT INTO auc_2g (subscriber_id, algo_id_2g, ki) VALUES(${i}, 1, '${key}');"
-        sqlite3 -echo ${HLR_DB} "INSERT INTO auc_3g (subscriber_id, algo_id_3g, k, op, opc) VALUES(${i}, 5, '${key}', NULL, '${opc}');"
-        count=$((count+1))
-    done
+    source /mnt/o5gc/core-init.sh
+    call_for_each_subscriber add_subscriber
     { set -x; } 2>/dev/null
 }
 

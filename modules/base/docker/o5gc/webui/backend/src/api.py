@@ -4,6 +4,7 @@ import re
 import docker
 import subprocess
 import sys
+from io import StringIO
 from datetime import datetime
 from pathlib import Path
 from types import ModuleType
@@ -275,18 +276,21 @@ def get_env():
 def get_uedb():
     if not current_app.config["UE_ENV_PATH"].is_file():
         return "UE DB file does not exist.", HTTPStatus.NOT_FOUND
-
-    uedb = dotenv.dotenv_values(current_app.config["UE_ENV_PATH"])
-    return [
-        {
-            "id": int(key.removeprefix("UE_")),
-            "imsi": value.split()[0],
-            "key": value.split()[1],
-            "opc": value.split()[2],
-        }
-        for key,value in uedb.items() if re.match(r"UE_[1-9]+\d*", key)
-    ]
-
+    uedb = []
+    idx = 1
+    for fn in [current_app.config["UE_ENV_PATH"]] + list(current_app.config["UE_ENV_D_PATH"].glob('*.env')):
+        with open(fn, 'r') as f:
+            e = ''.join(line for line in f if not line.lstrip().startswith('#'))
+            for ue in dotenv.dotenv_values(stream=StringIO(e)).get('UE_DB+', '').splitlines():
+                if not ue.strip(): continue
+                uedb.append({
+                    "id": idx,
+                    "imsi": ue.split()[0],
+                    "key": ue.split()[1],
+                    "opc": ue.split()[2],
+                })
+                idx += 1
+    return uedb
 
 def run_simcard_container(cmd):
     """

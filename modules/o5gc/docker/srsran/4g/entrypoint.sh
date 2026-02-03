@@ -25,6 +25,12 @@ esac
 
 [ -f /mnt/srsran/${srv}.conf ] && envsubst.sh /mnt/srsran/${srv}.conf ${srv}.conf
 
+add_user () {
+    imsi=$1; key=$2; opc=$3; id=$4
+    # Format: Name,Auth,IMSI,Key,OP_Type,OP/OPc,AMF,SQN,QCI,IP_alloc
+    echo ue${i},mil,${imsi},${key},opc,${opc},8000,000000001234,7,dynamic >> user_db.csv
+}
+
 case "${srv}" in
     enb | gnb)
         envsubst.sh /mnt/srsran/rr_${srv}.conf rr_${srv}.conf
@@ -34,14 +40,8 @@ case "${srv}" in
         ;;
     epc)
         { set +x; } 2>/dev/null
-        UE_0="${MCC}${MNC}${UE_SOFT_MSIN} ${UE_SOFT_KEY} ${UE_SOFT_OPC}"
-        for i in $(seq 0 100); do
-            ue=UE_$i
-            [[ -z "${!ue}" ]] && continue
-            read -r imsi key opc <<< "${!ue}"
-            # Format: Name,Auth,IMSI,Key,OP_Type,OP/OPc,AMF,SQN,QCI,IP_alloc
-            echo ue${i},mil,${imsi},${key},opc,${opc},8000,000000001234,7,dynamic >> user_db.csv
-        done
+        source /mnt/o5gc/core-init.sh
+        call_for_each_subscriber add_user
         { set -x; } 2>/dev/null
         iptables -t nat -A POSTROUTING -o $(route | grep '^default' | grep -o '[^ ]*$') -j MASQUERADE
         exec build/srsepc/src/srsepc ${srv}.conf

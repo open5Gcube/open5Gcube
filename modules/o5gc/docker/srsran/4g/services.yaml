@@ -17,6 +17,9 @@ services:
       service: base
     container_name: epc
     command: epc
+    volumes:
+      - ${MODULES}/base/docker/o5gc/core-init.sh:/mnt/o5gc/core-init.sh:ro
+      - ${BASE}/etc:/mnt/o5gc/etc:ro
     networks:
       extnet:
         ipv4_address: ${EPC_EXT_IP_ADDR} # eth0

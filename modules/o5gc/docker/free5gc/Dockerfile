@@ -8,7 +8,7 @@ RUN mkdir -p /etc/apt/keyrings                                                \
         > /etc/apt/sources.list.d/nodesource.list                             \
     && apt-get.sh install nodejs nginx
 
-RUN apt-get.sh install kmod mokutil jq                                        \
+RUN apt-get.sh install kmod mokutil                                           \
     && npm install --global yarn@1.22.21
 
 RUN cached-download.sh https://dl.google.com/go/go1.21.8.linux-amd64.tar.gz   \

@@ -10,6 +10,8 @@ services:
       - ./mysql-healthcheck.sh:/tmp/mysql-healthcheck.sh:ro
       - ./oai_db.${OAI_CN5G_TYPE:-none}.sql:/docker-entrypoint-initdb.d/oai_db.sql:ro
       - ./cn5g-init.sh:/docker-entrypoint-initdb.d/zz_cn5g-init.sh:ro
+      - ${MODULES}/base/docker/o5gc/core-init.sh:/mnt/o5gc/core-init.sh:ro
+      - ${BASE}/etc:/mnt/o5gc/etc:ro
     profiles: [ "core" ]
     healthcheck:
       test: /bin/bash -c "/tmp/mysql-healthcheck.sh"

@@ -15,7 +15,7 @@ RUN apt-get.sh install                                                        \
         build-essential flex bison git libsctp-dev libgnutls28-dev            \
         libgcrypt-dev libssl-dev libidn11-dev libmongoc-dev libbson-dev       \
         libyaml-dev libnghttp2-dev libmicrohttpd-dev libcurl4-gnutls-dev      \
-        libtins-dev libtalloc-dev meson jq
+        libtins-dev libtalloc-dev meson
 
 RUN pip3 install --upgrade --no-cache-dir pip                                 \
     && pip3 install --no-cache-dir click==8.0.4                               \

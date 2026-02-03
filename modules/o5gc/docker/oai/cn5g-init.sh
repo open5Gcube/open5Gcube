@@ -109,10 +109,5 @@ add_user () {
     esac
 }
 
-UE_0="${MCC}${MNC}${UE_SOFT_MSIN} ${UE_SOFT_KEY} ${UE_SOFT_OPC}"
-for i in $(seq 0 100); do
-    ue=UE_$i
-    [[ -z "${!ue}" ]] && continue
-    read -r imsi key opc <<< "${!ue}"
-    add_user ${imsi} ${key} ${opc} $i
-done
+source /mnt/o5gc/core-init.sh
+call_for_each_subscriber add_user

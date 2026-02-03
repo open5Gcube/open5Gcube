@@ -1,6 +1,7 @@
 SHELL := /bin/bash -o pipefail
 BASE_DIR := $(realpath $(dir $(realpath $(firstword $(MAKEFILE_LIST)))))
 ENV_DIR = ${BASE_DIR}/var/etc
+ETC_DIR = ${BASE_DIR}/etc
 MODULES_DIR = ${BASE_DIR}/modules
 DOCKER_HOST_BRIDGE := $(shell docker network inspect bridge -f '{{range .IPAM.Config}}{{.Gateway}}{{end}}')
 HOST_USER_GROUP_ID := $(shell echo $$(id -u):$$(id -g))
@@ -8,6 +9,8 @@ HOST_USER_GROUP_ID := $(shell echo $$(id -u):$$(id -g))
 export BASE_DIR DOCKER_HOST_BRIDGE OAI_TRACER_ENABLE HOST_USER_GROUP_ID DEFAULT_ROUTE_IFACE_IP
 EXPORT_ENV = export BASE_DIR=${BASE_DIR} DOCKER_HOST_BRIDGE=${DOCKER_HOST_BRIDGE} HOST_USER_GROUP_ID=${HOST_USER_GROUP_ID}
 
+UEDB_ENV = ${ETC_DIR}/uedb.env
+LOCAL_ENV = ${ETC_DIR}/local.env
 O5GC_ENV = ${ENV_DIR}/base/o5gc.env
 MAKE_ENV = MAKEFLAGS= make --no-print-directory -s ENV_DIR=${ENV_DIR}
 get_env = $(shell env=$(or ${2},${O5GC_ENV}); $(MAKE_ENV) $${env}; source $${env}; echo $(foreach v,${1},$$${v}))
@@ -125,7 +128,7 @@ DOCKER_COMPOSE = $(EXPORT_DEVELOP_VOLUMES); $(EXPORT_ENV);                    \
     $(MAKE_ENV) -C ${BASE_DIR} $${ENV_FILE};                                  \
     docker compose --env-file=$${ENV_FILE}                                    \
         --file $$(ls | grep -E "docker-compose.yaml|services.yaml")           \
-        --file ${BASE_DIR}/etc/networks.yaml
+        --file ${ETC_DIR}/networks.yaml
 
 STACKS = $(shell find modules/*/stacks/ -name docker-compose.yaml -printf "%h ")
 profiles = $(foreach p,$(shell cd ${1}; $(DOCKER_COMPOSE) config --profiles),--profile ${p})
@@ -155,24 +158,28 @@ include ${MODULE_TARGET_FILES}
 .SECONDEXPANSION:
 ${ENV_OVERRIDES_PATH}: ;
 ${ENV_DIR}/%.env:                                                             \
-        ${BASE_DIR}/etc/settings.env ${BASE_DIR}/etc/networks.env             \
-        ${BASE_DIR}/etc/o5gc.env ${BASE_DIR}/etc/local.env                    \
+        ${ETC_DIR}/settings.env ${ETC_DIR}/networks.env ${ETC_DIR}/o5gc.env   \
+		${LOCAL_ENV} ${UEDB_ENV}                                              \
         $$(wildcard ${MODULES_DIR}/$$(firstword $$(subst /, ,$$*))/settings.env) \
         $$(wildcard ${MODULES_DIR}/$$(subst /,/stacks/,$$*)/settings.env)     \
-        ${ENV_OVERRIDES_PATH} ${BASE_DIR}/etc/uedb.env
+        ${ENV_OVERRIDES_PATH}
 	mkdir -p $(dir $@)
-	awk 1 $^ > $@
-	$(if $(findstring ${BASE_DIR}/etc/local.env,$?),$(MAKE) --no-print-directory -s git-localenv-ignore)
+	awk 1 $(filter-out ${UEDB_ENV},$^) > $@
+	source ${UEDB_ENV};                                                       \
+	for soft_ue_env in UE_SOFT_MSIN UE_SOFT_KEY UE_SOFT_OPC; do               \
+	    echo $$soft_ue_env="$${!soft_ue_env}" >> $@;                          \
+	done
+	$(MAKE) --no-print-directory -s git-localenv-ignore
 
 git-localenv-ignore:
 ifneq ($(shell id -u), 0)
 	git -C ${BASE_DIR} rev-parse --is-inside-work-tree &>/dev/null &&         \
-	git update-index --skip-worktree ${BASE_DIR}/etc/local.env
+	git update-index --skip-worktree ${LOCAL_ENV} ${UEDB_ENV}
 endif
 git-localenv-no-ignore:
 ifneq ($(shell id -u), 0)
 	git -C ${BASE_DIR} rev-parse --is-inside-work-tree &>/dev/null &&         \
-	git update-index --no-skip-worktree ${BASE_DIR}/etc/local.env
+	git update-index --no-skip-worktree ${LOCAL_ENV} ${UEDB_ENV}
 endif
 
 NON_DEFAULT_MODULES = $(filter-out $(foreach m,${DEFAULT_MODULES},modules/${m}/),$(dir $(wildcard modules/*/.)))
