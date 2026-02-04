@@ -15,7 +15,7 @@ global:
 
 udm:
     hnet:
-      - id: 30
+      - id: 1
         scheme: 1
         key: /mnt/open5gs/curve25519-1.key
       - id: 2
