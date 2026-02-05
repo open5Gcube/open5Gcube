@@ -60,6 +60,7 @@ services:
     extends:
       file: ${MODULES}/base/docker/o5gc/services.yaml
       service: core-init
+    image: o5gc/${OPEN5GS_IMAGE:-open5gs:${OPEN5GS_VERSION:-latest}}
     container_name: open5gs-init
     entrypoint: /mnt/init-subscribers.sh
     volumes:
