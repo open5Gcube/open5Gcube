@@ -118,6 +118,7 @@ services:
       corenet:
         ipv4_address: ${OSMO_HLR_IP_ADDR}
       o5gc:
+        gw_priority: 1
     ports:
       - ${O5GC_WEBUI_HOST_ADDR}:${OSMO_HLR_DB_HOST_PORT}:8080
     labels:

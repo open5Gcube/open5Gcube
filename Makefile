@@ -331,9 +331,8 @@ markdownlint:
 	  markdownlint/markdownlint                                               \
 	    --rules ${MD_IGNORE} --style=$(BASE_DIR)/Doc/.mdl.style ${MD_FILES}
 
-
 CODESPELL_FILES += $(shell find etc/ -name *.env) ${DOCKER_FILES} ${MD_FILES} \
-                   ${SHELLCHECK_FILES} ${YAMLLINT_FILES} Makefile
+                   ${SHELLCHECK_FILES} ${YAMLLINT_FILES} ${DC_FILES} Makefile
 CODESPELL_IGNORE_WORDS = ue,ues,leas,bund,te
 codespell: scripts-install-venv
 	@echo Running codespell

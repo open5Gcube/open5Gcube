@@ -131,6 +131,7 @@ services:
       corenet:
         ipv4_address: ${VOLTE_HSS_IP_ADDR}
       o5gc:
+        gw_priority: 1
     ports:
       - ${O5GC_WEBUI_HOST_ADDR}:${FHOSS_HOST_PORT}:8080
     labels:
@@ -151,5 +152,6 @@ services:
       corenet:
         ipv4_address: ${VOLTE_HSS_IP_ADDR}
       o5gc:
+        gw_priority: 1
     depends_on: [ mysql, volte-dns ]
     dns: ${VOLTE_DNS_IP_ADDR}

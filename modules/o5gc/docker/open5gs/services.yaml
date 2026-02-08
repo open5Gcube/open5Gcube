@@ -61,8 +61,9 @@ services:
     volumes:
       - ${MODULES}/base/docker/o5gc/wait-for-it.sh:/wait-for-it.sh:ro
     networks:
-      - corenet
-      - o5gc
+      corenet:
+      o5gc:
+        gw_priority: 1
     ports:
       - ${O5GC_WEBUI_HOST_ADDR}:${MONGO_EXPRESS_HOST_PORT}:8081
     labels:
@@ -95,6 +96,7 @@ services:
       corenet:
         ipv4_address: ${OPEN5GS_WEBUI_IP_ADDR}
       o5gc:
+        gw_priority: 1
     ports:
       - ${O5GC_WEBUI_HOST_ADDR}:${OPEN5GS_WEBUI_HOST_PORT}:3000
     labels:

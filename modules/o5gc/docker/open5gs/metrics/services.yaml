@@ -5,8 +5,9 @@ services:
     volumes:
       - ./prometheus.yaml:/etc/prometheus/prometheus.yml:ro
     networks:
-      - corenet
-      - o5gc
+      corenet:
+      o5gc:
+        gw_priority: 1
     profiles: [ "metrics" ]
 
   grafana:
@@ -26,8 +27,9 @@ services:
       - ./dashboard.yaml:/etc/grafana/provisioning/dashboards/default.yaml:ro
       - ./dashboard.json:/var/lib/grafana/dashboards/open5gs.json
     networks:
-      - corenet
-      - o5gc
+      corenet:
+      o5gc:
+        gw_priority: 1
     ports:
       - ${O5GC_WEBUI_HOST_ADDR}:${GRAFANA_HOST_PORT}:3000
     labels:

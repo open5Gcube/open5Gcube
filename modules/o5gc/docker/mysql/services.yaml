@@ -21,8 +21,9 @@ services:
       - PMA_USER=root
       - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD}
     networks:
-      - corenet
-      - o5gc
+      corenet:
+      o5gc:
+        gw_priority: 1
     ports:
       - ${O5GC_WEBUI_HOST_ADDR}:${PHPMYADMIN_HOST_PORT}:80
     labels:

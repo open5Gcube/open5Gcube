@@ -60,8 +60,9 @@ services:
       - ./swagger-config.json:/usr/share/nginx/html/swagger-config.json:ro
       - ./swagger-entrypoint.sh:/docker-entrypoint.d/99-o5gc.sh:ro
     networks:
-      - corenet
-      - o5gc
+      corenet:
+      o5gc:
+        gw_priority: 1
     ports:
       - ${O5GC_WEBUI_HOST_ADDR}:${SWAGGER_UI_HOST_PORT}:8288
     profiles: [ "swagger-ui" ]
