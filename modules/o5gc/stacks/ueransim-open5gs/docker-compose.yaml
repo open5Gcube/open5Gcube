@@ -22,7 +22,6 @@ services:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
       service: open5gs-webui
-    depends_on: [ mongo ]
 
   open5gs-init:
     extends:

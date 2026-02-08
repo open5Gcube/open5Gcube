@@ -56,7 +56,6 @@ case "${service}" in
 #        ;;
     nrf | ausf | udr | udm | pcf | bsf | nssf | hss | sgwc | sgwu | smf | amf | mme | pcrf | upf | scp | sepp)
         while [[ -n "$(dig +short ${open5gs_init_host})" ]]; do sleep 2; done
-        [[ "${service}" != "nrf" ]] && sleep 1
         exec install/bin/open5gs-${service}d
         ;;
     *)
