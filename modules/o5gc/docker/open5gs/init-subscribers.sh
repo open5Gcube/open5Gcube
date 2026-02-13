@@ -145,7 +145,7 @@ logout () {
 
 if [ "${PURGE_SUBSCRIBERS_ONSTART}" == "1" ]; then
     echo "Purge subscriber database"
-    npx mongosh --host ${MONGO_IP_ADDR} open5gs --eval 'db.subscribers.drop()'
+    mongosh --host ${MONGO_IP_ADDR} open5gs --eval 'db.subscribers.drop()'
 fi
 
 login

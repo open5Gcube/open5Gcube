@@ -21,6 +21,12 @@ RUN pip3 install --upgrade --no-cache-dir pip                                 \
     && pip3 install --no-cache-dir click==8.0.4                               \
     && ln -s /o5gc/open5gs/ -t /
 
+RUN cached-download.sh                                                        \
+        https://downloads.mongodb.com/compass/mongodb-mongosh_2.7.0_amd64.deb \
+        mongosh.deb                                                           \
+    && dpkg -i mongosh.deb                                                    \
+    && rm mongosh.deb
+
 RUN echo develop > /etc/image_version
 
 WORKDIR /o5gc/open5gs
@@ -47,7 +53,6 @@ RUN cd webui                                                                  \
     && npm cache clean --force                                                \
     && sed -i server/index.js                                                 \
         -e "s|newAccount.username = 'admin'|newAccount.username = 'o5gc'|"    \
-        -e "s|register(newAccount, '1423'|register(newAccount, 'o5gc'|"       \
-    && npx mongosh --quiet || true
+        -e "s|register(newAccount, '1423'|register(newAccount, 'o5gc'|"
 
 RUN echo ${OPEN5GS_VERSION} > /etc/image_version
