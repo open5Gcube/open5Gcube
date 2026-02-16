@@ -5,7 +5,7 @@
         </q-card-section>
 
         <q-card-section>
-            <q-item-label header :class="darkIsActive() ? 'text-white' : 'text-black'">Dark Mode</q-item-label>
+            <q-item-label header :class="darkIsActive() ? 'text-white' : 'text-black'">Theme Mode</q-item-label>
             <q-item dense>
                 <q-item-section avatar>
                     <q-icon name="contrast" />

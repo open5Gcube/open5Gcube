@@ -89,14 +89,14 @@
 
         <q-separator />
 
-        <q-card-section style="max-height: 50vh; white-space: pre; word-break: break-word;" class="scroll">
+        <q-card-section style="max-height: 50vh; white-space: pre; word-break: break-word; font-family: monospace;" class="scroll">
           <div style="word-break: break-word; white-space: pre-wrap;">{{ eventLog[resultDetailDialogId].result_detail }}</div>
         </q-card-section>
 
         <q-separator />
 
-        <q-card-actions>
-          <q-btn flat label="OK" color="primary" v-close-popup />
+        <q-card-actions align="right">
+          <q-btn label="CLOSE" v-close-popup color="primary" />
         </q-card-actions>
       </q-card>
     </q-dialog>

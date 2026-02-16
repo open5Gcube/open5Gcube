@@ -18,7 +18,7 @@
                     icon="sim_card"
                     label="SIM Reader"
                     default-opened
-                    header-class="bg-primary text-subtitle1 text-weight-bold"
+                    header-class="bg-primary text-subtitle1 text-weight-bold text-white"
                   >
                     <SimReaderComponent />
                   </q-expansion-item>
@@ -28,7 +28,7 @@
                     group="sim-writer"
                     icon="sim_card_download"
                     label="SIM Writer"
-                    header-class="bg-primary text-subtitle1 text-weight-bold"
+                    header-class="bg-primary text-subtitle1 text-weight-bold text-white"
                   >
                     <SimWriterComponent />
                   </q-expansion-item>
@@ -38,7 +38,7 @@
                     group="sim-writer"
                     icon="code"
                     label="SIM Scripts"
-                    header-class="bg-primary text-subtitle1 text-weight-bold"
+                    header-class="bg-primary text-subtitle1 text-weight-bold text-white"
                   >
                     <SimScriptsComponent />
                   </q-expansion-item>
