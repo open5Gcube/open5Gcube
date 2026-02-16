@@ -1,6 +1,7 @@
 x-sbi-healthcheck: &sbi-healthcheck
   healthcheck:
     test: bash -c "ss -ltn | grep -q ':7777'"
+    start_period: 5s
     start_interval: 1s
     interval: 10s
     timeout: 5s
@@ -44,6 +45,7 @@ services:
     profiles: [ "core" ]
     healthcheck:
       test: bash -c "exec 6<> /dev/tcp/localhost/27017"
+      start_period: 5s
       start_interval: 1s
       interval: 10s
       timeout: 5s
