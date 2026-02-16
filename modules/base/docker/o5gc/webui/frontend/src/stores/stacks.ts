@@ -4,38 +4,9 @@ import { generateErrorNotification } from './common';
 import { useEventLogStore } from './event-log';
 import { useSettingsStore } from './settings';
 
-/*
- * Format of stack store:
- * {
- *   "global_env": "ENV1=VAL1\nENV2=VAL2\n...",
- *   "stacks": {
- *     "stack_name1": {
- *       "description": "Description of Stack 1",
- *       "module_name": "o5gc",
- *       "stackEnv": "ENV1=VAL1_modified\nENV3=VAL3\n...",
- *       "envOverrides": "ENV4=VAL4\n...",
- *       "starting": true,
- *       "stopping": false
- *     }
- *   }
- * }
- *
- * Getters:
- * - stackNames
- *
- * Actions:
- * - loadGlobalEnv
- * - loadStackNames
- * - ensureStackIsInStore
- * - loadStackDescription
- * - loadStackEnv
- * - startStack
- * - stopStack
- *
- */
-
 type StackStoreType = {
   globalEnv: string|null,
+  moduleEnvs: {[key: string]: string|null}, // New state for module envs
   stacks: {[key: string]: {[key:string]: any}},
   eventLogStore: any,
   settingsStore: any
@@ -59,12 +30,13 @@ function handleEnvApiError(error: any, fetchType: string, stackName: string|null
 export const useStackStore = defineStore('stacks', {
   state() : StackStoreType {
     const globalEnv: string|null = '';
+    const moduleEnvs: {[key: string]: string|null} = {}; 
     const stacks: {[key: string]: {[key:string]: any}} = {};
     const eventLogStore = useEventLogStore();
     const settingsStore = useSettingsStore();
 
     return {
-        globalEnv, stacks, eventLogStore, settingsStore
+        globalEnv, moduleEnvs, stacks, eventLogStore, settingsStore
     }
   },
   getters: {
@@ -74,6 +46,9 @@ export const useStackStore = defineStore('stacks', {
         if(!(stackName in state.stacks)) return undefined;
         return state.stacks[stackName].stackEnv;
       }
+    },
+    moduleEnv: (state) => {
+        return (moduleName: string) => state.moduleEnvs[moduleName] || null;
     },
     favouriteStackNames: (state) => Object.keys(state.stacks).filter(stackName => state.settingsStore.favouriteStacks.includes(stackName)),
     nonFavouriteStackNames: (state) => Object.keys(state.stacks).filter(stackName => !state.settingsStore.favouriteStacks.includes(stackName))
@@ -90,9 +65,20 @@ export const useStackStore = defineStore('stacks', {
           }
         }
     },
+    async loadModuleEnv(moduleName: string) {
+        try {
+            this.moduleEnvs[moduleName] = (await api.get(`api/module/${moduleName}/env`)).data
+        } catch(error: any) {
+            if(error.response && error.response.status == 404) {
+                this.moduleEnvs[moduleName] = null;
+            } else {
+                handleEnvApiError(error, `module environment for ${moduleName}`);
+            }
+        }
+    },
     async loadStackNames() {
         // Get stack names from API
-        let stackNames: {stacks: [{stack_name: string, module_name: string}]}|null = null;
+      let stackNames: {stacks: [{stack_name: string, module_name: string}]}|null = null;
         try {
           stackNames = (await api.get('api/stacks')).data
         } catch(error: any) {
@@ -187,7 +173,7 @@ export const useStackStore = defineStore('stacks', {
         }
       }
     },
-    async startStack(stackName: string) {
+     async startStack(stackName: string) {
       if(!this.ensureStackIsInStore(stackName)) return;
 
       // This code is only reached when the stack exists on the server

@@ -13,16 +13,32 @@
           </div>
         </div>
         <div class="row col q-mx-xs">
+          <!-- Column 1: Global Env -->
           <div class="col-xs-12 col-md-4 column q-pr-xs q-py-xs">
             <Suspense>
               <EnvComponent envType="global" :stackName="$route.params.stackName" />
             </Suspense>
           </div>
+          
+          <!-- Column 2: Module Env (Top) and Stack Env (Bottom) -->
           <div class="col-xs-12 col-md-4 column q-px-xs q-py-xs">
+            <!-- Because EnvComponent has class="col", placing two of them in a flex column makes them share height equally -->
             <Suspense>
-              <EnvComponent envType="stack" :stackName="$route.params.stackName" />
+              <EnvComponent 
+                envType="module" 
+                :moduleName="moduleName" 
+                class="q-mb-xs"
+              />
+            </Suspense>
+            <Suspense>
+              <EnvComponent 
+                envType="stack" 
+                :stackName="$route.params.stackName" 
+              />
             </Suspense>
           </div>
+
+          <!-- Column 3: Overrides -->
           <div class="col-xs-12 col-md-4 column q-pl-xs q-py-xs">
             <Suspense>
               <template #default>
@@ -60,7 +76,9 @@ import EnvComponent from 'src/components/EnvComponent.vue'
 import StackStartStopComponent from 'src/components/StackStartStopComponent.vue'
 import EventLogComponent from 'src/components/EventLogComponent.vue'
 
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useStackStore } from 'src/stores/stacks'
+import { useRoute } from 'vue-router'
 
 export default {
 
@@ -73,19 +91,31 @@ export default {
   },
   setup() {
     const mainSplitterPercentage = ref(226);
+    const stackStore = useStackStore();
+    const route = useRoute();
+
+    const moduleName = computed(() => {
+        const stackName = route.params.stackName;
+        // Default to 'General' if stack not yet loaded or module undefined
+        if (stackStore.stacks[stackName]) {
+            return stackStore.stacks[stackName].module || 'General';
+        }
+        return 'General'; 
+    });
 
     return {
-      mainSplitterPercentage
+      mainSplitterPercentage,
+      moduleName
     };
   },
   created() {
     this.$emit('tabs', [])
-    this.$emit('toolbarTitleContent', 'STACK: ' + this.$route.params.stackName)
+    this.$emit('toolbarTitleContent', this.$route.params.stackName)
 
     this.$watch(
       () => this.$route.params,
       (toParams, _previousParams) => {
-        this.$emit('toolbarTitleContent', 'STACK: ' + toParams.stackName)
+        this.$emit('toolbarTitleContent', toParams.stackName)
       }
     )
   }

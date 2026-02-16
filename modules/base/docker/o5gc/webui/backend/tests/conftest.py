@@ -16,6 +16,7 @@ def app(tmp_path):
         "BASE_DIR": tmp_path / "test_instance",
         "GLOBAL_ENV_PATH": tmp_path / "test_instance" / "etc" / "settings.env",
         "STACK_ENV_FILENAME": "settings.env",
+        "MODULE_ENV_FILENAME": "settings.env",
         "ENV_OVERRIDES_DIR": tmp_path / "test_instance" / "var" / "etc"
     })
 

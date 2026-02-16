@@ -1,6 +1,6 @@
 <template>
 <div class="col column">
-    <q-bar class="bg-primary text-white text-weight-bold">{{ envType == 'global' ? 'Global ' : 'Stack ' }} Environment</q-bar>
+    <q-bar class="bg-primary text-white text-weight-bold">{{ title }}</q-bar>
     <q-card flat bordered square class="column col q-pa-sm" style="white-space: pre; font-family: monospace; min-height: 100px;">
         <q-scroll-area v-if="env !== null" class="col">
             {{ env }}
@@ -13,23 +13,30 @@
 <script>
 import { storeToRefs } from 'pinia';
 import { useStackStore } from 'src/stores/stacks';
-import { onMounted, watch } from 'vue';
+import { onMounted, watch, computed } from 'vue';
 
 export default {
     props: {
         stackName: String,
-        envType: String // 'global'|'stack'
+        moduleName: String, // Added prop
+        envType: String // 'global'|'stack'|'module'
     },
 
-    async setup(props) {
+    setup(props) {
         const stackStore = useStackStore();
-        const { globalEnv, stackEnv } = storeToRefs(stackStore);
+        const { globalEnv, stackEnv, moduleEnvs } = storeToRefs(stackStore);
 
         async function loadData() {
             switch(props.envType) {
                 case 'global':
                     await stackStore.loadGlobalEnv();
                     break;
+                case 'module': // New case
+                    if (props.moduleName) {
+                        await stackStore.loadModuleEnv(props.moduleName);
+                    }
+                    break;
+                case 'stack':
                 default:
                     if(await stackStore.ensureStackIsInStore(props.stackName)) {
                         await stackStore.loadStackEnv(props.stackName);
@@ -40,20 +47,25 @@ export default {
         onMounted(() => loadData());
 
         watch(
-            () => props.stackName,
+            () => [props.stackName, props.moduleName],
             () => loadData()
         );
 
+        const env = computed(() => {
+            if(props.envType == 'global') return globalEnv.value;
+            else if(props.envType == 'module') return moduleEnvs.value[props.moduleName] || null;
+            else return stackEnv.value(props.stackName);
+        });
+
+        const title = computed(() => {
+            if(props.envType == 'global') return 'Global Environment';
+            else if(props.envType == 'module') return 'Module Environment';
+            else return 'Stack Environment';
+        });
+
         return {
-            globalEnv, stackEnv
+            env, title
         };
     },
-
-    computed: {
-        env() {
-            if(this.envType == 'global') return this.globalEnv;
-            else return this.stackEnv(this.stackName);
-        }
-    }
 }
 </script>

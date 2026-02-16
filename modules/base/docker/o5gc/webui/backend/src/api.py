@@ -125,10 +125,23 @@ def get_stack_env(stack_name: str):
     env_path = current_app.config["MODULES_DIR"] / module_name / "stacks" / stack_name / current_app.config["STACK_ENV_FILENAME"]
 
     if not env_path.is_file():
-        return "Stack has no stack environment.", HTTPStatus.NOT_FOUND
+        return "Stack has no specific environment.", HTTPStatus.NOT_FOUND
 
     return Response(env_path.read_text(), content_type="text/x-sh")
 
+
+@bp.get('/module/<string:module_name>/env')
+def get_module_env(module_name: str):
+    # Check whether stack exists
+    if not module_name:
+        return "Module does not exist.", HTTPStatus.NOT_FOUND
+
+    env_path = current_app.config["MODULES_DIR"] / module_name / current_app.config["MODULE_ENV_FILENAME"]
+
+    if not env_path.is_file():
+        return "Module has no specific environment.", HTTPStatus.NOT_FOUND
+
+    return Response(env_path.read_text(), content_type="text/x-sh")
 
 @bp.get('/stack/<string:stack_name>/env_overrides')
 def get_stack_env_overrides(stack_name: str):
