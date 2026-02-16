@@ -12,10 +12,10 @@
       row-key="event_id"
     >
       <template v-slot:top>
-          <span class="text-bold text-h6 text-white">Event Log</span>
+          <span class="text-bold text-h6">Event Log</span>
           <q-space />
           <q-btn color="negative" label="Clear Log" class="q-mx-sm" @click="clear_log" />
-          <q-input dense outlined debounce="300" color="positive" v-model="filter" input-style="line-height: 10px;" :dark="true">
+          <q-input dense outlined debounce="300" color="positive" v-model="filter" input-style="line-height: 10px;" :dark="$q.dark.isActive">
               <template v-slot:append>
                   <q-icon name="search" />
               </template>
@@ -71,7 +71,7 @@
     </q-table>
     <q-dialog v-model="resultDetailDialog">
       <q-card style="max-width: 75vw;">
-        <q-card-section :class="{'IN_PROGRESS': 'bg-primary', 'SUCCESSFUL': 'bg-positive', 'FAILED': 'bg-negative'}[eventLog[resultDetailDialogId].status]">
+        <q-card-section class="text-white" :class="{'IN_PROGRESS': 'bg-primary', 'SUCCESSFUL': 'bg-positive', 'FAILED': 'bg-negative'}[eventLog[resultDetailDialogId].status]">
           <div class="text-h6">Result Details</div>
         </q-card-section>
 
@@ -223,8 +223,8 @@ export default {
                 field: 'status',
                 sortable: true,
                 style: row => {return 'width: 0px; ' + (
-                    row.status == 'SUCCESSFUL' ? `background-color: ${pos_color}` :
-                    row.status == 'FAILED' ? `background-color: ${neg_color}` : '')}
+                    row.status == 'SUCCESSFUL' ? `background-color: ${pos_color}; color: white` :
+                    row.status == 'FAILED' ? `background-color: ${neg_color}; color: white` : '')}
             },
             {
                 name: 'delete',
@@ -254,7 +254,7 @@ export default {
   .q-table__top,
   .q-table__bottom,
   thead tr:first-child th /* bg color is important for th; just specify one */
-    background-color: $dark
+    background-color: #fff /* Default to white for light mode */
 
   // Eliminate table bottom
   .q-table__bottom
@@ -276,5 +276,12 @@ export default {
   tbody
     /* height of all previous header rows */
     scroll-margin-top: 48px
+
+/* Override for Dark Mode using Quasar global body class */
+.body--dark .eventlog-sticky-dynamic
+  .q-table__top,
+  .q-table__bottom,
+  thead tr:first-child th
+    background-color: $dark
 
 </style>
