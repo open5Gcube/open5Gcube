@@ -61,7 +61,7 @@ set_performance_state
 
 # Execute the passed command in the background
 echo "$@"
-nice -n 20 "$@" &
+nice -n -20 "$@" &
 CHILD_PID=$!
 ps -eo pid,comm,ni,cls,rtprio -f ${CHILD_PID}
 
