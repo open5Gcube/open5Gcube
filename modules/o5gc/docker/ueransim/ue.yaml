@@ -8,7 +8,7 @@ mnc: '${MNC}'
 # SUCI Protection Scheme : 0 for Null-scheme, 1 for Profile A and 2 for Profile B
 protectionScheme: ${SUCI_SCHEME}
 # Home Network Public Key for protecting with SUCI Profile A
-homeNetworkPublicKey: '5a8d38864820197c3394b92613b20b91633cbd897119273bf8e4a6f4eec0a650'
+homeNetworkPublicKey: '${SUCI_PUBKEY}'
 # Home Network Public Key ID for protecting with SUCI Profile A
 homeNetworkPublicKeyId: 1
 

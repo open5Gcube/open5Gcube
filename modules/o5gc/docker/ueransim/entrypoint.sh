@@ -14,5 +14,6 @@ fi
 
 [ "${NSSAI_SD}" == "ffffff" ] && export NSSAI_SD=0x${NSSAI_SD}
 envsubst.sh /mnt/ueransim/${service}.yaml config/${service}.yaml
+cat config/${service}.yaml
 
 exec ./build/nr-${service} -c config/${service}.yaml
