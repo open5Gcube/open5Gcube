@@ -155,20 +155,20 @@ include ${MODULE_TARGET_FILES}
 	cd docker/$(subst -,/,$*);                                                \
 	$(DOCKER_COMPOSE) --profile=develop down
 
+var/tmp/softue.env: ${UEDB_ENV}
+	source ${UEDB_ENV}; echo UE_SOFT_MSIN=$${UE_SOFT_MSIN} > $@
+	source ${UEDB_ENV}; echo UE_SOFT_KEY=$${UE_SOFT_KEY}  >> $@
+	source ${UEDB_ENV}; echo UE_SOFT_OPC=$${UE_SOFT_OPC}  >> $@
 .SECONDEXPANSION:
 ${ENV_OVERRIDES_PATH}: ;
 ${ENV_DIR}/%.env:                                                             \
         ${ETC_DIR}/settings.env ${ETC_DIR}/networks.env ${ETC_DIR}/o5gc.env   \
-		${LOCAL_ENV} ${UEDB_ENV}                                              \
+        var/tmp/softue.env ${LOCAL_ENV}                                       \
         $$(wildcard ${MODULES_DIR}/$$(firstword $$(subst /, ,$$*))/settings.env) \
         $$(wildcard ${MODULES_DIR}/$$(subst /,/stacks/,$$*)/settings.env)     \
         ${ENV_OVERRIDES_PATH}
 	mkdir -p $(dir $@)
-	awk 1 $(filter-out ${UEDB_ENV},$^) > $@
-	source ${UEDB_ENV};                                                       \
-	for soft_ue_env in UE_SOFT_MSIN UE_SOFT_KEY UE_SOFT_OPC; do               \
-	    echo $$soft_ue_env="$${!soft_ue_env}" >> $@;                          \
-	done
+	awk 'FNR==1 && NR!=1 { print "\n\n#### " FILENAME "\n" } { print }' $^ > $@
 	$(MAKE) --no-print-directory -s git-localenv-ignore
 
 git-localenv-ignore:
@@ -233,7 +233,7 @@ docker-purge-all-images: build-cacher-stop webui-stop  ## purge all project rela
 
 clean:
 	rm -f tests/.venv.build
-	rm -f var/etc/*.env var/tmp/*
+	rm -rf var/etc/* var/tmp/*
 
 system-install-all: systemd-install-unit system-install-docker                \
     system-install-python3-virtualenv tests-install-venv scripts-install-venv \
