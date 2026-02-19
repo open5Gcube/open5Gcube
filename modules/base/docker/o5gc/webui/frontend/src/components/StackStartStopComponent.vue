@@ -1,14 +1,14 @@
 <template>
         <div class="q-gutter-sm">
 
-        <q-btn :loading="current_stack.starting" class="bg-positive text-white" style="width: 150px" icon="play_arrow" @click="startStack()">
+        <q-btn :loading="current_stack?.starting" class="bg-positive text-white" style="width: 150px" icon="play_arrow" @click="startStack()">
           Start
           <template v-slot:loading>
             <q-spinner-hourglass class="on-left" />
             Starting...
           </template>
         </q-btn>
-        <q-btn :loading="current_stack.stopping" class="bg-negative text-white" style="width: 150px" icon="stop" @click="stopStack()">
+        <q-btn :loading="current_stack?.stopping" class="bg-negative text-white" style="width: 150px" icon="stop" @click="stopStack()">
           Stop
           <template v-slot:loading>
             <q-spinner-hourglass class="on-left" />
@@ -19,7 +19,7 @@
 </template>
 <script>
 import { useStackStore } from 'src/stores/stacks';
-import { toRef } from 'vue';
+import { toRef, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 
 export default {
@@ -35,7 +35,7 @@ export default {
         const result = await stackStore.ensureStackIsInStore(stackName.value)
         if(!result) return {};
 
-        const current_stack = stacks.value[stackName.value];
+        const current_stack = computed(() => stacks.value[stackName.value]);
 
         return {
             stackStore, stacks, current_stack

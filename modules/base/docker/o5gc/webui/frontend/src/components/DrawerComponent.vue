@@ -28,18 +28,24 @@
           <!-- Favourites Section -->
           <q-expansion-item v-if="stackLinks.favourites.length > 0"  label="&nbsp;&nbsp;&nbsp;Favourites" dense default-opened>
             <q-list>
-              <q-item clickable :active="$route.path == link.to" v-for="(link, i) in stackLinks.favourites" :key="i" @click="routeTo(link.to);">
-                <q-item-section avatar>
-                  <div class="icon-container" @click.stop="settingsStore.removeFavouriteStack(link.label);">
-                    <q-icon :name="link.icon" size="md" class="default-icon" />
-                    <q-icon name="star" size="md" class="hovered-icon" />
-                  </div>
-                </q-item-section>
+              <q-item clickable :active="$route.path == link.to" v-for="(link, i) in stackLinks.favourites" :key="i" @click="routeTo(link.to);" style="padding-left: 36px;">
                 <q-item-section>
                   <q-item-label>{{ link.label }}</q-item-label>
                 </q-item-section>
                 <q-item-section side>
-                  <q-item-label>{{ link.value }}</q-item-label>
+                  <div class="row no-wrap">
+                    <q-btn flat dense round icon="play_arrow" size="sm" :loading="stacks[link.label]?.starting" @click.stop.prevent="startStack(link.label)">
+                        <q-tooltip>Start Stack</q-tooltip>
+                    </q-btn>
+                    <q-btn flat dense round icon="stop" size="sm" :loading="stacks[link.label]?.stopping" @click.stop.prevent="stopStack(link.label)">
+                        <q-tooltip>Stop Stack</q-tooltip>
+                    </q-btn>
+                    <q-btn flat dense round color="grey" size="sm" class="star-swap-btn" @click.stop.prevent="settingsStore.removeFavouriteStack(link.label)">
+                        <q-icon name="star" class="icon-normal" />
+                        <q-icon :name="symOutlinedStar" class="icon-hover" />
+                        <q-tooltip>Remove from Favourites</q-tooltip>
+                     </q-btn>
+                  </div>
                 </q-item-section>
               </q-item>
             </q-list>
@@ -52,18 +58,24 @@
               :default-opened="Object.keys(stackLinks.modules).length === 1 || links.some(link => $route.path == link.to)"
             >
               <q-list>
-                <q-item clickable :active="$route.path == link.to" v-for="(link, i) in links" :key="i" @click="routeTo(link.to);">
-                  <q-item-section avatar>
-                    <div class="icon-container" @click.stop="settingsStore.addFavouriteStack(link.label);">
-                      <q-icon :name="link.icon" size="md" class="default-icon" />
-                      <q-icon :name="symOutlinedStar" size="md" class="hovered-icon" />
-                    </div>
-                  </q-item-section>
+                <q-item clickable :active="$route.path == link.to" v-for="(link, i) in links" :key="i" @click="routeTo(link.to);" style="padding-left: 36px;">
                   <q-item-section>
                     <q-item-label>{{ link.label }}</q-item-label>
                   </q-item-section>
                   <q-item-section side>
-                    <q-item-label>{{ link.value }}</q-item-label>
+                    <div class="row no-wrap">
+                      <q-btn flat dense round icon="play_arrow" size="sm" :loading="stacks[link.label]?.starting" @click.stop.prevent="startStack(link.label)">
+                          <q-tooltip>Start Stack</q-tooltip>
+                      </q-btn>
+                      <q-btn flat dense round icon="stop" size="sm" :loading="stacks[link.label]?.stopping" @click.stop.prevent="stopStack(link.label)">
+                          <q-tooltip>Stop Stack</q-tooltip>
+                      </q-btn>
+                      <q-btn flat dense round color="grey" size="sm" class="star-swap-btn non-fav" @click.stop.prevent="settingsStore.addFavouriteStack(link.label)">
+                          <q-icon :name="symOutlinedStar" class="icon-normal" />
+                          <q-icon name="star" class="icon-hover" />
+                          <q-tooltip>Add to Favourites</q-tooltip>
+                       </q-btn>
+                    </div>
                   </q-item-section>
                 </q-item>
               </q-list>
@@ -146,6 +158,7 @@ export default {
 
     const stackStore = useStackStore();
     const { favouriteStackNames, nonFavouriteStackNames, stacks } = storeToRefs(stackStore);
+    const { startStack, stopStack } = stackStore;
 
     const settingsStore = useSettingsStore();
     const { toggleDark } = settingsStore;
@@ -179,6 +192,8 @@ export default {
       favouriteStackNames,
       nonFavouriteStackNames,
       stacks,
+      startStack,
+      stopStack,
       externalLinksFromLabels,
       toggleDark,
       settingsDialog,
@@ -231,24 +246,13 @@ export default {
 </script>
 
 <style scoped>
-.icon-container {
-  position: relative;
-  display: inline-block;
-}
-
-.default-icon {
-  display: block;
-}
-
-.hovered-icon {
+.star-swap-btn .icon-hover {
   display: none;
 }
-
-.icon-container:hover .hovered-icon {
-  display: block;
-}
-
-.icon-container:hover .default-icon {
+.star-swap-btn:hover .icon-normal {
   display: none;
+}
+.star-swap-btn:hover .icon-hover {
+  display: block;
 }
 </style>
