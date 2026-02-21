@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 FROM o5gc/o5gc-base:jammy AS base
 
 RUN mkdir -p /etc/apt/keyrings                                                \
@@ -33,7 +34,7 @@ RUN cd frontend                                                               \
     && quasar build
 
 FROM base
-COPY --from=frontend /o5gc/webui/frontend ./frontend
+COPY --from=frontend --exclude=node_modules /o5gc/webui/frontend ./frontend
 COPY ./backend ./backend
 
 RUN echo latest > /etc/image_version
