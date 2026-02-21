@@ -6,7 +6,7 @@
         <q-btn dense flat round icon="menu" @click="toggleLeftDrawer" />
 
         <q-toolbar-title>
-          <q-icon name="view_in_ar" class="text-h4" />
+          <!---<q-icon name="view_in_ar" class="text-h4" />-->
           {{ toolbarTitleContent }}
         </q-toolbar-title>
       </q-toolbar>
@@ -43,7 +43,7 @@ export default {
   setup () {
     const leftDrawerOpen = ref(false)
     const tabs = ref([]) // [{'label': 'TAB1', 'to': '/page1'}]
-    const toolbarTitleContent = ref('5G Cube Frontend')
+    const toolbarTitleContent = ref('open5Gcube')
 
     return {
       leftDrawerOpen,

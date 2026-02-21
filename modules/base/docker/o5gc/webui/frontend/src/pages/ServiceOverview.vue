@@ -1,7 +1,7 @@
 <template>
     <q-page class="column bg-image">
       <div class="row">
-        <div class="col-xs-12 col-md-6 col-lg-6 column" v-for="serviceId in visibleServiceIdsSortedByHealthExecutionStatusAndPriorityLabel" style="height: 250px;" :key="serviceId">
+        <div class="col-xs-12 col-md-6 col-lg-6 column" v-for="serviceId in visibleServiceIdsSorted" style="height: 250px;" :key="serviceId">
             <ServiceLogComponent :serviceId="serviceId" :serviceTitleAsLink="true" :statusLine="false" :key="`${$route.params.serviceId}-mini`" class="q-pa-xs" />
         </div>
       </div>
@@ -18,14 +18,17 @@ import { _ } from 'lodash';
 export default {
     setup(_props, context) {
         const serviceStore = useServiceStore();
-        const { services, visibleServiceIdsSortedByHealthExecutionStatusAndPriorityLabel, visibleServiceDetailsSortedByHealthExecutionStatusAndPriorityLabel } = storeToRefs(serviceStore);
+        const { 
+            services,
+            visibleServiceIdsSorted,
+            visibleServiceDetailsSorted } = storeToRefs(serviceStore);
 
         const tabs = ref([]);
 
         let updater = null;
 
         function updateTabs() {
-          const new_tabs = visibleServiceDetailsSortedByHealthExecutionStatusAndPriorityLabel.value.map(service => ({
+          const new_tabs = visibleServiceDetailsSorted.value.map(service => ({
             label: service.containerName,
             to: `/service/${service.containerId}`
           }));
@@ -54,7 +57,7 @@ export default {
         });
 
         return {
-            services, visibleServiceIdsSortedByHealthExecutionStatusAndPriorityLabel, visibleServiceDetailsSortedByHealthExecutionStatusAndPriorityLabel, serviceStore
+            services, visibleServiceIdsSorted, visibleServiceDetailsSorted, serviceStore
         };
     },
     created() {

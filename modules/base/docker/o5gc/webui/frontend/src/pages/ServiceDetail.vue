@@ -24,8 +24,9 @@
         </q-tab-panels>
       </div>
   </q-page>
-  </template>
-  <script>
+</template>
+
+<script>
 import { onMounted, onUnmounted, ref, nextTick } from 'vue';
 import ServiceLogComponent from 'src/components/ServiceLogComponent.vue';
 import ServiceInspectComponent from 'src/components/ServiceInspectComponent.vue';
@@ -35,7 +36,6 @@ import { _ } from 'lodash';
 import { useRoute } from 'vue-router';
 
 export default {
-
   components: {
     ServiceLogComponent, ServiceInspectComponent
   },
@@ -45,7 +45,7 @@ export default {
     const tab = ref('logs');
 
     const serviceStore = useServiceStore();
-    const { services, visibleServiceDetailsSortedByHealthExecutionStatusAndPriorityLabel } = storeToRefs(serviceStore);
+    const { services, visibleServiceDetailsSorted } = storeToRefs(serviceStore);
 
     const tabs = ref([]);
     const inspect = ref('inspect');
@@ -53,7 +53,7 @@ export default {
     let updater = null;
 
     function updateTabs() {
-      const new_tabs = visibleServiceDetailsSortedByHealthExecutionStatusAndPriorityLabel.value.map(service => ({
+      const new_tabs = visibleServiceDetailsSorted.value.map(service => ({
         label: service.containerName,
         to: `/service/${service.containerId}`
       }));
@@ -66,7 +66,7 @@ export default {
     onMounted(async () => {
       await serviceStore.loadServiceNamesAndStatus();
       updateTabs();
-      context.emit('toolbarTitleContent', 'SERVICE: ' + services.value[route.params.serviceId].containerName);
+      context.emit('toolbarTitleContent', 'Service: ' + services.value[route.params.serviceId].containerName);
 
       nextTick(() => {
         context.emit('tabs', tabs.value);
@@ -100,7 +100,7 @@ export default {
         // see https://router.vuejs.org/guide/essentials/dynamic-matching.html#Reacting-to-Params-Changes
         // hence check whether the params apply to this component
         if('serviceId' in toParams) {
-          this.$emit('toolbarTitleContent', 'SERVICE: ' + this.services[toParams.serviceId].containerName)
+          this.$emit('toolbarTitleContent', 'Service: ' + this.services[toParams.serviceId].containerName)
         }
       }
     )

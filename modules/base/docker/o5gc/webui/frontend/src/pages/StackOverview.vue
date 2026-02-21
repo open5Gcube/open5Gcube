@@ -110,12 +110,12 @@ export default {
   },
   created() {
     this.$emit('tabs', [])
-    this.$emit('toolbarTitleContent', this.$route.params.stackName)
+    this.$emit('toolbarTitleContent', 'Stack: ' + this.$route.params.stackName)
 
     this.$watch(
       () => this.$route.params,
       (toParams, _previousParams) => {
-        this.$emit('toolbarTitleContent', toParams.stackName)
+        this.$emit('toolbarTitleContent', 'Stack: ' + toParams.stackName)
       }
     )
   }

@@ -270,7 +270,7 @@ export const useServiceStore = defineStore('services', {
     visibleServiceDetails: (state) => {
       return state.visibleServiceIds.map((serviceId: string) => state.services[serviceId]);
     },
-    visibleServiceIdsSortedByHealthExecutionStatusAndPriorityLabel: (state) => {
+    visibleServiceIdsSorted: (state) => {
       const l = Object.assign([],  state.visibleServiceIds); // clone array
       return l.sort((a: string, b: string) => {
         const statusPriorities: {[healthExecutionStatus: string]: number} = {
@@ -302,8 +302,8 @@ export const useServiceStore = defineStore('services', {
         return createdB - createdA;
       })
     },
-    visibleServiceDetailsSortedByHealthExecutionStatusAndPriorityLabel: (state) => {
-      return state.visibleServiceIdsSortedByHealthExecutionStatusAndPriorityLabel.map((serviceId: string) => state.services[serviceId])
+    visibleServiceDetailsSorted: (state) => {
+      return state.visibleServiceIdsSorted.map((serviceId: string) => state.services[serviceId])
     },
     runningVisibleServiceNames: (state) => state.visibleServiceIds.filter((serviceId: string) => state.executionStatus(serviceId) === 'running'),
   },
