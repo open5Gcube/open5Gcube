@@ -31,7 +31,7 @@ export default {
                 case 'global':
                     await stackStore.loadGlobalEnv();
                     break;
-                case 'module': // New case
+                case 'module':
                     if (props.moduleName) {
                         await stackStore.loadModuleEnv(props.moduleName);
                     }

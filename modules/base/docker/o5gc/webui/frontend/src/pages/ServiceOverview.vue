@@ -12,17 +12,18 @@
 import { onMounted, onUnmounted, ref, nextTick } from 'vue';
 import ServiceLogComponent from 'src/components/ServiceLogComponent.vue'
 import { useServiceStore } from 'src/stores/services';
+import { useStackStore } from 'src/stores/stacks';
 import { storeToRefs } from 'pinia';
 import { _ } from 'lodash';
 
 export default {
     setup(_props, context) {
         const serviceStore = useServiceStore();
-        const { 
+        const stackStore = useStackStore();
+        const {
             services,
             visibleServiceIdsSorted,
             visibleServiceDetailsSorted } = storeToRefs(serviceStore);
-
         const tabs = ref([]);
 
         let updater = null;
@@ -40,6 +41,8 @@ export default {
 
         onMounted(async () => {
             await serviceStore.loadServiceNamesAndStatus();
+            await stackStore.loadRunningStacks();
+
             updateTabs();
 
             nextTick(() => {
@@ -48,6 +51,7 @@ export default {
 
             updater = serviceStore.addUpdateServicesInterval(() => {
                 updateTabs();
+                stackStore.loadRunningStacks();
             }, 1);
         });
 

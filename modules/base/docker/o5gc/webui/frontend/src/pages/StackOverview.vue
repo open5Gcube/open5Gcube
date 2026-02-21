@@ -19,21 +19,21 @@
               <EnvComponent envType="global" :stackName="$route.params.stackName" />
             </Suspense>
           </div>
-          
+
           <!-- Column 2: Module Env (Top) and Stack Env (Bottom) -->
           <div class="col-xs-12 col-md-4 column q-px-xs q-py-xs">
             <!-- Because EnvComponent has class="col", placing two of them in a flex column makes them share height equally -->
             <Suspense>
-              <EnvComponent 
-                envType="module" 
-                :moduleName="moduleName" 
+              <EnvComponent
+                envType="module"
+                :moduleName="moduleName"
                 class="q-mb-xs"
               />
             </Suspense>
             <Suspense>
-              <EnvComponent 
-                envType="stack" 
-                :stackName="$route.params.stackName" 
+              <EnvComponent
+                envType="stack"
+                :stackName="$route.params.stackName"
               />
             </Suspense>
           </div>
@@ -100,7 +100,7 @@ export default {
         if (stackStore.stacks[stackName]) {
             return stackStore.stacks[stackName].module || 'General';
         }
-        return 'General'; 
+        return 'General';
     });
 
     return {

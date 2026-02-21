@@ -31,6 +31,7 @@ import { onMounted, onUnmounted, ref, nextTick } from 'vue';
 import ServiceLogComponent from 'src/components/ServiceLogComponent.vue';
 import ServiceInspectComponent from 'src/components/ServiceInspectComponent.vue';
 import { useServiceStore } from 'src/stores/services';
+import { useStackStore } from 'src/stores/stacks';
 import { storeToRefs } from 'pinia';
 import { _ } from 'lodash';
 import { useRoute } from 'vue-router';
@@ -45,6 +46,7 @@ export default {
     const tab = ref('logs');
 
     const serviceStore = useServiceStore();
+    const stackStore = useStackStore();
     const { services, visibleServiceDetailsSorted } = storeToRefs(serviceStore);
 
     const tabs = ref([]);
@@ -65,6 +67,7 @@ export default {
 
     onMounted(async () => {
       await serviceStore.loadServiceNamesAndStatus();
+      await stackStore.loadRunningStacks();
       updateTabs();
       context.emit('toolbarTitleContent', 'Service: ' + services.value[route.params.serviceId].containerName);
 
@@ -74,6 +77,7 @@ export default {
 
       updater = serviceStore.addUpdateServicesInterval(() => {
         updateTabs();
+        stackStore.loadRunningStacks();
       }, 1);
     });
 

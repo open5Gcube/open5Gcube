@@ -6,8 +6,9 @@ import { useSettingsStore } from './settings';
 
 type StackStoreType = {
   globalEnv: string|null,
-  moduleEnvs: {[key: string]: string|null}, // New state for module envs
+  moduleEnvs: {[key: string]: string|null},
   stacks: {[key: string]: {[key:string]: any}},
+  runningStacks: string[],
   eventLogStore: any,
   settingsStore: any
 }
@@ -30,13 +31,14 @@ function handleEnvApiError(error: any, fetchType: string, stackName: string|null
 export const useStackStore = defineStore('stacks', {
   state() : StackStoreType {
     const globalEnv: string|null = '';
-    const moduleEnvs: {[key: string]: string|null} = {}; 
+    const moduleEnvs: {[key: string]: string|null} = {};
     const stacks: {[key: string]: {[key:string]: any}} = {};
+    const runningStacks: string[] = [];
     const eventLogStore = useEventLogStore();
     const settingsStore = useSettingsStore();
 
     return {
-        globalEnv, moduleEnvs, stacks, eventLogStore, settingsStore
+        globalEnv, moduleEnvs, stacks, runningStacks, eventLogStore, settingsStore // <-- ADDED to return
     }
   },
   getters: {
@@ -54,6 +56,19 @@ export const useStackStore = defineStore('stacks', {
     nonFavouriteStackNames: (state) => Object.keys(state.stacks).filter(stackName => !state.settingsStore.favouriteStacks.includes(stackName))
   },
   actions: {
+    async loadRunningStacks() {
+      try {
+        const response = await api.get('api/running-stacks');
+        this.runningStacks = response.data.stacks;
+      } catch(error: any) {
+        this.runningStacks = [];
+        if(error.response) {
+          generateErrorNotification(`HTTP Error ${error.response.status} on trying to fetch running stacks.`);
+        } else {
+          generateErrorNotification('Unknown error on trying to fetch running stacks.');
+        }
+      }
+    },
     async loadGlobalEnv() {
         try {
             this.globalEnv = (await api.get('api/global_env')).data
@@ -77,7 +92,7 @@ export const useStackStore = defineStore('stacks', {
         }
     },
     async loadStackNames() {
-        // Get stack names from API
+      // Get stack names from API
       let stackNames: {stacks: [{stack_name: string, module_name: string}]}|null = null;
         try {
           stackNames = (await api.get('api/stacks')).data
@@ -162,8 +177,8 @@ export const useStackStore = defineStore('stacks', {
     async loadStackDescription(stackName: string) {
       if(!this.ensureStackIsInStore(stackName)) return;
 
-      // This code is only reached when the stack exists on the server
-      try {
+     // This code is only reached when the stack exists on the server
+     try {
         this.stacks[stackName].description = (await api.get('api/stack/' + stackName + '/description')).data;
       } catch(error: any) {
         if(error.response && error.response.status == 404) {

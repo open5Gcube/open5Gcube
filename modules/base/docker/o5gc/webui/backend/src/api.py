@@ -30,6 +30,13 @@ def get_stacks():
         ]
     }
 
+@bp.get('/running-stacks')
+def get_running_stacks():
+    status_module = import_status_module()
+    return {
+        "stacks": status_module.get_running_stacks()
+    }
+
 def get_module(stack_name):
     for stack in get_stacks()['stacks']:
         if stack['stack_name'] == stack_name:

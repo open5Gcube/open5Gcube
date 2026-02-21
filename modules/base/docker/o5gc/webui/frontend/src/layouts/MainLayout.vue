@@ -9,6 +9,23 @@
           <!---<q-icon name="view_in_ar" class="text-h4" />-->
           {{ toolbarTitleContent }}
         </q-toolbar-title>
+        <div v-if="$route.path.startsWith('/service')" class="row items-center">
+          <span class="text-subtitle2 q-mr-sm">Running Stacks:</span>
+          <div v-if="runningStacks && runningStacks.length > 0" class="row items-center q-gutter-x-sm">
+            <q-chip
+              v-for="stack in runningStacks"
+              :key="stack"
+              color="positive"
+              text-color="white"
+              dense
+              clickable
+              @click="$router.push(`/stack/${stack}`)"
+            >
+              {{ stack }}
+            </q-chip>
+          </div>
+          <div v-else class="text-subtitle2 text-italic q-mr-sm">None</div>
+        </div>
       </q-toolbar>
 
       <q-tabs align="left" v-if="tabs.length > 0">
@@ -33,6 +50,8 @@
 <script>
 import { ref } from 'vue'
 import DrawerComponent from 'components/DrawerComponent.vue'
+import { useStackStore } from 'src/stores/stacks'
+import { storeToRefs } from 'pinia'
 
 export default {
 
@@ -42,13 +61,16 @@ export default {
 
   setup () {
     const leftDrawerOpen = ref(false)
-    const tabs = ref([]) // [{'label': 'TAB1', 'to': '/page1'}]
+    const tabs = ref([])
     const toolbarTitleContent = ref('open5Gcube')
+    const stackStore = useStackStore()
+    const { runningStacks } = storeToRefs(stackStore)
 
     return {
       leftDrawerOpen,
       tabs,
       toolbarTitleContent,
+      runningStacks,
       toggleLeftDrawer () {
         leftDrawerOpen.value = !leftDrawerOpen.value
       }

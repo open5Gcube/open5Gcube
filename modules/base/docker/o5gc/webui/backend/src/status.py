@@ -24,6 +24,12 @@ def get_running_containers() -> List[Dict]:
     ]
 
 
+def get_running_stacks() -> List[str]:
+    client = docker.from_env()
+    containers = client.containers.list(all=True, filters={"label":"o5gc.stack"})
+    return sorted({c.labels.get("o5gc.stack") for c in containers})
+
+
 def get_container_logs(host: str, container_id: str,
                        stdout: bool, stderr: bool, timestamps: bool, tail: int,
                        since: datetime | None, until: datetime | None) -> str:
