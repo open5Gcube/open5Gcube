@@ -1,6 +1,12 @@
 @use "quasar/src/css/variables" as q;
 
 <template>
+  <q-scroll-area
+    class="fit"
+    visible
+    :thumb-style="{ background: '#777', opacity: 1 }"
+    :bar-style="{ background: dark.isActive ? '#1D1D1D' : '#ffffff', opacity: 1 }"
+  >
     <img src="~assets/logo.png" style="max-width: 70%; margin-left: auto; margin-right: auto; margin-top: 10px; display: block;" />
     <q-list>
       <q-item-label header class="text-bold text-h3" style="text-align: center; padding-top: 0px !important; font-family: SourceSans3;">
@@ -11,11 +17,9 @@
         <q-item-section avatar>
           <q-icon name="monitor_heart" />
         </q-item-section>
-
         <q-item-section>
           <q-item-label>Service Overview</q-item-label>
         </q-item-section>
-
         <q-item-section side>
           <q-item-label><q-chip dense :class="serviceOverviewBackgroundColor" style="color: white;">{{ runningVisibleServiceNames.length }} running</q-chip></q-item-label>
         </q-item-section>
@@ -28,7 +32,7 @@
           <!-- Favourites Section -->
           <q-expansion-item v-if="stackLinks.favourites.length > 0"  label="&nbsp;&nbsp;&nbsp;Favourites" dense default-opened>
             <q-list>
-              <q-item clickable :active="$route.path == link.to" v-for="(link, i) in stackLinks.favourites" :key="i" @click="routeTo(link.to);" style="padding-left: 36px;">
+              <q-item clickable :active="$route.path == link.to" v-for="(link, i) in stackLinks.favourites" :key="i" @click="routeTo(link.to);" style="padding-left: 36px;" dense>
                 <q-item-section>
                   <q-item-label>{{ link.label }}</q-item-label>
                 </q-item-section>
@@ -44,7 +48,7 @@
                         <q-icon name="star" class="icon-normal" />
                         <q-icon :name="symOutlinedStar" class="icon-hover" />
                         <q-tooltip>Remove from Favourites</q-tooltip>
-                     </q-btn>
+                      </q-btn>
                   </div>
                 </q-item-section>
               </q-item>
@@ -58,7 +62,7 @@
               :default-opened="Object.keys(stackLinks.modules).length === 1 || links.some(link => $route.path == link.to)"
             >
               <q-list>
-                <q-item clickable :active="$route.path == link.to" v-for="(link, i) in links" :key="i" @click="routeTo(link.to);" style="padding-left: 36px;">
+                <q-item clickable :active="$route.path == link.to" v-for="(link, i) in links" :key="i" @click="routeTo(link.to);" style="padding-left: 36px;" dense>
                   <q-item-section>
                     <q-item-label>{{ link.label }}</q-item-label>
                   </q-item-section>
@@ -74,7 +78,7 @@
                           <q-icon :name="symOutlinedStar" class="icon-normal" />
                           <q-icon name="star" class="icon-hover" />
                           <q-tooltip>Add to Favourites</q-tooltip>
-                       </q-btn>
+                        </q-btn>
                     </div>
                   </q-item-section>
                 </q-item>
@@ -100,12 +104,12 @@
 
       <q-expansion-item icon="open_in_browser" label="Service Links" default-closed>
         <q-list>
-          <q-item v-for="(url, title) in externalLinksFromLabels" :key="title" :href="url" style="text-decoration: none; padding-left: 2em;" target="_blank">
+          <q-item v-for="(url, title) in externalLinksFromLabels" :key="title" :href="url" style="text-decoration: none; padding-left: 2em;" target="_blank" dense>
             <q-item-section>
               <q-item-label>{{ title }}</q-item-label>
             </q-item-section>
           </q-item>
-          <q-item href="/doc/" style="text-decoration: none; padding-left: 2em;" target="_blank">
+          <q-item href="/doc/" style="text-decoration: none; padding-left: 2em;" target="_blank" dense>
             <q-item-section>
               <q-item-label>open5Gcube Documentation</q-item-label>
             </q-item-section>
@@ -126,9 +130,10 @@
 
     </q-list>
     <q-space />
-    <q-dialog v-model="settingsDialog">
-      <SettingsComponent />
-    </q-dialog>
+  </q-scroll-area>
+  <q-dialog v-model="settingsDialog">
+    <SettingsComponent />
+  </q-dialog>
 </template>
 
 <script>
