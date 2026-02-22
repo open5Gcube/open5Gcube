@@ -23,7 +23,7 @@
 
       <q-separator />
 
-      <q-expansion-item label="Stacks" dense default-opened>
+      <q-expansion-item icon="layers" label="Stacks" default-opened>
         <q-list>
           <!-- Favourites Section -->
           <q-expansion-item v-if="stackLinks.favourites.length > 0"  label="&nbsp;&nbsp;&nbsp;Favourites" dense default-opened>
@@ -98,23 +98,16 @@
 
       <q-separator />
 
-      <q-expansion-item label="Service Links" dense default-closed>
+      <q-expansion-item icon="open_in_browser" label="Service Links" default-closed>
         <q-list>
-          <q-item v-for="(url, title) in externalLinksFromLabels" :key="title" :href="url" style="text-decoration: none" target="_blank">
-            <q-item-section avatar>
-              <q-icon name="open_in_browser" />
-            </q-item-section>
+          <q-item v-for="(url, title) in externalLinksFromLabels" :key="title" :href="url" style="text-decoration: none; padding-left: 2em;" target="_blank">
             <q-item-section>
               <q-item-label>{{ title }}</q-item-label>
             </q-item-section>
           </q-item>
-          <q-separator inset="item" />
-          <q-item href="/doc/" style="text-decoration: none" target="_blank">
-            <q-item-section avatar>
-              <q-icon name="open_in_browser" />
-            </q-item-section>
+          <q-item href="/doc/" style="text-decoration: none; padding-left: 2em;" target="_blank">
             <q-item-section>
-              <q-item-label>Documentation</q-item-label>
+              <q-item-label>open5Gcube Documentation</q-item-label>
             </q-item-section>
           </q-item>
         </q-list>
