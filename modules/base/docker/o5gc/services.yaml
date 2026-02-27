@@ -20,15 +20,14 @@ services:
     container_name: o5gc-webui
     entrypoint: [ "/mnt/webui/entrypoint.sh" ]
     init: true
-    privileged: true
     # No env-file, because this would override the settings when calling run-* inside the container
     # env_file:
     environment:
-      - BASE=${BASE}
+      - BASE
       - HOST_HOME=${HOME}
-      - HOST_USER=${HOST_USER}
-      - ENB_HOSTNAME=${ENB_HOSTNAME}
-      - GNB_HOSTNAME=${GNB_HOSTNAME}
+      - HOST_USER=${USER}
+      - ENB_HOSTNAME
+      - GNB_HOSTNAME
     volumes:
       - ./webui:/mnt/webui:ro
       - ${BASE}/Doc/html:/mnt/doc/html:ro
