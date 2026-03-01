@@ -17,7 +17,7 @@ COPY --from=osmo-stp /usr/local/lib/pkgconfig/libosmo-sccp.pc /usr/local/lib/pkg
 ARG LIBSMPP34_VERSION=1.14.3
 RUN git clone https://gitea.osmocom.org/cellular-infrastructure/libsmpp34     \
     && cd libsmpp34                                                           \
-    && git checkout ${LIBASN1C_VERSION}                                       \
+    && git checkout ${LIBSMPP34_VERSION}                                       \
     && autoreconf -i                                                          \
     && ./configure --disable-dependency-tracking                              \
     && make -j $(nproc)                                                       \
