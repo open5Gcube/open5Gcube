@@ -19,16 +19,20 @@ upf:
         - address: ${UPF_IP_ADDR}
           advertise: ${UPF_ADVERTISE_IP}
     session:
-      - subnet: 192.168.100.1/24
+      - subnet: 192.168.100.0/24
+        gateway: 192.168.100.1
         dev: ogstun
         dnn: ${APN}
-      - subnet: 2001:230:cafe::1/48
+      - subnet: 2001:230:cafe::/48
+        gateway: 2001:230:cafe::1
         dev: ogstun
         dnn: internet
-      - subnet: 192.168.100.1/24
+      - subnet: 192.168.100.0/24
+        gateway: 192.168.100.1
         dnn: ims
         dev: ogstun2
-      - subnet: 2001:230:babe::1/48
+      - subnet: 2001:230:babe::/48
+        gateway: 2001:230:bafe::1
         dnn: ims
         dev: ogstun2
     metrics:
