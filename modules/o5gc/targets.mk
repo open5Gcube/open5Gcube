@@ -136,6 +136,13 @@ stop-srsran-open5gs-4g: .create-running-env  ##
 run-srsran-open5gs-4g-enb run-srsran-open5gs-4g-core: .create-running-env
 	$(call run_stack,o5gc,srsran-open5gs-4g,$(subst run-srsran-open5gs-4g-,,$@))
 
+run-srsran-open5gs-4g-cmas: .create-running-env  ##
+	$(call run_stack,o5gc,srsran-open5gs-4g-cmas,enb core)
+stop-srsran-open5gs-4g-cmas: .create-running-env  ##
+	$(call stop_stack,o5gc,srsran-open5gs-4g-cmas,enb core)
+run-srsran-open5gs-4g-cmas-enb run-srsran-open5gs-4g-cmas-core: .create-running-env
+	$(call run_stack,o5gc,srsran-open5gs-4g-cmas,$(subst run-srsran-open5gs-4g-cmas-,,$@))
+
 run-srsran-open5gs-4g-volte: ${ENV_DIR}/srsran-open5gs-4g-volte.env .create-running-env  ##
 	$(call run_stack,o5gc,srsran-open5gs-4g-volte,enb core volte                   \
 	    $(if $(subst SMS-over-SGs,,$(call get_env,SMS_DOMAIN,$<)),smsc,osmocom))
