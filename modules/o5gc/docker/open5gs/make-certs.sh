@@ -16,7 +16,7 @@ cd /tmp
 rm -rf demoCA
 mkdir demoCA
 echo 01 > demoCA/serial
-touch demoCA/index.txt.attr
+echo "unique_subject = no" > demoCA/index.txt.attr
 touch demoCA/index.txt
 
 # Generate .rnd if it does not exist
