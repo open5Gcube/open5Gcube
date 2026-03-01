@@ -40,7 +40,7 @@ WORKDIR /o5gc/srsRAN_4G
 FROM develop
 
 # Clone and build srsRAN
-ENV SRSRAN_VERSION=23_11
+ENV SRSRAN_VERSION=25_10
 
 RUN git clone --branch release_${SRSRAN_VERSION} --depth 1                    \
         https://github.com/srsran/srsRAN_4G .
