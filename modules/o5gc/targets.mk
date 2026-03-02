@@ -201,8 +201,15 @@ run-srsran-4g-cell_search: ${O5GC_ENV}  ##
 	source ${O5GC_ENV};                                                       \
 	docker run --rm --privileged --tty --entrypoint /bin/bash                 \
 	    --volume="/dev/bus/usb:/dev/bus/usb"                                  \
-	  o5gc/srsran -xc "build/lib/examples/cell_search                         \
+	  o5gc/srsran-4g -xc "build/lib/examples/cell_search                         \
 	    -b $${EUTRA_BAND} -s $${EUTRA_ARFCN_DL} -e $$((EUTRA_ARFCN_DL+1))"
+
+run-srsran-4g-cell_search-band: ${O5GC_ENV}  ##
+	source ${O5GC_ENV};                                                       \
+	docker run --rm --privileged --tty --entrypoint /bin/bash                 \
+	    --volume="/dev/bus/usb:/dev/bus/usb"                                  \
+	  o5gc/srsran-4g -xc "build/lib/examples/cell_search                         \
+	    -b $${EUTRA_BAND}"
 
 run-srsran-4g-cell_measurement: ${O5GC_ENV}  ##
 	source ${O5GC_ENV};                                                       \
