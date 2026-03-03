@@ -1,0 +1,74 @@
+services:
+  enb:
+    extends:
+      file: ${DOCKER}/srsran/4g/services.yaml
+      service: enb
+    environment:
+      - RF_DEVICE_NAME=auto
+      - RF_DEVICE_ARGS=auto
+    volumes:
+      - ./sib.conf:/mnt/srsran/sib.conf:ro
+
+  mongo:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: mongo
+  mongo-express:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: mongo-express
+
+  open5gs-webui:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: open5gs-webui
+
+  open5gs-init:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: open5gs-init
+
+  hss:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: hss
+
+  sgwc:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: sgwc
+
+  sgwu:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: sgwu
+
+  smf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: smf
+
+  upf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: upf
+
+  nrf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: nrf
+
+  mme:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: mme
+
+  pcrf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: pcrf
+
+  scp:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: scp

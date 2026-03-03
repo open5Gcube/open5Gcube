@@ -136,6 +136,13 @@ stop-srsran-open5gs-4g: .create-running-env  ##
 run-srsran-open5gs-4g-enb run-srsran-open5gs-4g-core: .create-running-env
 	$(call run_stack,o5gc,srsran-open5gs-4g,$(subst run-srsran-open5gs-4g-,,$@))
 
+run-srsran-open5gs-4g-cmas: .create-running-env  ##
+	$(call run_stack,o5gc,srsran-open5gs-4g-cmas,enb core)
+stop-srsran-open5gs-4g-cmas: .create-running-env  ##
+	$(call stop_stack,o5gc,srsran-open5gs-4g-cmas,enb core)
+run-srsran-open5gs-4g-cmas-enb run-srsran-open5gs-4g-cmas-core: .create-running-env
+	$(call run_stack,o5gc,srsran-open5gs-4g-cmas,$(subst run-srsran-open5gs-4g-cmas-,,$@))
+
 run-srsran-open5gs-4g-volte: ${ENV_DIR}/srsran-open5gs-4g-volte.env .create-running-env  ##
 	$(call run_stack,o5gc,srsran-open5gs-4g-volte,enb core volte                   \
 	    $(if $(subst SMS-over-SGs,,$(call get_env,SMS_DOMAIN,$<)),smsc,osmocom))
@@ -194,8 +201,15 @@ run-srsran-4g-cell_search: ${O5GC_ENV}  ##
 	source ${O5GC_ENV};                                                       \
 	docker run --rm --privileged --tty --entrypoint /bin/bash                 \
 	    --volume="/dev/bus/usb:/dev/bus/usb"                                  \
-	  o5gc/srsran -xc "build/lib/examples/cell_search                         \
+	  o5gc/srsran-4g -xc "build/lib/examples/cell_search                         \
 	    -b $${EUTRA_BAND} -s $${EUTRA_ARFCN_DL} -e $$((EUTRA_ARFCN_DL+1))"
+
+run-srsran-4g-cell_search-band: ${O5GC_ENV}  ##
+	source ${O5GC_ENV};                                                       \
+	docker run --rm --privileged --tty --entrypoint /bin/bash                 \
+	    --volume="/dev/bus/usb:/dev/bus/usb"                                  \
+	  o5gc/srsran-4g -xc "build/lib/examples/cell_search                         \
+	    -b $${EUTRA_BAND}"
 
 run-srsran-4g-cell_measurement: ${O5GC_ENV}  ##
 	source ${O5GC_ENV};                                                       \
