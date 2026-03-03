@@ -33,7 +33,7 @@ WORKDIR /o5gc/open5gs
 
 FROM develop
 
-ARG OPEN5GS_VERSION=2.7.2
+ARG OPEN5GS_VERSION=2.7.6
 RUN git clone --branch v${OPEN5GS_VERSION} --depth 1                          \
         https://github.com/open5gs/open5gs .
 
