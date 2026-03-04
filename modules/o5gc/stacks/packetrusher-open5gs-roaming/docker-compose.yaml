@@ -12,7 +12,7 @@ networks:
       com.docker.network.bridge.name: home-corenet
   home-extnet:
     driver: bridge
-    name: 0_home_extnet
+    name: home_extnet
     ipam:
       config:
         - subnet: ${HOME_EXTNET_SUBNET}
@@ -33,7 +33,7 @@ networks:
       com.docker.network.bridge.name: visited-corenet
   visited-extnet:
     driver: bridge
-    name: 0_visited_extnet
+    name: visited_extnet
     ipam:
       config:
         - subnet: ${VISITED_EXTNET_SUBNET}
@@ -269,6 +269,7 @@ services:
         aliases:
           - upf.5gc.mnc${HOME_MNC03}.mcc${HOME_MCC}.3gppnetwork.org
       home-extnet:
+        gw_priority: 1
     labels:
       o5gc.webui.priority: ${WEBUI_PRIO_CORE_DEFAULT}
     depends_on: [ home-nrf, home-smf ]
@@ -535,6 +536,7 @@ services:
         aliases:
           - upf.5gc.mnc${VISITED_MNC03}.mcc${VISITED_MCC}.3gppnetwork.org
       visited-extnet:
+        gw_priority: 1
     labels:
       o5gc.webui.priority: ${WEBUI_PRIO_CORE_DEFAULT}
     depends_on: [ visited-nrf, visited-smf ]

@@ -309,6 +309,7 @@ services:
           - monitor-capture-host
       extnet:
         ipv4_address: ${UPF_EXT_IP_ADDR}
+        gw_priority: 1
     labels:
       o5gc.webui.priority: ${WEBUI_PRIO_CORE_DEFAULT}
     depends_on: [ nrf, smf ]

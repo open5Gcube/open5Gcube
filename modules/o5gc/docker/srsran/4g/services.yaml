@@ -23,6 +23,7 @@ services:
     networks:
       extnet:
         ipv4_address: ${EPC_EXT_IP_ADDR} # eth0
+        gw_priority: 1
       corenet:
         ipv4_address: ${EPC_IP_ADDR} # eth1
     labels:

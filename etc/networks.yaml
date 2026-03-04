@@ -11,7 +11,7 @@ networks:
             com.docker.network.bridge.name: corenet
     extnet:
         driver: bridge
-        name: 0_extnet
+        name: extnet
         ipam:
             config:
                 - subnet: ${EXTNET_SUBNET}

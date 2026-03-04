@@ -135,6 +135,7 @@ services:
     networks:
       extnet:
         ipv4_address: ${UPF_EXT_IP_ADDR} # eth0
+        gw_priority: 1
       corenet:
         ipv4_address: ${UPF_IP_ADDR} # eth1
         aliases:
@@ -225,6 +226,7 @@ services:
       - ./ran-entrypoint.sh:/o5gc/openairinterface5g/ran-entrypoint.sh:ro
       - ${BASE}/scripts/band_helper.py:/o5gc/openairinterface5g/scripts/band_helper.py:ro
     networks:
-      - corenet
-      - extnet
+      corenet:
+      extnet:
+        gw_priority: 1
     profiles: [ "oai-ran-macpdu2wireshark" ]
