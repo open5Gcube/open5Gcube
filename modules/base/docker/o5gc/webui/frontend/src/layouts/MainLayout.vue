@@ -23,6 +23,10 @@
             >
               {{ stack }}
             </q-chip>
+            <!-- Layout Toggle Button -->
+            <q-btn v-if="$route.path === '/serviceOverview'" flat round dense :icon="settingsStore.oneColumnLogLayout ? 'grid_view' : 'view_agenda'" @click="settingsStore.oneColumnLogLayout = !settingsStore.oneColumnLogLayout" class="q-ml-md">
+              <q-tooltip>{{ settingsStore.oneColumnLogLayout ? 'Two Columns Layout' : 'One Column Layout' }}</q-tooltip>
+            </q-btn>
           </div>
           <div v-else class="text-subtitle2 text-italic q-mr-sm">None</div>
         </div>
@@ -51,6 +55,7 @@
 import { ref } from 'vue'
 import DrawerComponent from 'components/DrawerComponent.vue'
 import { useStackStore } from 'src/stores/stacks'
+import { useSettingsStore } from 'src/stores/settings'
 import { storeToRefs } from 'pinia'
 
 export default {
@@ -65,12 +70,14 @@ export default {
     const toolbarTitleContent = ref('open5Gcube')
     const stackStore = useStackStore()
     const { runningStacks } = storeToRefs(stackStore)
+    const settingsStore = useSettingsStore()
 
     return {
       leftDrawerOpen,
       tabs,
       toolbarTitleContent,
       runningStacks,
+      settingsStore,
       toggleLeftDrawer () {
         leftDrawerOpen.value = !leftDrawerOpen.value
       }

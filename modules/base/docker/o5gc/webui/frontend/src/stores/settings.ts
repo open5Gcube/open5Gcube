@@ -5,7 +5,8 @@ import { generateErrorNotification } from './common';
 type SettingsType = {
     dark: boolean|'auto',
     logLines: number,
-    favouriteStacks: string[]
+    favouriteStacks: string[],
+    oneColumnLogLayout: boolean
 };
 
 export const useSettingsStore = defineStore('settings', {
@@ -13,7 +14,8 @@ export const useSettingsStore = defineStore('settings', {
       return {
         dark: true,
         logLines: 1000,
-        favouriteStacks: []
+        favouriteStacks: [],
+        oneColumnLogLayout: false
       }
     },
     actions: {

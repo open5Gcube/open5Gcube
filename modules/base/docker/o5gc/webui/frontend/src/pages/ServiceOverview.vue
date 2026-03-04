@@ -1,8 +1,8 @@
 <template>
     <q-page class="column bg-image">
       <div class="row">
-        <div class="col-xs-12 col-md-6 col-lg-6 column" v-for="serviceId in visibleServiceIdsSorted" style="height: 250px;" :key="serviceId">
-            <ServiceLogComponent :serviceId="serviceId" :serviceTitleAsLink="true" :statusLine="false" :key="`${$route.params.serviceId}-mini`" class="q-pa-xs" />
+        <div :class="['column', settingsStore.oneColumnLogLayout ? 'col-12' : 'col-xs-12 col-md-6 col-lg-6']" v-for="serviceId in visibleServiceIdsSorted" style="height: 250px;" :key="serviceId">
+           <ServiceLogComponent :serviceId="serviceId" :serviceTitleAsLink="true" :statusLine="false" :key="`${$route.params.serviceId}-mini`" class="q-pa-xs" />
         </div>
       </div>
   </q-page>
@@ -13,6 +13,7 @@ import { onMounted, onUnmounted, ref, nextTick } from 'vue';
 import ServiceLogComponent from 'src/components/ServiceLogComponent.vue'
 import { useServiceStore } from 'src/stores/services';
 import { useStackStore } from 'src/stores/stacks';
+import { useSettingsStore } from 'src/stores/settings';
 import { storeToRefs } from 'pinia';
 import { _ } from 'lodash';
 
@@ -20,6 +21,7 @@ export default {
     setup(_props, context) {
         const serviceStore = useServiceStore();
         const stackStore = useStackStore();
+        const settingsStore = useSettingsStore();
         const {
             services,
             visibleServiceIdsSorted,
@@ -61,7 +63,7 @@ export default {
         });
 
         return {
-            services, visibleServiceIdsSorted, visibleServiceDetailsSorted, serviceStore
+            services, visibleServiceIdsSorted, visibleServiceDetailsSorted, serviceStore, settingsStore
         };
     },
     created() {
