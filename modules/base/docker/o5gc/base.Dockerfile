@@ -23,9 +23,9 @@ RUN echo "dash dash/sh boolean false" | debconf-set-selections                \
 # set timezone
 ARG TZ
 ENV TZ=${TZ}
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime                            \
-    && ln -fs /usr/share/zoneinfo/$TZ /etc/timezone                           \
-    && DEBIAN_FRONTEND=noninteractive dpkg-reconfigure -f noninteractive tzdata
+RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime                          \
+    && echo ${TZ} > /etc/timezone                                             \
+    && dpkg-reconfigure -f noninteractive tzdata
 # setup ccache
 RUN /usr/sbin/update-ccache-symlinks
 ENV PATH="/usr/lib/ccache:${PATH}"
