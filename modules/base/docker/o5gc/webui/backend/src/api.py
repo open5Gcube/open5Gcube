@@ -44,6 +44,7 @@ def get_module(stack_name):
     return None
 
 def run_cmd(cmd):
+    cmd = [c for c in cmd if c is not None]
     result = subprocess.run(cmd, cwd=current_app.config["BASE_DIR"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     return ('$ ' + ' '.join(cmd) + '\n' + result.stdout.decode('utf-8'), result.returncode)
 
@@ -95,12 +96,13 @@ def start_stack(stack_name: str):
             for env_var, env_val in payload.get("env", {}).items():
                 envfile.write(f"{env_var}={shlex.quote(env_val)}\n")
         elif "env_file" in payload:
-            envfile.write(payload["env_file"])
+            envfile.write(payload["env_file"].strip())
         else:
             envfile.write("")
 
     # Call Makefile
-    output, returncode = run_cmd(["make", f"run-{stack_name}", "DETACHED=1", f"ENV_OVERRIDES_PATH={env_filepath.as_posix()}", f"ENV_DIR=/tmp"])
+    output, returncode = run_cmd(["make", f"run-{stack_name}", "DETACHED=1", f"ENV_DIR=/tmp",
+                                  f"ENV_OVERRIDES_PATH={env_filepath.as_posix()}" if env_filepath.stat().st_size else None])
     if returncode != 0:
         return output, HTTPStatus.INTERNAL_SERVER_ERROR
     else:
