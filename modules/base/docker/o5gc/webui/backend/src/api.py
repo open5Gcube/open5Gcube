@@ -184,8 +184,9 @@ def get_stack_description(stack_name: str):
         return "Stack has no description.", HTTPStatus.NOT_FOUND
 
     description = readme_files[0].read_text()
+    stack_path = Path('/o5gc') / stack_dir.relative_to(current_app.config["BASE_DIR"])
     for regex in [r'(!\[.*?\])\((.*?)\)', r'(\[.*\])\((.*?)\)']:
-        description = re.sub(regex, lambda m: replace_relative_path(m, f'/o5gc/etc/{stack_name}'), description)
+        description = re.sub(regex, lambda m: replace_relative_path(m, stack_path), description)
 
     return Response(description, content_type="text/markdown")
 
