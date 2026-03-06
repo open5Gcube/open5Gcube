@@ -32,7 +32,7 @@
           <!-- Favourites Section -->
           <q-expansion-item v-if="stackLinks.favourites.length > 0"  label="&nbsp;&nbsp;&nbsp;Favourites" dense default-opened>
             <q-list>
-              <q-item clickable :active="$route.path == link.to" v-for="(link, i) in stackLinks.favourites" :key="i" @click="routeTo(link.to);" style="padding-left: 36px;" dense>
+              <q-item v-for="(link, i) in stackLinks.favourites" :key="i" clickable :active="$route.path == link.to" style="padding-left: 36px;" dense @click="routeTo(link.to);">
                 <q-item-section>
                   <q-item-label>{{ link.label }}</q-item-label>
                 </q-item-section>
@@ -62,7 +62,7 @@
               :default-opened="Object.keys(stackLinks.modules).length === 1 || links.some(link => $route.path == link.to)"
             >
               <q-list>
-                <q-item clickable :active="$route.path == link.to" v-for="(link, i) in links" :key="i" @click="routeTo(link.to);" style="padding-left: 36px;" dense>
+                <q-item v-for="(link, i) in links" :key="i" clickable :active="$route.path == link.to" style="padding-left: 36px;" dense @click="routeTo(link.to);">
                   <q-item-section>
                     <q-item-label>{{ link.label }}</q-item-label>
                   </q-item-section>
@@ -104,9 +104,9 @@
 
       <q-expansion-item icon="open_in_browser" label="Service Links" default-closed>
         <q-list>
-          <q-item v-for="(url, title) in externalLinksFromLabels" :key="title" :href="url" style="text-decoration: none; padding-left: 2em;" target="_blank" dense>
+          <q-item v-for="(url, label) in externalLinksFromLabels" :key="label" :href="url" style="text-decoration: none; padding-left: 2em;" target="_blank" dense>
             <q-item-section>
-              <q-item-label>{{ title }}</q-item-label>
+              <q-item-label>{{ label }}</q-item-label>
             </q-item-section>
           </q-item>
           <q-item href="/doc/" style="text-decoration: none; padding-left: 2em;" target="_blank" dense>
@@ -138,7 +138,7 @@
 
 <script>
 import { onMounted, onUnmounted, ref } from 'vue';
-import { useQuasar, getCssVar } from 'quasar';
+import { useQuasar } from 'quasar';
 import { useServiceStore } from 'src/stores/services';
 import { storeToRefs } from 'pinia';
 import { symOutlinedStar } from '@quasar/extras/material-symbols-outlined';
@@ -147,6 +147,9 @@ import { useSettingsStore } from 'src/stores/settings';
 import SettingsComponent from './SettingsComponent.vue';
 
 export default {
+  components: {
+    SettingsComponent
+  },
   setup() {
     const $q = useQuasar();
     const dark = $q.dark;
@@ -159,7 +162,6 @@ export default {
     const { startStack, stopStack } = stackStore;
 
     const settingsStore = useSettingsStore();
-    const { toggleDark } = settingsStore;
 
     const settingsDialog = ref(false);
 
@@ -184,7 +186,6 @@ export default {
       serviceNames,
       runningVisibleServiceNames,
       healthStatusForAllServices,
-      getCssVar,
       serviceStore,
       settingsStore,
       favouriteStackNames,
@@ -193,7 +194,6 @@ export default {
       startStack,
       stopStack,
       externalLinksFromLabels,
-      toggleDark,
       settingsDialog,
       symOutlinedStar,
       title
@@ -235,9 +235,6 @@ export default {
     routeTo(to) {
         this.$router.push(to);
     }
-  },
-  components: {
-    SettingsComponent
   },
 }
 

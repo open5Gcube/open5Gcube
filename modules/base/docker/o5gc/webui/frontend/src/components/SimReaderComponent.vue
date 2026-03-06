@@ -1,9 +1,9 @@
 <template>
     <div class="col column">
         <q-card flat bordered square class="column col q-pa-sm" style="font-family: monospace;">
-            <q-btn icon="search" :loading="_busy.detectReader" :disable="consoleOutBusy" color="primary" label="Detect Reader" @click="detectReader()" class="q-ma-xs" />
-            <q-btn :icon="symOutlinedSimCard" :loading="_busy.detectCard" :disable="consoleOutBusy" color="primary" label="Detect Card" @click="detectCard()" class="q-ma-xs" />
-            <q-btn :icon="symOutlinedSimCardDownload" :loading="_busy.readCard" :disable="consoleOutBusy" color="primary" label="Read Card" @click="readCard()" class="q-ma-xs" />
+            <q-btn icon="search" :loading="_busy.detectReader" :disable="consoleOutBusy" color="primary" label="Detect Reader" class="q-ma-xs" @click="detectReader()" />
+            <q-btn :icon="symOutlinedSimCard" :loading="_busy.detectCard" :disable="consoleOutBusy" color="primary" label="Detect Card" class="q-ma-xs" @click="detectCard()" />
+            <q-btn :icon="symOutlinedSimCardDownload" :loading="_busy.readCard" :disable="consoleOutBusy" color="primary" label="Read Card" class="q-ma-xs" @click="readCard()" />
         </q-card>
     </div>
 </template>

@@ -15,11 +15,11 @@
 
         <q-tab-panels v-model="tab" class="column col">
           <q-tab-panel name="logs" class="column col q-pa-none">
-            <ServiceLogComponent :serviceId="$route.params.serviceId" :serviceTitleAsLink="false" :statusLine="true" :key="`${$route.params.serviceId}-detail`" class="column col" />
+            <ServiceLogComponent :key="`${$route.params.serviceId}-detail`" :service-id="$route.params.serviceId" :service-title-as-link="false" :status-line="true" class="column col" />
           </q-tab-panel>
 
           <q-tab-panel name="inspect" class="column col q-pa-none">
-            <ServiceInspectComponent :serviceId="$route.params.serviceId" class="column col" />
+            <ServiceInspectComponent :service-id="$route.params.serviceId" class="column col" />
           </q-tab-panel>
         </q-tab-panels>
       </div>
@@ -40,6 +40,7 @@ export default {
   components: {
     ServiceLogComponent, ServiceInspectComponent
   },
+  emits: ['tabs', 'toolbar-title-content'],
   setup(_props, context) {
     const route = useRoute();
 
@@ -69,7 +70,7 @@ export default {
       await serviceStore.loadServiceNamesAndStatus();
       await stackStore.loadRunningStacks();
       updateTabs();
-      context.emit('toolbarTitleContent', 'Service: ' + services.value[route.params.serviceId].containerName);
+      context.emit('toolbar-title-content', 'Service: ' + services.value[route.params.serviceId].containerName);
 
       nextTick(() => {
         context.emit('tabs', tabs.value);
@@ -104,11 +105,11 @@ export default {
         // see https://router.vuejs.org/guide/essentials/dynamic-matching.html#Reacting-to-Params-Changes
         // hence check whether the params apply to this component
         if('serviceId' in toParams) {
-          this.$emit('toolbarTitleContent', 'Service: ' + this.services[toParams.serviceId].containerName)
+          this.$emit('toolbar-title-content', 'Service: ' + this.services[toParams.serviceId].containerName)
         }
       }
     )
-  }
+  },
 }
 
 </script>

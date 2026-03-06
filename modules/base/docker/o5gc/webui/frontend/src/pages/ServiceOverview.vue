@@ -1,8 +1,8 @@
 <template>
     <q-page class="column bg-image">
       <div class="row">
-        <div :class="['column', settingsStore.oneColumnLogLayout ? 'col-12' : 'col-xs-12 col-md-6 col-lg-6']" v-for="serviceId in visibleServiceIdsSorted" style="height: 250px;" :key="serviceId">
-           <ServiceLogComponent :serviceId="serviceId" :serviceTitleAsLink="true" :statusLine="false" :key="`${$route.params.serviceId}-mini`" class="q-pa-xs" />
+        <div v-for="serviceId in visibleServiceIdsSorted" :key="serviceId" :class="['column', settingsStore.oneColumnLogLayout ? 'col-12' : 'col-xs-12 col-md-6 col-lg-6']" style="height: 250px;">
+           <ServiceLogComponent :key="`${$route.params.serviceId}-mini`" :service-id="serviceId" :service-title-as-link="true" :status-line="false" class="q-pa-xs" />
         </div>
       </div>
   </q-page>
@@ -18,6 +18,8 @@ import { storeToRefs } from 'pinia';
 import { _ } from 'lodash';
 
 export default {
+    components: { ServiceLogComponent },
+    emits: ['tabs', 'toolbar-title-content'],
     setup(_props, context) {
         const serviceStore = useServiceStore();
         const stackStore = useStackStore();
@@ -67,9 +69,8 @@ export default {
         };
     },
     created() {
-        this.$emit('toolbarTitleContent', 'Service Overview');
-    },
-    components: { ServiceLogComponent }
+        this.$emit('toolbar-title-content', 'Service Overview');
+    }
 }
 
 </script>

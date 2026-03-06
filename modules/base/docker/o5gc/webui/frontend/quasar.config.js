@@ -66,7 +66,7 @@ module.exports = configure(function (/* ctx */) {
       // publicPath: '/',
       // analyze: true,
       env: {
-        API_URL: process.env.API_URL ? process.env.API_URL : "/",
+        API_URL: process.env.API_URL ? process.env.API_URL : '/',
         ...(require('dotenv').config({path:'src/variables.env'}).parsed),
       },
 

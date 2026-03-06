@@ -10,40 +10,40 @@
           :loading="_busy.loadUeDb"
           row-key="id"
           dense square>
-            <template v-slot:top>
+            <template #top>
                 <span class="text-bold text-h6 text-white">UE Database</span>
                 <q-space />
                 <q-btn color="positive" :disable="true" label="Add UE" class="q-mx-sm" @click="addRow" />
-                <q-input dense outlined debounce="300" color="positive" v-model="filter" input-style="line-height: 10px;" :dark="true">
-                    <template v-slot:append>
+                <q-input v-model="filter" dense outlined debounce="300" color="positive" input-style="line-height: 10px;" :dark="true">
+                    <template #append>
                         <q-icon name="search" />
                     </template>
                 </q-input>
             </template>
-            <template v-slot:body-cell-imsi="props">
+            <template #body-cell-imsi="props">
                 <q-td :props="props">
                     <span style="font-family: monospace;">{{ props.value }}</span>
                 </q-td>
             </template>
-            <template v-slot:body-cell-key="props">
+            <template #body-cell-key="props">
                 <q-td :props="props">
                     <span style="font-family: monospace;">{{ props.value }}</span>
                 </q-td>
             </template>
-            <template v-slot:body-cell-opc="props">
+            <template #body-cell-opc="props">
                 <q-td :props="props">
                     <span style="font-family: monospace;">{{ props.value }}</span>
                 </q-td>
             </template>
-            <template v-slot:body-cell-functions="props">
+            <template #body-cell-functions="props">
                 <q-td :props="props">
                     <div>
                         <q-icon name="edit" style="font-size: large;" class="q-mx-xs cursor-not-allowed"><q-tooltip>Edit</q-tooltip></q-icon>
-                        <q-icon name="keyboard_double_arrow_down" @click="copyUeDataToWriterContent(props.row.imsi, props.row.key, props.row.opc)" style="font-size: large;" class="q-mx-xs cursor-pointer"><q-tooltip>Copy to SIM Writer</q-tooltip></q-icon>
+                        <q-icon name="keyboard_double_arrow_down" style="font-size: large;" class="q-mx-xs cursor-pointer" @click="copyUeDataToWriterContent(props.row.imsi, props.row.key, props.row.opc)"><q-tooltip>Copy to SIM Writer</q-tooltip></q-icon>
                         <q-icon :name="symOutlinedDelete" style="font-size: large;" class="text-negative q-mx-xs cursor-not-allowed"><q-tooltip>Delete</q-tooltip>
                             <q-menu>
                                 <q-list dense>
-                                    <q-item clickable :disable="true" v-close-popup>
+                                    <q-item v-close-popup clickable :disable="true">
                                         <q-item-section avatar><q-icon :name="symOutlinedDelete" class="text-negative" /></q-item-section>
                                         <q-item-section>Delete</q-item-section>
                                     </q-item>
@@ -53,7 +53,7 @@
                     </div>
                 </q-td>
             </template>
-            <template v-slot:bottom><!-- Empty bottom to save space (pagination isn't used anyways) --></template>
+            <template #bottom><!-- Empty bottom to save space (pagination isn't used anyways) --></template>
         </q-table>
     </div>
 </template>

@@ -3,14 +3,14 @@
 
         <q-btn :loading="current_stack?.starting" class="bg-positive text-white" style="width: 150px" icon="play_arrow" @click="startStack()">
           Start
-          <template v-slot:loading>
+          <template #loading>
             <q-spinner-hourglass class="on-left" />
             Starting...
           </template>
         </q-btn>
         <q-btn :loading="current_stack?.stopping" class="bg-negative text-white" style="width: 150px" icon="stop" @click="stopStack()">
           Stop
-          <template v-slot:loading>
+          <template #loading>
             <q-spinner-hourglass class="on-left" />
             Stopping...
           </template>
@@ -24,7 +24,7 @@ import { storeToRefs } from 'pinia';
 
 export default {
     props: {
-        stackName: String
+        stackName: { type: String, required: true }
     },
 
     async setup(props) {

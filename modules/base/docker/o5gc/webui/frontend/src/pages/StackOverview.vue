@@ -3,12 +3,12 @@
 
     <q-splitter v-model="mainSplitterPercentage" reverse horizontal unit="px" style="min-height: 100%; height: 100%;" class="column">
 
-      <template v-slot:before>
+      <template #before>
       <div class="column" style="min-height: 100%;">
         <div class="row col-auto q-pa-xs">
           <div class="col-12">
             <Suspense>
-              <StackDescriptionComponent :stackName="$route.params.stackName" />
+              <StackDescriptionComponent :stack-name="$route.params.stackName" />
             </Suspense>
           </div>
         </div>
@@ -16,7 +16,7 @@
           <!-- Column 1: Global Env -->
           <div class="col-xs-12 col-md-4 column q-pr-xs q-py-xs">
             <Suspense>
-              <EnvComponent envType="global" :stackName="$route.params.stackName" />
+              <EnvComponent env-type="global" :stack-name="$route.params.stackName" />
             </Suspense>
           </div>
 
@@ -25,15 +25,15 @@
             <!-- Because EnvComponent has class="col", placing two of them in a flex column makes them share height equally -->
             <Suspense>
               <EnvComponent
-                envType="module"
-                :moduleName="moduleName"
+                env-type="module"
+                :module-name="moduleName"
                 class="q-mb-xs"
               />
             </Suspense>
             <Suspense>
               <EnvComponent
-                envType="stack"
-                :stackName="$route.params.stackName"
+                env-type="stack"
+                :stack-name="$route.params.stackName"
               />
             </Suspense>
           </div>
@@ -42,7 +42,7 @@
           <div class="col-xs-12 col-md-4 column q-pl-xs q-py-xs">
             <Suspense>
               <template #default>
-                <EnvOverridesComponent :stackName="$route.params.stackName" />
+                <EnvOverridesComponent :stack-name="$route.params.stackName" />
               </template>
             </Suspense>
           </div>
@@ -50,18 +50,18 @@
         <div class="row col-auto">
           <div class="col q-pa-xs">
             <Suspense>
-              <StackStartStopComponent :stackName="$route.params.stackName" :key="$route.params.stackName" />
+              <StackStartStopComponent :key="$route.params.stackName" :stack-name="$route.params.stackName" />
             </Suspense>
           </div>
         </div>
       </div>
       </template>
 
-      <template v-slot:separator>
+      <template #separator>
         <q-avatar color="primary" text-color="white" size="40px" icon="drag_indicator" />
       </template>
 
-      <template v-slot:after>
+      <template #after>
         <EventLogComponent />
       </template>
 
@@ -89,6 +89,7 @@ export default {
     StackStartStopComponent,
     EventLogComponent
   },
+  emits: ['tabs', 'toolbar-title-content'],
   setup() {
     const mainSplitterPercentage = ref(226);
     const stackStore = useStackStore();
@@ -110,15 +111,15 @@ export default {
   },
   created() {
     this.$emit('tabs', [])
-    this.$emit('toolbarTitleContent', 'Stack: ' + this.$route.params.stackName)
+    this.$emit('toolbar-title-content', 'Stack: ' + this.$route.params.stackName)
 
     this.$watch(
       () => this.$route.params,
       (toParams, _previousParams) => {
-        this.$emit('toolbarTitleContent', 'Stack: ' + toParams.stackName)
+        this.$emit('toolbar-title-content', 'Stack: ' + toParams.stackName)
       }
     )
-  }
+  },
 }
 
 </script>

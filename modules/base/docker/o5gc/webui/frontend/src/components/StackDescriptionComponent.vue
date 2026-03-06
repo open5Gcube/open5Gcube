@@ -1,17 +1,10 @@
 <template>
-    <q-card square flat bordered v-if="stackDesc">
+    <q-card v-if="stackDesc" square flat bordered>
         <q-scroll-area style="height: 150px;" visible>
             <q-markdown :src="stackDesc" no-heading-anchor-links class="q-ma-md" />
         </q-scroll-area>
     </q-card>
 </template>
-
-<style>
-.q-markdown--image {
-    max-width: 100%;
-    height: 130px;
-}
-</style>
 
 <script>
 import { storeToRefs } from 'pinia';
@@ -20,7 +13,7 @@ import { toRef, ref, watch, onMounted } from 'vue';
 
 export default {
     props: {
-        stackName: String
+        stackName: { type: String, required: true }
     },
 
     async setup(props) {
@@ -52,3 +45,10 @@ export default {
     },
 }
 </script>
+
+<style>
+.q-markdown--image {
+    max-width: 100%;
+    height: 130px;
+}
+</style>

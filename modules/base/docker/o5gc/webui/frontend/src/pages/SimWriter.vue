@@ -1,13 +1,13 @@
 <template>
   <q-page class="column full-height">
-        <q-resize-observer @resize="onResize" :debounce="0" />
+        <q-resize-observer :debounce="0" @resize="onResize" />
         <q-splitter v-model="splitterPixel" :reverse="true" horizontal unit="px" style="min-height: 100%; height: 100%;" class="column">
-          <template v-slot:before>
+          <template #before>
             <div class="row column q-px-sm q-py-xs full-height">
               <UeDbComponent />
             </div>
           </template>
-          <template v-slot:after>
+          <template #after>
             <div class="row full-height q-mx-xs">
               <div class="col-xs-12 col-md-4 full-height">
                 <q-list class="q-pa-xs">
@@ -62,7 +62,8 @@ import SimConsoleOutComponent from 'src/components/SimConsoleOutComponent.vue'
 import {ref} from 'vue';
 
 export default {
-
+  components: { UeDbComponent, SimReaderComponent, SimWriterComponent, SimScriptsComponent, SimConsoleOutComponent },
+  emits: ['tabs', 'toolbar-title-content'],
   setup() {
     const splitterPixel = ref(539);
 
@@ -87,9 +88,8 @@ export default {
   },
   created() {
     this.$emit('tabs', [])
-    this.$emit('toolbarTitleContent', 'SIM Writer')
-  },
-  components: { UeDbComponent, SimReaderComponent, SimWriterComponent, SimScriptsComponent, SimConsoleOutComponent }
+    this.$emit('toolbar-title-content', 'SIM Writer')
+  }
 }
 
 </script>

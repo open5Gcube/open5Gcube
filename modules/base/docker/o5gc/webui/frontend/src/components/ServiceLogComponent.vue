@@ -1,8 +1,8 @@
 <template>
   <div class="column col">
-    <ServiceTitleBarComponent :serviceId="serviceId" :serviceTitleAsLink="serviceTitleAsLink" :autoscroll="autoscroll" />
+    <ServiceTitleBarComponent :service-id="serviceId" :service-title-as-link="serviceTitleAsLink" :autoscroll="autoscroll" />
     <q-card flat bordered square class="column col">
-      <q-scroll-area visible="visible" @scroll="onScroll" ref="scrollArea" :bar-style="autoscroll ? {background: getCssVar('info')} : {}" class="col bg-grey-10 text-white">
+      <q-scroll-area ref="scrollArea" visible="visible" :bar-style="autoscroll ? {background: getCssVar('info')} : {}" class="col bg-grey-10 text-white" @scroll="onScroll">
         <div>
           <div v-for="(logLine, lineIndex) in log" :key="lineIndex" style="font-family: monospace; margin-left: 1.5em; text-indent: -1em; margin-top: 0.5em; margin-bottom: 0.5em; margin-right: 0.5em; line-height: 1.0; white-space: pre-wrap; word-break: break-word">
             <span v-for="(logSpan, spanIndex) in logLine.spans" :key="spanIndex" :style="logSpan.css">
@@ -43,8 +43,9 @@ import { symOutlinedDeployedCode, symOutlinedUnarchive, symOutlinedLan, symOutli
 import ServiceTitleBarComponent from './ServiceTitleBarComponent.vue';
 
 export default {
+  components: { ServiceTitleBarComponent },
   props: {
-    serviceId: String,
+    serviceId: { type: String, required: true },
     serviceTitleAsLink: {
       type: Boolean,
       default: () => true
@@ -151,8 +152,7 @@ export default {
       ipv4Addresses,
       serviceRunningOrStarting
     }
-  },
-  components: { ServiceTitleBarComponent }
+  }
 }
 
 </script>

@@ -1,5 +1,6 @@
 <template>
     <q-table
+      v-model:pagination="pagination"
       flat
       bordered
       title="Log Events"
@@ -8,56 +9,55 @@
       :columns="columns"
       :rows="Object.values(eventLog)"
       :filter="filter"
-      v-model:pagination="pagination"
       row-key="event_id"
     >
-      <template v-slot:top>
+      <template #top>
           <span class="text-bold text-h6">Event Log</span>
           <q-space />
           <q-btn color="negative" label="Clear Log" class="q-mx-sm" @click="clear_log" />
-          <q-input dense outlined debounce="300" color="positive" v-model="filter" input-style="line-height: 10px;" :dark="$q.dark.isActive">
-              <template v-slot:append>
+          <q-input v-model="filter" dense outlined debounce="300" color="positive" input-style="line-height: 10px;" :dark="$q.dark.isActive">
+              <template #append>
                   <q-icon name="search" />
               </template>
           </q-input>
       </template>
-      <template v-slot:body-cell-event_id="props">
-        <q-td :props="props" @click="resultDetailDialog = true; resultDetailDialogId = props.row.event_id" class="cursor-pointer">
+      <template #body-cell-event_id="props">
+        <q-td :props="props" class="cursor-pointer" @click="resultDetailDialog = true; resultDetailDialogId = props.row.event_id">
           {{ props.value }}
         </q-td>
       </template>
-      <template v-slot:body-cell-start_timestamp="props">
-        <q-td :props="props" @click="resultDetailDialog = true; resultDetailDialogId = props.row.event_id" class="cursor-pointer">
+      <template #body-cell-start_timestamp="props">
+        <q-td :props="props" class="cursor-pointer" @click="resultDetailDialog = true; resultDetailDialogId = props.row.event_id">
           {{ props.value }}
         </q-td>
       </template>
-      <template v-slot:body-cell-end_timestamp="props">
-        <q-td :props="props" @click="resultDetailDialog = true; resultDetailDialogId = props.row.event_id" class="cursor-pointer">
+      <template #body-cell-end_timestamp="props">
+        <q-td :props="props" class="cursor-pointer" @click="resultDetailDialog = true; resultDetailDialogId = props.row.event_id">
           {{ props.value }}
         </q-td>
       </template>
-      <template v-slot:body-cell-description="props">
-        <q-td :props="props" @click="resultDetailDialog = true; resultDetailDialogId = props.row.event_id" class="cursor-pointer">
+      <template #body-cell-description="props">
+        <q-td :props="props" class="cursor-pointer" @click="resultDetailDialog = true; resultDetailDialogId = props.row.event_id">
           {{ props.value }}
         </q-td>
       </template>
-      <template v-slot:body-cell-status="props">
-        <q-td :props="props" @click="resultDetailDialog = true; resultDetailDialogId = props.row.event_id" class="cursor-pointer">
+      <template #body-cell-status="props">
+        <q-td :props="props" class="cursor-pointer" @click="resultDetailDialog = true; resultDetailDialogId = props.row.event_id">
           {{ props.value }}
         </q-td>
       </template>
-      <template v-slot:body-cell-result="props">
-        <q-td :props="props" @click="resultDetailDialog = true; resultDetailDialogId = props.row.event_id" class="cursor-pointer">
+      <template #body-cell-result="props">
+        <q-td :props="props" class="cursor-pointer" @click="resultDetailDialog = true; resultDetailDialogId = props.row.event_id">
           {{ props.value }} <q-icon v-if="props.row.result_detail != ''" name="info"></q-icon>
         </q-td>
       </template>
-      <template v-slot:body-cell-delete="props">
+      <template #body-cell-delete="props">
           <q-td :props="props">
               <div>
                   <q-icon :name="symOutlinedDelete" style="font-size: large;" class="text-negative q-mx-xs cursor-pointer"><q-tooltip>Delete</q-tooltip>
                       <q-menu>
                           <q-list dense>
-                              <q-item clickable @click="delete_event(props.row.event_id)" v-close-popup>
+                              <q-item v-close-popup clickable @click="delete_event(props.row.event_id)">
                                   <q-item-section avatar><q-icon :name="symOutlinedDelete" class="text-negative" /></q-item-section>
                                   <q-item-section>Delete</q-item-section>
                               </q-item>
@@ -67,7 +67,7 @@
               </div>
           </q-td>
       </template>
-      <template v-slot:bottom><!-- Empty bottom to save space (pagination isn't used anyways) --></template>
+      <template #bottom><!-- Empty bottom to save space (pagination isn't used anyways) --></template>
     </q-table>
     <q-dialog v-model="resultDetailDialog">
       <q-card style="max-width: 75vw;">
@@ -96,7 +96,7 @@
         <q-separator />
 
         <q-card-actions align="right">
-          <q-btn label="CLOSE" v-close-popup color="primary" />
+          <q-btn v-close-popup label="CLOSE" color="primary" />
         </q-card-actions>
       </q-card>
     </q-dialog>

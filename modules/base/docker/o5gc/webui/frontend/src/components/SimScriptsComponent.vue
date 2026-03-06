@@ -3,23 +3,23 @@
         <q-card flat bordered square class="q-pa-sm" style="font-family: monospace;">
             <div class="row">
                 <div class="col-md-6 col-xs-12 q-pa-xs"><q-btn color="primary" label="New Script" class="full-width" icon="add" @click="editScriptContent=''; editScriptName=''; editDialogActive=true;" /></div>
-                <div class="col-md-6 col-xs-12 q-pa-xs"><q-btn color="primary" label="Edit Script" class="full-width" icon="edit" @click="editScriptContent=scriptContent; editScriptName=simScriptFormContent.scriptName; editDialogActive=true;" :disable="simScriptFormContent.scriptName === null" /></div>
+                <div class="col-md-6 col-xs-12 q-pa-xs"><q-btn color="primary" label="Edit Script" class="full-width" icon="edit" :disable="simScriptFormContent.scriptName === null" @click="editScriptContent=scriptContent; editScriptName=simScriptFormContent.scriptName; editDialogActive=true;" /></div>
             </div>
             <q-select
+                ref="scriptNameRef"
+                v-model="simScriptFormContent.scriptName"
                 dense
                 outlined
-                v-model="simScriptFormContent.scriptName"
                 :options="scriptNameOptionsRef"
-                ref="scriptNameRef"
                 :rules="[val => checkScriptNameFormat || '']"
                 label="Select Script"
                 class="q-pa-xs"
                 use-input
                 input-debounce="0"
-                @filter="filterScriptNames"
                 behavior="menu"
+                @filter="filterScriptNames"
             >
-                <template v-slot:append>
+                <template #append>
                     <q-icon v-if="scriptComment" name="info" style="cursor: help" @click.stop.prevent>
                         <q-tooltip style="white-space: pre-wrap; font-family: monospace; background-color: #333333; font-size: 15px;">
                             {{ scriptComment }}
@@ -28,7 +28,7 @@
                     <q-icon v-if="simScriptFormContent.scriptName !== null" name="delete" class="cursor-pointer" color="negative" @click.stop.prevent="">
                         <q-menu>
                           <q-list dense>
-                              <q-item clickable @click="deleteScript(); simScriptFormContent.scriptName = null; resetValidation()" v-close-popup>
+                              <q-item v-close-popup clickable @click="deleteScript(); simScriptFormContent.scriptName = null; resetValidation()">
                                   <q-item-section avatar><q-icon name="delete" class="text-negative" /></q-item-section>
                                   <q-item-section>Delete Script</q-item-section>
                               </q-item>
@@ -36,7 +36,7 @@
                       </q-menu>
                     </q-icon>
                 </template>
-                <template v-slot:no-option>
+                <template #no-option>
                     <q-item>
                         <q-item-section class="text-italic text-grey">
                             No scripts found - upload your first one today!
@@ -50,10 +50,10 @@
                 </div></q-scroll-area>
             </q-card>
             <div class="row">
-                <q-input dense outlined v-model="simScriptFormContent.adm" ref="admRef" :rules="[val => checkAdmFormat || '']" label="ADM" class="q-pa-xs col-md-9 col-xs-12" />
+                <q-input ref="admRef" v-model="simScriptFormContent.adm" dense outlined :rules="[val => checkAdmFormat || '']" label="ADM" class="q-pa-xs col-md-9 col-xs-12" />
             </div>
             <div class="row">
-                <q-btn :loading="_busy.writeCard" :disable="!executeButtonActive" @click="scriptDialogActive = true" size="lg" color="negative" class="q-pa-xs col-12">Execute Script</q-btn>
+                <q-btn :loading="_busy.writeCard" :disable="!executeButtonActive" size="lg" color="negative" class="q-pa-xs col-12" @click="scriptDialogActive = true">Execute Script</q-btn>
             </div>
         </q-card>
     </div>
@@ -69,8 +69,8 @@
         </q-card-section>
 
         <q-card-actions align="right">
-          <q-btn flat label="Okay" @click="executeScript()" icon="check" color="positive" v-close-popup />
-          <q-btn flat label="Cancel" icon="close" color="negative" v-close-popup />
+          <q-btn v-close-popup flat label="Okay" icon="check" color="positive" @click="executeScript()" />
+          <q-btn v-close-popup flat label="Cancel" icon="close" color="negative" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -83,10 +83,10 @@
             <q-card-actions class="q-pa-sm">
                 <div class="row q-col-gutter-sm items-start full-width">
                     <div class="col-md-6 col-xs-12">
-                        <q-input dense outlined v-model="editScriptName" ref="editScriptNameRef" :rules="[val => checkEditScriptNameFormat || 'Script name cannot be empty and can only contain alphanumeric characters, _, - and .']" label="Script Name" style="font-family: monospace;" />
+                        <q-input ref="editScriptNameRef" v-model="editScriptName" dense outlined :rules="[val => checkEditScriptNameFormat || 'Script name cannot be empty and can only contain alphanumeric characters, _, - and .']" label="Script Name" style="font-family: monospace;" />
                     </div>
                     <div class="col-md-3 col-xs-6">
-                        <q-btn class="full-width" color="positive" icon="save" label="Save Script" @click="uploadScript(editScriptName, editScriptContent); editDialogActive = false;" :loading="_busy.uploadScript" :disable="!uploadButtonActive" />
+                        <q-btn class="full-width" color="positive" icon="save" label="Save Script" :loading="_busy.uploadScript" :disable="!uploadButtonActive" @click="uploadScript(editScriptName, editScriptContent); editDialogActive = false;" />
                     </div>
                     <div class="col-md-3 col-xs-6">
                         <q-btn class="full-width" color="negative" icon="cancel" label="Discard Changes" @click="editDialogActive = false" />

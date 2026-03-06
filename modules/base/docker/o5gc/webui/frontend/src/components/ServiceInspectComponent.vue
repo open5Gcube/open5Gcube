@@ -1,17 +1,17 @@
 <template>
   <div class="column col">
-    <ServiceTitleBarComponent :serviceId="serviceId" :serviceTitleAsLink="false" :autoscroll="false" :loadingHistoryIndicator="false" />
+    <ServiceTitleBarComponent :service-id="serviceId" :service-title-as-link="false" :autoscroll="false" :loading-history-indicator="false" />
     <q-card flat bordered class="column col">
-      <q-input ref="filterRef" filled v-model="filter" label="Filter" class="col-auto">
-        <template v-slot:append>
+      <q-input ref="filterRef" v-model="filter" filled label="Filter" class="col-auto">
+        <template #append>
           <q-icon v-if="filter !== ''" name="clear" class="cursor-pointer" @click="resetFilter" />
         </template>
       </q-input>
       <!-- no-transition disables animations for tree. Since tree is regularly updated, transitions might affect performance a lot! -->
       <q-scroll-area class="col">
-        <q-tree :nodes="serviceInspectTree" node-key="label" :filter="filter" ref="treeRef" no-transition>
-          <template v-slot:header-keyvalue="prop"><b>{{ prop.node.key }}:&nbsp;</b>{{ prop.node.value }}</template>
-          <template v-slot:header-key="prop"><b>{{ prop.node.key }}</b></template>
+        <q-tree ref="treeRef" :nodes="serviceInspectTree" node-key="label" :filter="filter" no-transition>
+          <template #header-keyvalue="prop"><b>{{ prop.node.key }}:&nbsp;</b>{{ prop.node.value }}</template>
+          <template #header-key="prop"><b>{{ prop.node.key }}</b></template>
         </q-tree>
       </q-scroll-area>
     </q-card>
@@ -25,8 +25,9 @@ import { storeToRefs } from 'pinia';
 import ServiceTitleBarComponent from './ServiceTitleBarComponent.vue';
 
 export default {
+  components: { ServiceTitleBarComponent },
   props: {
-    serviceId: String
+    serviceId: { type: String, required: true }
   },
   setup() {
 
@@ -97,8 +98,7 @@ export default {
         this.treeRef.expandAll();
       }
     }
-  },
-  components: { ServiceTitleBarComponent }
+  }
 }
 
 </script>

@@ -44,7 +44,7 @@
         </q-card-section>
 
         <q-card-actions align="right">
-          <q-btn label="OK" v-close-popup color="primary" />
+          <q-btn v-close-popup label="OK" color="primary" />
         </q-card-actions>
 
     </q-card>

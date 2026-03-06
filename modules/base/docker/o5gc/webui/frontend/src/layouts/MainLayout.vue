@@ -24,7 +24,7 @@
               {{ stack }}
             </q-chip>
             <!-- Layout Toggle Button -->
-            <q-btn v-if="$route.path === '/serviceOverview'" flat round dense :icon="settingsStore.oneColumnLogLayout ? 'grid_view' : 'view_agenda'" @click="settingsStore.oneColumnLogLayout = !settingsStore.oneColumnLogLayout" class="q-ml-md">
+            <q-btn v-if="$route.path === '/serviceOverview'" flat round dense :icon="settingsStore.oneColumnLogLayout ? 'grid_view' : 'view_agenda'" class="q-ml-md" @click="settingsStore.oneColumnLogLayout = !settingsStore.oneColumnLogLayout">
               <q-tooltip>{{ settingsStore.oneColumnLogLayout ? 'Two Columns Layout' : 'One Column Layout' }}</q-tooltip>
             </q-btn>
           </div>
@@ -32,19 +32,19 @@
         </div>
       </q-toolbar>
 
-      <q-tabs align="left" v-if="tabs.length > 0">
+      <q-tabs v-if="tabs.length > 0" align="left">
         <q-route-tab v-for="tab in tabs" :key="tab.label" :to="tab.to" :label="tab.label" />
       </q-tabs>
     </q-header>
 
-    <q-drawer show-if-above v-model="leftDrawerOpen" side="left" elevated>
+    <q-drawer v-model="leftDrawerOpen" show-if-above side="left" elevated>
       <DrawerComponent/>
     </q-drawer>
 
     <q-page-container style="height: 100%;">
       <router-view
-        @tabs="(_tabs) => tabs = _tabs"
-        @toolbarTitleContent="(_toolbarTitleContent) => toolbarTitleContent = _toolbarTitleContent"
+        @tabs="tabs = $event"
+        @toolbar-title-content="toolbarTitleContent = $event"
       />
     </q-page-container>
 

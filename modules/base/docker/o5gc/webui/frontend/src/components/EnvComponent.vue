@@ -5,7 +5,7 @@
         <q-scroll-area v-if="env !== null" class="col">
             {{ env }}
         </q-scroll-area>
-        <span style="font-style: italic;" v-if="env === null">No environment defined.</span>
+        <span v-if="env === null" style="font-style: italic;">No environment defined.</span>
     </q-card>
 </div>
 </template>
@@ -17,9 +17,9 @@ import { onMounted, watch, computed } from 'vue';
 
 export default {
     props: {
-        stackName: String,
-        moduleName: String, // Added prop
-        envType: String // 'global'|'stack'|'module'
+        stackName: { type: String, required: true },
+        moduleName: { type: String, required: true },
+        envType: { type: String, required: true } // 'global'|'stack'|'module'
     },
 
     setup(props) {

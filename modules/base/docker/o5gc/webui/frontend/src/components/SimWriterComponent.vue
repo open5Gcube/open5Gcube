@@ -1,25 +1,25 @@
 <template>
     <div class="col column">
         <q-card flat bordered square class="column col q-pa-sm" style="font-family: monospace;">
-            <q-select dense outlined v-model="simWriterContent.type" :options="types" ref="typeRef" :rules="[val => checkTypeFormat || '']" label="Type" class="q-pa-xs" />
+            <q-select ref="typeRef" v-model="simWriterContent.type" dense outlined :options="types" :rules="[val => checkTypeFormat || '']" label="Type" class="q-pa-xs" />
             <div class="row">
-                <q-input dense outlined v-model="simWriterContent.mcc" ref="mccRef" :rules="[val => checkMccFormat || '']" @update:model-value="simWriterContent.imsi && imsiRef.validate()" label="MCC" maxlength="3" class="col-md-3 col-xs-6 q-pa-xs" />
-                <q-input dense outlined v-model="simWriterContent.mnc" ref="mncRef" :rules="[val => checkMncFormat || '']" @update:model-value="simWriterContent.imsi && imsiRef.validate()" label="MNC" maxlength="3" class="col-md-3 col-xs-6 q-pa-xs" />
-                <q-input dense outlined v-model="simWriterContent.imsi" ref="imsiRef" :rules="[val => checkImsiFormat || '']" label="IMSI (incl. MCC + MNC)" maxlength="15" class="col-md-6 col-xs-12 q-pa-xs"/>
+                <q-input ref="mccRef" v-model="simWriterContent.mcc" dense outlined :rules="[val => checkMccFormat || '']" label="MCC" maxlength="3" class="col-md-3 col-xs-6 q-pa-xs" @update:model-value="simWriterContent.imsi && imsiRef.validate()" />
+                <q-input ref="mncRef" v-model="simWriterContent.mnc" dense outlined :rules="[val => checkMncFormat || '']" label="MNC" maxlength="3" class="col-md-3 col-xs-6 q-pa-xs" @update:model-value="simWriterContent.imsi && imsiRef.validate()" />
+                <q-input ref="imsiRef" v-model="simWriterContent.imsi" dense outlined :rules="[val => checkImsiFormat || '']" label="IMSI (incl. MCC + MNC)" maxlength="15" class="col-md-6 col-xs-12 q-pa-xs"/>
             </div>
             <div class="row">
                 <div class="col-10 row">
-                    <q-input dense outlined v-model="simWriterContent.ki" ref="kiRef" :rules="[val => checkKiFormat || '']" label="KEY" class="col-12 q-pa-xs" />
-                    <q-input dense outlined v-model="simWriterContent.opc" ref="opcRef" :rules="[val => checkOpcFormat || '']" label="OPC" class="col-12 q-pa-xs" />
+                    <q-input ref="kiRef" v-model="simWriterContent.ki" dense outlined :rules="[val => checkKiFormat || '']" label="KEY" class="col-12 q-pa-xs" />
+                    <q-input ref="opcRef" v-model="simWriterContent.opc" dense outlined :rules="[val => checkOpcFormat || '']" label="OPC" class="col-12 q-pa-xs" />
                 </div>
-                <div class="col-2 row"><q-btn :loading="_busy.autogen" @click="autogenKeyOpc()" color="primary" class="col-11 q-ma-xs">Autogen</q-btn></div>
+                <div class="col-2 row"><q-btn :loading="_busy.autogen" color="primary" class="col-11 q-ma-xs" @click="autogenKeyOpc()">Autogen</q-btn></div>
             </div>
             <div class="row">
-                <q-input dense outlined v-model="simWriterContent.adm" ref="admRef" :rules="[val => checkAdmFormat || '']" label="ADM" class="q-pa-xs col-md-9 col-xs-12" />
-                <div class="col-3 row"><q-btn @click="clearWriterContent(); resetValidation();" color="primary" class="col-11 q-ma-xs">Clear&nbsp;Form</q-btn></div>
+                <q-input ref="admRef" v-model="simWriterContent.adm" dense outlined :rules="[val => checkAdmFormat || '']" label="ADM" class="q-pa-xs col-md-9 col-xs-12" />
+                <div class="col-3 row"><q-btn color="primary" class="col-11 q-ma-xs" @click="clearWriterContent(); resetValidation();">Clear&nbsp;Form</q-btn></div>
             </div>
             <div class="row">
-                <q-btn :loading="_busy.writeCard" :disable="!writeButtonActive" @click="writeDialogActive = true" size="lg" color="negative" class="q-pa-xs col-12">Write to Card</q-btn>
+                <q-btn :loading="_busy.writeCard" :disable="!writeButtonActive" size="lg" color="negative" class="q-pa-xs col-12" @click="writeDialogActive = true">Write to Card</q-btn>
             </div>
         </q-card>
     </div>
@@ -40,8 +40,8 @@
         </q-card-section>
 
         <q-card-actions align="right">
-          <q-btn flat label="Okay" @click="writeCard()" icon="check" color="positive" v-close-popup />
-          <q-btn flat label="Cancel" icon="close" color="negative" v-close-popup />
+          <q-btn v-close-popup flat label="Okay" icon="check" color="positive" @click="writeCard()" />
+          <q-btn v-close-popup flat label="Cancel" icon="close" color="negative" />
         </q-card-actions>
       </q-card>
     </q-dialog>
