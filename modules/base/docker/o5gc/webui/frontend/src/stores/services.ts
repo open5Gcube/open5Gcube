@@ -255,7 +255,6 @@ export const useServiceStore = defineStore('services', {
           const url = state.labelValue(id, 'o5gc.link.url');
 
           if (title && url) {
-            console.log(window.location)
             containerLinks[title] = url.replace('{{host}}', window.location.hostname);
           }
         }
