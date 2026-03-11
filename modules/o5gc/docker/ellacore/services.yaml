@@ -1,0 +1,35 @@
+services:
+  ellacore:
+    image: o5gc/ellacore
+    container_name: ellacore
+    entrypoint: >
+      bash -c "envsubst.sh /mnt/core.yaml /o5gc/ellacore/core.yaml && ./main --config /o5gc/ellacore/core.yaml"
+    privileged: true
+    env_file: [ "${ENV_FILE}" ]
+    volumes:
+      - ./core.yaml:/mnt/core.yaml:ro
+    networks:
+      corenet:
+        ipv4_address: ${AMF_IP_ADDR}
+      extnet:
+        ipv4_address: ${UPF_EXT_IP_ADDR}
+        gw_priority: 1
+    ports:
+      - ${O5GC_WEBUI_HOST_ADDR}:${ELLACORE_WEBUI_HOST_PORT}:5002
+    labels:
+      o5gc.corenetwork-function: true
+      o5gc.stack: ${O5GC_STACK}
+      o5gc.link.title: "Ella-Core WebUI"
+      o5gc.link.url: "http://{{host}}:${ELLACORE_WEBUI_HOST_PORT}/"
+      o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
+    profiles: [ "core" ]
+
+  ellacore-init:
+    extends:
+      file: ${MODULES}/base/docker/o5gc/services.yaml
+      service: core-init
+    container_name: ellacore-init
+    entrypoint: /mnt/init-subscribers.sh
+    volumes:
+      - ./init-subscribers.sh:/mnt/init-subscribers.sh:ro
+    depends_on: [ ellacore ]

@@ -1,0 +1,24 @@
+logging:
+  system:
+    level: "info"
+    output: "stdout"
+  audit:
+    output: "stdout"
+db:
+  path: "core.db"
+interfaces:
+  n2:
+    address: "${AMF_IP_ADDR}"
+    port: 38412
+  n3:
+    address: "${AMF_IP_ADDR}"
+  n6:
+    name: "eth1"
+  api:
+    address: "0.0.0.0"
+    port: 5002
+xdp:
+  attach-mode: "generic"
+telemetry:
+  enabled: false
+  otlp-endpoint: "localhost:4317"

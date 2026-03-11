@@ -5,7 +5,7 @@ docker-build-srsran-4g docker-build-srsran-project: docker-build-o5gc-base
 docker-build-srsran-4g-% docker-build-srsran-project-%:
 	$(call parse-stem,$*)
 	$(call docker-build,o5gc,srsran/$(word 4,$(subst -, ,$@)),,,,,${$@_H})
-	
+
 OPEN5GS_VERSIONS = $(filter-out latest,$(call image_versions,open5gs))
 docker-build-open5gs: docker-build-o5gc-base
 	$(foreach ver,${OPEN5GS_VERSIONS},$(call docker-build,o5gc,open5gs,,OPEN5GS_VERSION=${ver},,${ver}))
@@ -70,6 +70,9 @@ docker-build-mysql: docker-build-o5gc-base
 
 docker-build-free5gc: docker-build-o5gc-base
 	$(call docker-build,o5gc,free5gc)
+
+docker-build-ellacore: docker-build-o5gc-base
+	$(call docker-build,o5gc,ellacore)
 
 docker-build-misc-falcon docker-build-misc-sigdigger                          \
 docker-build-misc-gr-osmosdr docker-build-misc-ltesniffer                     \
@@ -161,10 +164,10 @@ stop-srsran-open5gs-5g-emu: .create-running-env  ##
 run-srsran-open5gs-5g-emu-gnb run-srsran-open5gs-5g-emu-core run-srsran-open5gs-5g-emu-ue: .create-running-env
 	$(call run_stack,o5gc,srsran-open5gs-5g-emu,$(subst run-srsran-open5gs-5g-emu-,,$@))
 
-run-ueransim-open5gs run-ueransim-free5gc run-ueransim-oai: .create-running-env  ##
+run-ueransim-open5gs run-ueransim-free5gc run-ueransim-oai run-ueransim-ellacore: .create-running-env  ##
 	export OAI_CN5G_TYPE=basic;                                               \
 	$(call run_stack,o5gc,$(subst run-,,$@),core gnb ue metrics)
-stop-ueransim-open5gs stop-ueransim-free5gc stop-ueransim-oai:  ##
+stop-ueransim-open5gs stop-ueransim-free5gc stop-ueransim-oai stop-ueransim-ellacore:  ##
 	$(call stop_stack,o5gc,$(subst stop-,,$@),core gnb ue metrics)
 
 run-packetrusher-open5gs run-packetrusher-open5gs-roaming: .create-running-env  ##

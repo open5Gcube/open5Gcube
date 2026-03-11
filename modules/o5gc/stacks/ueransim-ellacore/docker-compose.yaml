@@ -1,0 +1,20 @@
+services:
+  gnb:
+    extends:
+      file: ${DOCKER}/ueransim/services.yaml
+      service: ueransim-gnb
+
+  ue:
+    extends:
+      file: ${DOCKER}/ueransim/services.yaml
+      service: ueransim-ue
+
+  ellacore:
+    extends:
+      file: ${DOCKER}/ellacore/services.yaml
+      service: ellacore
+
+  ellacore-init:
+    extends:
+      file: ${DOCKER}/ellacore/services.yaml
+      service: ellacore-init
