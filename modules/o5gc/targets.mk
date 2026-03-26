@@ -25,6 +25,7 @@ docker-build-oai-ran-%:
 OAI_CORE_IMAGES = amf ausf lmf nrf smf udm udr upf
 docker-build-oai-core:
 	$(MAKE) ${PARALLEL_JOBS} RUN_PARALLEL=1 $(foreach img,${OAI_CORE_IMAGES},docker-build-oai-${img})
+	$(call docker_image_ls,oai-*)
 
 OAI_CN5G_VERSIONS = $(sort $(foreach img,${OAI_CORE_IMAGES},$(filter-out latest,$(call image_versions,oai-${img}))))
 docker-build-oai-cn5g-base: docker-build-o5gc-base
@@ -38,7 +39,7 @@ docker-build-oai-udr docker-build-oai-upf: docker-build-oai-cn5g-base
 
 OSMOCOM_IMAGES = base hlr mgw stp msc bts trx bsc ggsn sgsn pcu cbc
 docker-build-osmocom: $(foreach img,${OSMOCOM_IMAGES},docker-build-osmocom-${img})
-	docker images o5gc/osmocom-* | (read h; echo "$$h"; LC_ALL=C sort)
+	$(call docker_image_ls,osmocom-*)
 docker-build-osmocom-base: docker-build-o5gc-base
 	$(call docker-build-remotely,localhost ${DOCKER_RAN_HOSTS})
 docker-build-osmocom-msc docker-build-osmocom-bsc:                            \
@@ -138,6 +139,13 @@ stop-srsran-open5gs-4g: .create-running-env  ##
 	$(call stop_stack,o5gc,srsran-open5gs-4g,enb core)
 run-srsran-open5gs-4g-enb run-srsran-open5gs-4g-core: .create-running-env
 	$(call run_stack,o5gc,srsran-open5gs-4g,$(subst run-srsran-open5gs-4g-,,$@))
+
+run-srsran-open5gs-4g-emu: .create-running-env  ##
+	$(call run_stack,o5gc,srsran-open5gs-4g-emu,enb core ue)
+stop-srsran-open5gs-4g-emu: .create-running-env  ##
+	$(call stop_stack,o5gc,srsran-open5gs-4g-emu,enb core ue)
+run-srsran-open5gs-4g-emu-enb run-srsran-open5gs-4g-emu-core run-srsran-open5gs-4g-emu-ue: .create-running-env
+	$(call run_stack,o5gc,srsran-open5gs-4g-emu,$(subst run-srsran-open5gs-4g-emu-,,$@))
 
 run-srsran-open5gs-4g-volte: ${ENV_DIR}/srsran-open5gs-4g-volte.env .create-running-env  ##
 	$(call run_stack,o5gc,srsran-open5gs-4g-volte,enb core volte                   \

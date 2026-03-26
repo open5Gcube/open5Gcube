@@ -27,7 +27,7 @@ O5GC_BASE_IMAGES = jammy focal
 TIMEZONE = $(shell timedatectl show -p Timezone --value)
 docker-build-o5gc-base:
 	$(call docker-build-remotely,${DOCKER_ALL_HOSTS},${O5GC_BASE_IMAGES})
-	docker image ls o5gc/o5gc-base
+	$(call docker_image_ls,o5gc-base)
 docker-build-o5gc-base-%: .docker-build-prerequisites
 	$(call parse-stem,$*)
 	$(call docker-build,base,o5gc,base,USE_BUILD_CACHER=${USE_BUILD_CACHER} BUILD_HOST=${$@_H} BASE_IMG=${$@_V} TZ=$(TIMEZONE),,${$@_V},${$@_H})

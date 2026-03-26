@@ -98,6 +98,7 @@ GIT_SUBMODULES = $(strip $(foreach m,$(wildcard modules/*),$(shell git config --
 DOCKER_FILES_IGNORE += $(foreach m,${GIT_SUBMODULES},${m}/%)
 DOCKER_FILES = $(filter-out ${DOCKER_FILES_IGNORE},$(shell find -L modules/*/docker/ -name *Dockerfile))
 
+docker_image_ls = docker image ls o5gc/${1} | (read h; echo "$$h"; LC_ALL=C sort)
 DOCKER_BUILD_ALL = $(filter-out %-build-cacher,$(filter-out %-base,$(sort     \
     $(shell echo ${DOCKER_FILES} | tr ' ' '\n' | cut -d '/' -f2-              \
         | sed -E "s|.*/docker/(.*)/([^.]*).?Dockerfile|docker-build-\1-\2|"   \
@@ -105,7 +106,7 @@ DOCKER_BUILD_ALL = $(filter-out %-build-cacher,$(filter-out %-base,$(sort     \
 docker-build-all: clean build-cacher-restart docker-build-o5gc-base  ## Build all Docker images
 	$(MAKE) ${PARALLEL_JOBS} RUN_PARALLEL=1 ${DOCKER_BUILD_ALL} pull-all-external-images
 	$(MAKE) docker-cleanup
-	docker image ls o5gc/* | (read h; echo "$$h"; LC_ALL=C sort)
+	$(call docker_image_ls,*)
 
 pull-all-external-images:
 	$(foreach img,$(filter-out o5gc/%,${IMAGES}),docker pull ${img};)
