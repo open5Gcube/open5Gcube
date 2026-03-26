@@ -44,20 +44,12 @@ services:
   smf:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
-      service: smf
-  #        volumes:
-  #            - ./smf.yaml:/mnt/open5gs/smf.yaml
+      service: smf-4g
 
   upf:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
-      service: upf
-    depends_on: [ smf ]
-
-  nrf:
-    extends:
-      file: ${DOCKER}/open5gs/services.yaml
-      service: nrf
+      service: upf-4g
 
   mme:
     extends:

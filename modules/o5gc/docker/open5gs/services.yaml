@@ -294,6 +294,15 @@ services:
     profiles: [ "core" ]
     <<: *sbi-healthcheck
 
+  smf-4g:
+    extends:
+      service: smf
+    volumes:
+      - ./smf-4g.yaml:/mnt/open5gs/smf.yaml:ro
+    depends_on: !reset []
+    healthcheck:
+      test: bash -c "ss -ltn | grep -q ':3868'"
+
   upf:
     extends:
       service: base
@@ -318,6 +327,11 @@ services:
       - NET_ADMIN
     sysctls:
       - net.ipv4.ip_forward=1
+
+  upf-4g:
+    extends:
+      service: upf
+    depends_on: !reset []
 
   amf:
     extends:
@@ -363,7 +377,7 @@ services:
         ipv4_address: ${MME_IP_ADDR}
     labels:
       o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
-    depends_on: [ hss, sgwc, sgwu, smf, upf ]
+    depends_on: [ hss, sgwc, sgwu ]
     profiles: [ "core" ]
 
   pcrf:
