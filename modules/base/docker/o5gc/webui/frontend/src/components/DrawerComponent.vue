@@ -32,60 +32,35 @@
           <!-- Favourites Section -->
           <q-expansion-item v-if="stackLinks.favourites.length > 0"  label="&nbsp;&nbsp;&nbsp;Favourites" dense default-opened>
             <q-list>
-              <q-item v-for="(link, i) in stackLinks.favourites" :key="i" clickable :active="$route.path == link.to" style="padding-left: 36px;" dense @click="routeTo(link.to);">
-                <q-item-section>
-                  <q-item-label>{{ link.label }}</q-item-label>
-                </q-item-section>
-                <q-item-section side>
-                  <div class="row no-wrap">
-                    <q-btn flat dense round icon="play_arrow" size="sm" :loading="stacks[link.label]?.starting" @click.stop.prevent="startStack(link.label)">
-                        <q-tooltip>Start Stack</q-tooltip>
-                    </q-btn>
-                    <q-btn flat dense round icon="stop" size="sm" :loading="stacks[link.label]?.stopping" @click.stop.prevent="stopStack(link.label)">
-                        <q-tooltip>Stop Stack</q-tooltip>
-                    </q-btn>
-                    <q-btn flat dense round color="grey" size="sm" class="star-swap-btn" @click.stop.prevent="settingsStore.removeFavouriteStack(link.label)">
-                        <q-icon name="star" class="icon-normal" />
-                        <q-icon :name="symOutlinedStar" class="icon-hover" />
-                        <q-tooltip>Remove from Favourites</q-tooltip>
-                      </q-btn>
-                  </div>
-                </q-item-section>
-              </q-item>
+              <DrawerStackItem v-for="(link, i) in stackLinks.favourites" :key="i" :link="link" :is-fav="true" padding-left="2.5em" />
             </q-list>
           </q-expansion-item>
+
           <!-- Modules Section (Grouped Non-Favourites) -->
-          <div v-for="(links, moduleName) in stackLinks.modules" :key="moduleName">
+          <div v-for="(moduleData, moduleName) in stackLinks.modules" :key="moduleName">
             <q-expansion-item
               :label="`&nbsp;&nbsp;&nbsp;${moduleName}`"
               dense
-              :default-opened="Object.keys(stackLinks.modules).length === 1 || links.some(link => $route.path == link.to)"
+              :default-opened="Object.keys(stackLinks.modules).length === 1 || moduleData.allLinks.some(link => $route.path == link.to)"
             >
-              <q-list>
-                <q-item v-for="(link, i) in links" :key="i" clickable :active="$route.path == link.to" style="padding-left: 36px;" dense @click="routeTo(link.to);">
-                  <q-item-section>
-                    <q-item-label>{{ link.label }}</q-item-label>
-                  </q-item-section>
-                  <q-item-section side>
-                    <div class="row no-wrap">
-                      <q-btn flat dense round icon="play_arrow" size="sm" :loading="stacks[link.label]?.starting" @click.stop.prevent="startStack(link.label)">
-                          <q-tooltip>Start Stack</q-tooltip>
-                      </q-btn>
-                      <q-btn flat dense round icon="stop" size="sm" :loading="stacks[link.label]?.stopping" @click.stop.prevent="stopStack(link.label)">
-                          <q-tooltip>Stop Stack</q-tooltip>
-                      </q-btn>
-                      <q-btn flat dense round color="grey" size="sm" class="star-swap-btn non-fav" @click.stop.prevent="settingsStore.addFavouriteStack(link.label)">
-                          <q-icon :name="symOutlinedStar" class="icon-normal" />
-                          <q-icon name="star" class="icon-hover" />
-                          <q-tooltip>Add to Favourites</q-tooltip>
-                        </q-btn>
-                    </div>
-                  </q-item-section>
-                </q-item>
+              <q-list v-if="!moduleData.isGrouped">
+                <DrawerStackItem v-for="(link, i) in moduleData.items" :key="i" :link="link" :is-fav="false" padding-left="2.5em" />
+              </q-list>
+              <q-list v-else>
+                <q-expansion-item
+                  v-for="(groupLinks, groupName) in moduleData.items"
+                  :key="groupName"
+                  :label="`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${groupName}`"
+                  dense
+                  :default-opened="groupLinks.some(link => $route.path == link.to)"
+                >
+                  <q-list>
+                    <DrawerStackItem v-for="(link, i) in groupLinks" :key="i" :link="link" :is-fav="false" padding-left="3em" />
+                  </q-list>
+                </q-expansion-item>
               </q-list>
             </q-expansion-item>
           </div>
-
         </q-list>
       </q-expansion-item>
 
@@ -141,32 +116,27 @@ import { onMounted, onUnmounted, ref } from 'vue';
 import { useQuasar } from 'quasar';
 import { useServiceStore } from 'src/stores/services';
 import { storeToRefs } from 'pinia';
-import { symOutlinedStar } from '@quasar/extras/material-symbols-outlined';
 import { useStackStore } from 'src/stores/stacks';
-import { useSettingsStore } from 'src/stores/settings';
 import SettingsComponent from './SettingsComponent.vue';
+import DrawerStackItem from './DrawerStackItem.vue';
 
 export default {
   components: {
-    SettingsComponent
+    SettingsComponent,
+    DrawerStackItem
   },
   setup() {
     const $q = useQuasar();
     const dark = $q.dark;
 
     const serviceStore = useServiceStore();
-    const { serviceNames, healthStatusForAllServices, externalLinksFromLabels, runningVisibleServiceNames } = storeToRefs(serviceStore);
+    const { runningVisibleServiceNames, healthStatusForAllServices, externalLinksFromLabels } = storeToRefs(serviceStore);
 
     const stackStore = useStackStore();
     const { favouriteStackNames, nonFavouriteStackNames, stacks } = storeToRefs(stackStore);
-    const { startStack, stopStack } = stackStore;
-
-    const settingsStore = useSettingsStore();
 
     const settingsDialog = ref(false);
-
     const title = process.env.TITLE;
-
     let updater = null;
 
     onMounted(async () => {
@@ -183,20 +153,14 @@ export default {
 
     return {
       dark,
-      serviceNames,
       runningVisibleServiceNames,
       healthStatusForAllServices,
-      serviceStore,
-      settingsStore,
-      favouriteStackNames,
-      nonFavouriteStackNames,
-      stacks,
-      startStack,
-      stopStack,
       externalLinksFromLabels,
       settingsDialog,
-      symOutlinedStar,
-      title
+      title,
+      favouriteStackNames,
+      nonFavouriteStackNames,
+      stacks
     }
   },
   computed: {
@@ -208,6 +172,7 @@ export default {
         to: `/stack/${name}`
       });
       const groupedModules = {};
+
       this.nonFavouriteStackNames.forEach((name) => {
         const moduleName = this.stacks[name].module;
         if (!groupedModules[moduleName]) {
@@ -215,10 +180,72 @@ export default {
         }
         groupedModules[moduleName].push(createLink(name));
       });
+
       const sortedModules = {};
       Object.keys(groupedModules).sort().forEach(key => {
-        sortedModules[key] = groupedModules[key];
+        const links = groupedModules[key];
+        let isGrouped = false;
+        let items = links;
+
+        if (links.length > 10) {
+          const initialSubGroups = {};
+
+          links.forEach(link => {
+            const firstWord = link.label.split('-')[0];
+            if (!initialSubGroups[firstWord]) {
+              initialSubGroups[firstWord] = [];
+            }
+            initialSubGroups[firstWord].push(link);
+          });
+
+          const finalSubGroups = {};
+          const others = [];
+
+          // Separate out groups with only a single item
+          Object.keys(initialSubGroups).forEach(subKey => {
+            if (initialSubGroups[subKey].length === 1) {
+              others.push(initialSubGroups[subKey][0]);
+            } else {
+              finalSubGroups[subKey] = initialSubGroups[subKey];
+            }
+          });
+
+          // Move the singles to "Others"
+          if (others.length > 0) {
+            if (finalSubGroups['Others']) {
+              finalSubGroups['Others'].push(...others);
+            } else {
+              finalSubGroups['Others'] = others;
+            }
+          }
+
+          // Verify if at least two groups are present
+          if (Object.keys(finalSubGroups).length >= 2) {
+            isGrouped = true;
+            const sortedSubGroups = {};
+
+            Object.keys(finalSubGroups)
+              .filter(k => k !== 'Others')
+              .sort()
+              .forEach(subKey => {
+                sortedSubGroups[subKey] = finalSubGroups[subKey];
+              });
+
+            if (finalSubGroups['Others']) {
+              sortedSubGroups['Others'] = finalSubGroups['Others'].sort((a, b) => a.label.localeCompare(b.label));
+            }
+
+            items = sortedSubGroups;
+          }
+        }
+
+        sortedModules[key] = {
+          isGrouped,
+          items,
+          allLinks: links
+        };
       });
+
       return {
         favourites: this.favouriteStackNames.map(createLink),
         modules: sortedModules,
@@ -230,24 +257,6 @@ export default {
       else if(hs == 'unhealthy') return 'bg-negative';
       else return 'bg-primary';
     }
-  },
-  methods: {
-    routeTo(to) {
-        this.$router.push(to);
-    }
-  },
+  }
 }
-
 </script>
-
-<style scoped>
-.star-swap-btn .icon-hover {
-  display: none;
-}
-.star-swap-btn:hover .icon-normal {
-  display: none;
-}
-.star-swap-btn:hover .icon-hover {
-  display: block;
-}
-</style>
