@@ -1,6 +1,6 @@
 FROM o5gc/osmocom-base:latest
 
-ARG OSMO_HLR_VERSION=1.7.0
+ARG OSMO_HLR_VERSION=1.9.2
 
 WORKDIR /o5gc/osmo-hlr
 

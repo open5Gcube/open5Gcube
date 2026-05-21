@@ -1,6 +1,6 @@
 FROM o5gc/osmocom-base:latest
 
-ARG OSMO_CBC_VERSION=0.4.2
+ARG OSMO_CBC_VERSION=0.5.0
 
 WORKDIR /o5gc/osmo-cbc
 

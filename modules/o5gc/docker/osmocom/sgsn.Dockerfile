@@ -5,11 +5,12 @@ FROM o5gc/osmocom-base:latest
 COPY --from=osmo-hlr /usr/local/include/osmocom/gsupclient/* /usr/local/include/osmocom/gsupclient/
 COPY --from=osmo-hlr /usr/local/lib/libosmo-gsup-client.* /usr/local/lib/
 COPY --from=osmo-hlr /usr/local/lib/pkgconfig/libosmo-gsup-client.pc /usr/local/lib/pkgconfig/
+COPY --from=osmo-ggsn /usr/local/include/osmocom/gtp/ /usr/local/include/osmocom/gtp/
 COPY --from=osmo-ggsn /usr/local/include/*.h /usr/local/include/
 COPY --from=osmo-ggsn /usr/local/lib/libgtp.* /usr/local/lib/
 COPY --from=osmo-ggsn /usr/local/lib/pkgconfig/libgtp.pc /usr/local/lib/pkgconfig/
 
-ARG OSMO_SGSN_VERSION=1.11.0
+ARG OSMO_SGSN_VERSION=1.13.1
 
 WORKDIR /o5gc/osmo-sgsn
 

@@ -1,6 +1,6 @@
 FROM o5gc/osmocom-base:latest
 
-ARG OSMO_MGW_VERSION=1.12.1
+ARG OSMO_MGW_VERSION=1.15.0
 
 WORKDIR /o5gc/osmo-mgw
 
