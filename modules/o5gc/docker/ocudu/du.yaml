@@ -13,8 +13,8 @@ ru_sdr:
   otw_format: sc12
   tx_gain: 80
   rx_gain: 40
-  clock: gpsdo
-  sync: gpsdo
+  clock: ${CLOCK_SRC}
+  sync: ${CLOCK_SRC}
 
 cell_cfg:
   dl_arfcn: ${NR_ARFCN}
