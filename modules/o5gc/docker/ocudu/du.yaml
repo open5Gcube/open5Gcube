@@ -1,0 +1,36 @@
+f1ap:
+  addrs: ${CU_CP_IP_ADDR}
+  bind_addrs: ${DU_IP_ADDR}
+
+f1u:
+  socket:
+    - bind_addr: ${DU_IP_ADDR}
+
+ru_sdr:
+  device_driver: uhd
+  device_args: type=b200,num_recv_frames=128,num_send_frames=128
+  srate: 23.04
+  otw_format: sc12
+  tx_gain: 80
+  rx_gain: 40
+  clock: gpsdo
+  sync: gpsdo
+
+cell_cfg:
+  dl_arfcn: ${NR_ARFCN}
+  band: ${NR_BAND}
+  channel_bandwidth_MHz: 10
+  common_scs: 30
+  plmn: "${MCC}${MNC}"
+  tac: ${TAC}
+  pci: 1
+
+log:
+  filename: stdout
+  all_level: warning
+
+pcap:
+  mac_enable: false
+  mac_filename: /tmp/du_mac.pcap
+  f1ap_enable: false
+  f1ap_filename: /tmp/du_f1ap.pcap

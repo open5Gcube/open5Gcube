@@ -6,6 +6,12 @@ docker-build-srsran-4g-% docker-build-srsran-project-%:
 	$(call parse-stem,$*)
 	$(call docker-build,o5gc,srsran/$(word 4,$(subst -, ,$@)),,,,,${$@_H})
 
+docker-build-ocudu: docker-build-o5gc-base
+	$(call docker-build,o5gc,ocudu)
+docker-build-ocudu-%:
+	$(call parse-stem,$*)
+	$(call docker-build,o5gc,ocudu,,,,, ${$@_H})
+
 OPEN5GS_VERSIONS = $(filter-out latest,$(call image_versions,open5gs))
 docker-build-open5gs: docker-build-o5gc-base
 	$(foreach ver,${OPEN5GS_VERSIONS},$(call docker-build,o5gc,open5gs,,OPEN5GS_VERSION=${ver},,${ver}))
@@ -171,6 +177,21 @@ stop-srsran-open5gs-5g-emu: .create-running-env  ##
 	$(call stop_stack,o5gc,srsran-open5gs-5g-emu,gnb core ue)
 run-srsran-open5gs-5g-emu-gnb run-srsran-open5gs-5g-emu-core run-srsran-open5gs-5g-emu-ue: .create-running-env
 	$(call run_stack,o5gc,srsran-open5gs-5g-emu,$(subst run-srsran-open5gs-5g-emu-,,$@))
+
+run-ocudu-open5gs-5g: .create-running-env  ##
+	$(call run_stack,o5gc,ocudu-open5gs-5g,gnb core)
+stop-ocudu-open5gs-5g: .create-running-env  ##
+	$(call stop_stack,o5gc,ocudu-open5gs-5g,gnb core)
+run-ocudu-open5gs-5g-gnb run-ocudu-open5gs-5g-core: .create-running-env
+	$(call run_stack,o5gc,ocudu-open5gs-5g,$(subst run-ocudu-open5gs-5g-,,$@))
+
+run-ocudu-split-open5gs-5g: .create-running-env  ##
+	$(call run_stack,o5gc,ocudu-split-open5gs-5g,cu-cp cu-up core du)
+stop-ocudu-split-open5gs-5g: .create-running-env  ##
+	$(call stop_stack,o5gc,ocudu-split-open5gs-5g,cu-cp cu-up core du)
+run-ocudu-split-open5gs-5g-cu-cp run-ocudu-split-open5gs-5g-cu-up \
+run-ocudu-split-open5gs-5g-core run-ocudu-split-open5gs-5g-du: .create-running-env
+	$(call run_stack,o5gc,ocudu-split-open5gs-5g,$(subst run-ocudu-split-open5gs-5g-,,$@))
 
 run-ueransim-open5gs run-ueransim-free5gc run-ueransim-oai run-ueransim-ellacore: .create-running-env  ##
 	export OAI_CN5G_TYPE=basic;                                               \
