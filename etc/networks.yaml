@@ -37,6 +37,15 @@ networks:
     o5gc:
         name: o5gc
         external: true
+    f1net:
+        driver: bridge
+        name: f1net
+        ipam:
+            config:
+                - subnet: ${F1NET_SUBNET}
+                  gateway: ${F1NET_SUBNET_ADDR}
+        driver_opts:
+            com.docker.network.bridge.name: f1net
 
 volumes:
     develop:

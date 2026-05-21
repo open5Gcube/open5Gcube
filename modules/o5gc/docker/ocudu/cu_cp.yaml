@@ -1,0 +1,28 @@
+cu_cp:
+  amf:
+    addrs: ${AMF_IP_ADDR}
+    bind_addrs: ${CU_CP_CORENET_IP_ADDR}
+    supported_tracking_areas:
+      - tac: ${TAC}
+        plmn_list:
+          - plmn: "${MCC}${MNC}"
+            tai_slice_support_list:
+              - sst: ${NSSAI_SST}
+                sd: ${NSSAI_SD}
+  security:
+    integrity: not_needed
+    confidentiality: required
+    nea_pref_list: nea2,nea1,nea0
+    nia_pref_list: nia2,nia1
+  e1ap:
+    bind_addrs: ${CU_CP_IP_ADDR}
+  f1ap:
+    bind_addrs: ${CU_CP_IP_ADDR}
+
+log:
+  filename: stdout
+  all_level: info
+
+pcap:
+  ngap_enable: false
+  ngap_filename: /tmp/cu_cp_ngap.pcap
