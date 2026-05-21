@@ -7,12 +7,12 @@ FROM proxy
 RUN apt-get.sh install libfftw3-dev libboost-system-dev
 
 # Install UHD for USRP support
-ARG UHD_VERSION=4.4
+ARG UHD_VERSION=4.6
 RUN sync-cache.sh download osmocom-trx ccache                                 \
     && install-uhd.sh ${UHD_VERSION}                                          \
     && sync-cache.sh upload osmocom-trx ccache
 
-ARG OSMO_TRX_VERSION=1.6.1
+ARG OSMO_TRX_VERSION=1.7.2
 
 WORKDIR /o5gc/osmo-trx
 

@@ -1,6 +1,6 @@
 FROM o5gc/osmocom-base:latest
 
-ARG OSMO_PCU_VERSION=1.3.1
+ARG OSMO_PCU_VERSION=1.5.2
 
 WORKDIR /o5gc/osmo-pcu
 

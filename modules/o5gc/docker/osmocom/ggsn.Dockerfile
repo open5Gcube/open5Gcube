@@ -1,6 +1,6 @@
 FROM o5gc/osmocom-base:latest
 
-ARG OSMO_GGSN_VERSION=1.10.2
+ARG OSMO_GGSN_VERSION=1.14.0
 
 WORKDIR /o5gc/osmo-ggsn
 

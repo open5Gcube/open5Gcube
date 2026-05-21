@@ -5,7 +5,7 @@ RUN apt-get.sh install                                                        \
         libdbi-dev libdbd-sqlite3 libsqlite3-dev sqlite3 libc-ares-dev        \
         liburing-dev libulfius-dev telnet
 
-ARG LIBOSMO_CORE_VERSION=1.11.0
+ARG LIBOSMO_CORE_VERSION=1.12.1
 RUN git clone https://gitea.osmocom.org/osmocom/libosmocore                   \
     && cd libosmocore                                                         \
     && git checkout ${LIBOSMO_CORE_VERSION}                                   \
@@ -15,20 +15,20 @@ RUN git clone https://gitea.osmocom.org/osmocom/libosmocore                   \
     && make install                                                           \
     && ldconfig
 
-ARG LIBOSMO_ABIS_VERSION=1.5.0
-RUN git clone https://gitea.osmocom.org/osmocom/libosmo-abis                  \
-    && cd libosmo-abis                                                        \
-    && git checkout ${LIBOSMO_ABIS_VERSION}                                   \
+ARG LIBOSMO_NETIF_VERSION=1.7.0
+RUN git clone https://gitea.osmocom.org/osmocom/libosmo-netif                 \
+    && cd libosmo-netif                                                       \
+    && git checkout ${LIBOSMO_NETIF_VERSION}                                  \
     && autoreconf -i                                                          \
     && ./configure --disable-dependency-tracking --disable-dahdi              \
     && make -j $(nproc)                                                       \
     && make install                                                           \
     && ldconfig
 
-ARG LIBOSMO_NETIF_VERSION=1.6.0
-RUN git clone https://gitea.osmocom.org/osmocom/libosmo-netif                 \
-    && cd libosmo-netif                                                       \
-    && git checkout ${LIBOSMO_NETIF_VERSION}                                  \
+ARG LIBOSMO_ABIS_VERSION=2.1.0
+RUN git clone https://gitea.osmocom.org/osmocom/libosmo-abis                  \
+    && cd libosmo-abis                                                        \
+    && git checkout ${LIBOSMO_ABIS_VERSION}                                   \
     && autoreconf -i                                                          \
     && ./configure --disable-dependency-tracking --disable-dahdi              \
     && make -j $(nproc)                                                       \

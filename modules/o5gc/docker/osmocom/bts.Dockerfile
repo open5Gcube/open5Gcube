@@ -1,6 +1,6 @@
 FROM o5gc/osmocom-base:latest
 
-ARG OSMO_BTS_VERSION=1.7.1
+ARG OSMO_BTS_VERSION=1.10.0
 
 WORKDIR /o5gc/osmo-bts
 

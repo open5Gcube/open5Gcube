@@ -11,8 +11,8 @@ COPY --from=osmo-hlr /usr/local/lib/libosmo-gsup-client.* /usr/local/lib/
 COPY --from=osmo-hlr /usr/local/lib/pkgconfig/libosmo-gsup-client.pc /usr/local/lib/pkgconfig/
 COPY --from=osmo-stp /usr/local/include/osmocom/sigtran/* /usr/local/include/osmocom/sigtran/
 COPY --from=osmo-stp /usr/local/include/osmocom/sccp/* /usr/local/include/osmocom/sccp/
-COPY --from=osmo-stp /usr/local/lib/libosmo-sccp.* /usr/local/lib/libosmo-sigtran.* /usr/local/lib/
-COPY --from=osmo-stp /usr/local/lib/pkgconfig/libosmo-sccp.pc /usr/local/lib/pkgconfig/libosmo-sigtran.pc /usr/local/lib/pkgconfig/
+COPY --from=osmo-stp /usr/local/lib/libosmo-sigtran.* /usr/local/lib/
+COPY --from=osmo-stp /usr/local/lib/pkgconfig/libosmo-sigtran.pc /usr/local/lib/pkgconfig/
 
 ARG LIBSMPP34_VERSION=1.14.3
 RUN git clone https://gitea.osmocom.org/cellular-infrastructure/libsmpp34     \
@@ -24,7 +24,7 @@ RUN git clone https://gitea.osmocom.org/cellular-infrastructure/libsmpp34     \
     && make install                                                           \
     && ldconfig
 
-ARG OSMO_MSC_VERSION=1.11.1
+ARG OSMO_MSC_VERSION=1.15.0
 
 WORKDIR /o5gc/osmo-msc
 
