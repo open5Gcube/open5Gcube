@@ -177,3 +177,4 @@ services:
           - monitor-capture-host
       extnet:
         ipv4_address: ${OSMO_GGSN_EXT_IP_ADDR}
+        gw_priority: 1
