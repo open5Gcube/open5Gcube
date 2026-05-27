@@ -1,11 +1,11 @@
-FROM o5gc/o5gc-base:focal
+FROM o5gc/o5gc-base:jammy
 
 # https://open5gs.org/open5gs/docs/tutorial/02-VoLTE-setup/index.html
 
 RUN apt-get.sh install dkms nfs-common module-assistant dpkg-dev rsyslog      \
          libavcodec-extra
 
-ENV RTPENGINE_VERSION=9.4.1
+ENV RTPENGINE_VERSION=9.5.9.1
 
 RUN mkdir /o5gc/rtpengine && cd /o5gc/rtpengine                           \
     && git clone https://github.com/sipwise/rtpengine build                   \

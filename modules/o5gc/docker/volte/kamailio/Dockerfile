@@ -1,4 +1,4 @@
-FROM o5gc/o5gc-base:focal
+FROM o5gc/o5gc-base:jammy
 
 # https://open5gs.org/open5gs/docs/tutorial/02-VoLTE-setup/index.html
 # https://github.com/herlesupreeth/docker_open5gs/blob/master/ims_base

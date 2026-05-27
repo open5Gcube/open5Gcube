@@ -1,4 +1,4 @@
-FROM o5gc/o5gc-base:focal
+FROM o5gc/o5gc-base:jammy
 
 # Install srsRAN dependencies
 RUN apt-get.sh install                                                        \
@@ -30,10 +30,14 @@ RUN apt-get.sh install                                                        \
         libglib2.0-dev libudev-dev libcurl4-gnutls-dev                        \
         qtdeclarative5-dev libqt5charts5-dev
 
+WORKDIR /o5gc/falcon
+
 # Clone and build FALCON
-RUN git clone https://github.com/falkenber9/falcon.git                        \
-    && mkdir falcon/build                                                     \
-    && cd falcon/build                                                        \
+RUN git clone https://github.com/falkenber9/falcon.git .                       \
+    && wget https://patch-diff.githubusercontent.com/raw/falkenber9/falcon/pull/12.patch \
+    && git apply 12.patch                                                     \
+    && mkdir build                                                            \
+    && cd build                                                               \
     && sync-cache.sh download misc-falcon ccache                              \
     && cmake -DHAVE_AVX512=0 ..                                               \
     && make -j $(nproc)                                                       \

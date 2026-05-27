@@ -1,4 +1,4 @@
-FROM o5gc/o5gc-base:focal
+FROM o5gc/o5gc-base:jammy
 
 # Install Oracle Java 7 SE JDK
 RUN cached-download.sh                                                        \

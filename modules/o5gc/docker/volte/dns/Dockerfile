@@ -1,4 +1,4 @@
-FROM o5gc/o5gc-base:focal
+FROM o5gc/o5gc-base:jammy
 
 RUN apt-get.sh install rsyslog bind9
 

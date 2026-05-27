@@ -23,7 +23,7 @@ build-cacher-restart:
 build-cacher-clean:
 	rm -rf $(foreach cache,${CACHES},var/cache/${cache}/*)
 
-O5GC_BASE_IMAGES = jammy focal
+O5GC_BASE_IMAGES = jammy
 TIMEZONE = $(shell timedatectl show -p Timezone --value)
 docker-build-o5gc-base:
 	$(call docker-build-remotely,${DOCKER_ALL_HOSTS},${O5GC_BASE_IMAGES})
