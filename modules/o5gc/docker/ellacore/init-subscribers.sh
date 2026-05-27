@@ -8,7 +8,7 @@ sleep 1
 WEBUI_URL=http://${AMF_IP_ADDR}:5002
 
 ella_api () {
-    #echo "curl -d "$3" -X $1 /api/v1/$2)"
+    echo "curl -d "$3" -X $1 /api/v1/$2)"
     # shellcheck disable=SC2068
     http_code=$(curl -sS --output /tmp/curl_output --write-out "%{http_code}" \
         -X $1                                                                 \
@@ -29,7 +29,7 @@ add_subscriber () {
         "key": "'${key}'",
         "opc": "'${opc}'",
         "sequenceNumber": "000000000022",
-        "policyName": "default"
+        "profile_name": "default"
     }'
     ella_api POST subscribers "${data}"
     echo "added imsi: $imsi with key: $key opc: $opc"
@@ -47,9 +47,11 @@ setup () {
     data='{"supportedTacs": ["'$(printf "%06x" "${TAC}")'"]}'
     ella_api PUT operator/tracking "${data}"
     data='{"sd": "'$(printf "%06x" "${NSSAI_SD/#0x}")'", "sst": '${NSSAI_SST}'}'
-    ella_api PUT operator/slice "${data}"
-    data='{"privateKey": "c53c22208b61860b06c62e5406a7b330c2b577aa5558981510d128247d38bd1d"}'
-    ella_api PUT operator/home-network "${data}"
+    ella_api PUT slices/default "${data}"
+    data='{"keyIdentifier":1, "scheme": "A", "privateKey": "c53c22208b61860b06c62e5406a7b330c2b577aa5558981510d128247d38bd1d"}'
+    ella_api POST operator/home-network-keys "${data}"
+    data='{"keyIdentifier":2, "scheme": "B", "privateKey": "F1AB1074477EBCC7F554EA1C5FC368B1616730155E0041AC447D6301975FECDA"}'
+    ella_api POST operator/home-network-keys "${data}"
 }
 
 init

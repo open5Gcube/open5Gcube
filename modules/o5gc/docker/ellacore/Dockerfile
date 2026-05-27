@@ -15,7 +15,7 @@ ENV PATH="$PATH:/usr/local/go/bin"
 
 WORKDIR /o5gc/ellacore
 
-ARG ELLACORE_VERSION=1.5.0
+ARG ELLACORE_VERSION=1.11.0
 RUN git clone --branch v${ELLACORE_VERSION} --depth 1                         \
         https://github.com/ellanetworks/core.git .                            \
     && REVISION=`git rev-parse HEAD`                                          \
