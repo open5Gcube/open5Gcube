@@ -43,9 +43,6 @@ docker-build-o5gc-webui: docker-build-o5gc-base Documentation-build
 docker-build-simcard: docker-build-o5gc-base
 	$(call docker-build,base,simcard)
 
-docker-build-misc-lbgpsdo: docker-build-o5gc-base
-	$(call docker-build,base,misc,lbgpsdo)
-
 Documentation-build: docker-build-o5gc-mkdocs
 	cd ${BASE_O5GC_DIR};                                                      \
 	$(DOCKER_COMPOSE) --profile=docu run --no-TTY --rm                        \

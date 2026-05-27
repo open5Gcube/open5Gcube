@@ -219,11 +219,6 @@ run-sigdigger run-osmocom_fft run-swagger-ui: .xhost  ##
 	cd modules/o5gc/docker/misc;                                              \
 	$(DOCKER_COMPOSE) --profile=$(subst run-,,$@) up
 
-lbgpsdo-list lbgpsdo-status lbgpsdo-detail:
-	docker run --rm --privileged                                              \
-	    --volume="/dev/bus/usb:/dev/bus/usb" --env LANG=C.UTF-8               \
-	  o5gc/misc-lbgpsdo $(subst lbgpsdo-,,$@)
-
 develop-srsran-4g-build develop-srsran-4g-start develop-srsran-4g-stop        \
 develop-srsran-4g-tag-latest develop-srsran-4g-untag-latest                   \
 develop-open5gs-build develop-open5gs-start develop-open5gs-stop              \
