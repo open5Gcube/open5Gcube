@@ -32,33 +32,33 @@ install_preliminaries() {
 
 install_docker_cli() {
     case "${OS_DISTRO} ${OS_RELEASE}" in
-        "ubuntu 20.04" | "ubuntu 22.04" | "ubuntu 24.04")
-            apt_get_install docker-ce-cli=5:28.* docker-compose-plugin=2.35.* docker-buildx-plugin=0.23.*
+        "ubuntu 22.04" | "ubuntu 24.04" | "ubuntu 26.04")
+            apt_get_install docker-ce-cli=5:29.* docker-compose-plugin=5.1.* docker-buildx-plugin=0.31.*
             ;;
         *)
             exit 1
     esac
     apt-mark hold docker-ce-cli docker-compose-plugin docker-buildx-plugin
-    [ -z "${SUDO_USER}" ] || bash -xc "usermod --append --groups docker ${SUDO_USER}"
 }
 
 install_docker_ce() {
     case "${OS_DISTRO} ${OS_RELEASE}" in
-        "ubuntu 20.04" | "ubuntu 22.04" | "ubuntu 24.04")
-            apt_get_install docker-ce=5:28.* docker-ce-rootless-extras=5:28.* containerd.io=1.7.*
+        "ubuntu 22.04" | "ubuntu 24.04" | "ubuntu 26.04")
+            apt_get_install docker-ce=5:29.* docker-ce-rootless-extras=5:29.* containerd.io=2.2.*
             ;;
         *)
             exit 1
     esac
     apt-mark hold docker-ce docker-ce-rootless-extras containerd.io
+    [ -z "${SUDO_USER}" ] || bash -xc "usermod --append --groups docker ${SUDO_USER}"
     systemctl restart docker
 }
 
 check_supported_distribution() {
     case "${OS_DISTRO} ${OS_RELEASE}" in
-        "ubuntu 20.04") return 0 ;;
         "ubuntu 22.04") return 0 ;;
         "ubuntu 24.04") return 0 ;;
+        "ubuntu 26.04") return 0 ;;
     esac
     echo "You're using an unsupported distro: ${OS_DISTRO} ${OS_RELEASE}"
     exit 1
