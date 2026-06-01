@@ -17,8 +17,8 @@ services:
     container_name: gnb
     command: gnb
     networks:
-      rfsim:
-        ipv4_address: ${GNB_RF_IP_ADDR}
+      ran:
+        ipv4_address: ${GNB_RAN_IP_ADDR}
       corenet:
         ipv4_address: ${GNB_IP_ADDR}
     profiles: [ "gnb" ]
@@ -37,8 +37,8 @@ services:
       - SUCI_SCHEME=${SUCI_SCHEME:-0}
       - SUCI_PUBKEY=${SUCI_PUBKEY:-5a8d38864820197c3394b92613b20b91633cbd897119273bf8e4a6f4eec0a650}
     networks:
-      rfsim:
-        ipv4_address: ${UE_RF_IP_ADDR}
+      ran:
+        ipv4_address: ${UE_RAN_IP_ADDR}
     profiles: [ "ue" ]
     healthcheck:
       test: /bin/bash -c "/mnt/ueransim/healthcheck.sh ue"

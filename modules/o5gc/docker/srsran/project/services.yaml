@@ -18,8 +18,8 @@ services:
     environment:
       - DOCKER_TARGET_HOSTNAME=${GNB_HOSTNAME}
     networks:
-      rfnet:
-        ipv4_address: ${GNB_RF_IP_ADDR}
+      ran:
+        ipv4_address: ${GNB_RAN_IP_ADDR}
       corenet:
         ipv4_address: ${GNB_IP_ADDR}
     profiles: [ "gnb" ]

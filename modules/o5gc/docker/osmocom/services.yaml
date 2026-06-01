@@ -50,7 +50,7 @@ services:
       corenet:
         ipv4_address: ${OSMO_TRX_IP_ADDR}
       rfnet:
-        ipv4_address: ${OSMO_TRX_RF_IP_ADDR}
+        ipv4_address: ${RF_IP_ADDR}
     profiles:
       - osmo-trx-uhd
 

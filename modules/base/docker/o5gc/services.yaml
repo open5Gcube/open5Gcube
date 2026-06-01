@@ -99,6 +99,9 @@ services:
       - ${HOME}/.ssh:/mnt/.ssh:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /dev/bus/usb:/dev/bus/usb
+    networks:
+      rfnet:
+        ipv4_address: ${RF_IP_ADDR}
     labels:
       o5gc.stack: ${O5GC_STACK}
       o5gc.webui.priority: ${WEBUI_PRIO_RAN}

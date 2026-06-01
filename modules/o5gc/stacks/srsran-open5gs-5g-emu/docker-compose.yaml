@@ -5,7 +5,7 @@ services:
       service: gnb
     environment:
       - RF_DEVICE_DRIVER=zmq
-      - RF_DEVICE_ARGS=tx_port=tcp://${GNB_RF_IP_ADDR}:2000,rx_port=tcp://${UE_RF_IP_ADDR}:2001,base_srate=23.04e6
+      - RF_DEVICE_ARGS=tx_port=tcp://${GNB_RAN_IP_ADDR}:2000,rx_port=tcp://${UE_RAN_IP_ADDR}:2001,base_srate=23.04e6
     volumes:
       - ./gnb.yaml:/mnt/srsran/gnb.yaml:ro
 
@@ -15,7 +15,7 @@ services:
       service: ue
     environment:
       - RF_DEVICE_NAME=zmq
-      - RF_DEVICE_ARGS=tx_port=tcp://${UE_RF_IP_ADDR}:2001,rx_port=tcp://${GNB_RF_IP_ADDR}:2000,id=ue,base_srate=23.04e6"
+      - RF_DEVICE_ARGS=tx_port=tcp://${UE_RAN_IP_ADDR}:2001,rx_port=tcp://${GNB_RAN_IP_ADDR}:2000,id=ue,base_srate=23.04e6"
       - TX_GAIN=50
       - RX_GAIN=40
       - RF_SRATE=23.04e6

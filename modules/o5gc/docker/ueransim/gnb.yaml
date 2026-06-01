@@ -5,7 +5,7 @@ nci: '${NR_CELL_ID}'  # NR Cell Identity (36-bit)
 idLength: 32       # NR gNB ID length in bits [22...32]
 tac: ${TAC}        # Tracking Area Code
 
-linkIp: ${GNB_RF_IP_ADDR}  # gNB's local IP address for Radio Link Simulation
+linkIp: ${GNB_RAN_IP_ADDR}  # gNB's local IP address for Radio Link Simulation
 ngapIp: ${GNB_IP_ADDR}     # gNB's local IP address for N2 Interface
 gtpIp: ${GNB_IP_ADDR}      # gNB's local IP address for N3 Interface
 

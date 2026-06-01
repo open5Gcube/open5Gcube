@@ -55,7 +55,7 @@ services:
     image: o5gc/oai-ran:2024.w23-4.4.0.0
     command: nr-ue -r 106 --numerology 1 --band ${NR_BAND} -C $(scripts/band_helper.py arfcn_to_freq ${NR_ARFCN})
     environment:
-      - OAI_RFSIM_SERVERADDR=${GNB_RF_IP_ADDR}
+      - OAI_RFSIM_SERVERADDR=${GNB_RAN_IP_ADDR}
     volumes:
       - ./ue.conf:/o5gc/openairinterface5g/etc/nr-ue.conf:ro
 

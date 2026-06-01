@@ -45,12 +45,12 @@ services:
     image: o5gc/oai-ran:2024.w23-4.4.0.0
     command: nr-ue -r 106 --numerology 1 --band 78 -C 3619200000
     environment:
-      - OAI_RFSIM_SERVERADDR=${GNB_RF_IP_ADDR}
+      - OAI_RFSIM_SERVERADDR=${GNB_RAN_IP_ADDR}
     volumes:
       - ./ue.conf:/o5gc/openairinterface5g/etc/ue.conf:ro
     networks:
-      rfnet:
-        ipv4_address: ${UE_RF_IP_ADDR}
+      ran:
+        ipv4_address: ${UE_RAN_IP_ADDR}
 
   o5gc-dns:
     image: cytopia/bind:stable-0.28

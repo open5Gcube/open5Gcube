@@ -167,8 +167,8 @@ services:
     environment:
       - DOCKER_TARGET_HOSTNAME=${ENB_HOSTNAME}
     networks:
-      rfnet:
-        ipv4_address: ${ENB_RF_IP_ADDR}
+      ran:
+        ipv4_address: ${ENB_RAN_IP_ADDR}
       corenet:
         ipv4_address: ${ENB_IP_ADDR}
     profiles: [ "enb" ]
@@ -180,8 +180,8 @@ services:
     environment:
       - DOCKER_TARGET_HOSTNAME=${GNB_HOSTNAME}
     networks:
-      rfnet:
-        ipv4_address: ${GNB_RF_IP_ADDR}
+      ran:
+        ipv4_address: ${GNB_RAN_IP_ADDR}
       corenet:
         ipv4_address: ${GNB_IP_ADDR}
     profiles: [ "gnb" ]
@@ -191,8 +191,8 @@ services:
       service: oai-ran
     container_name: ue
     networks:
-      rfnet:
-        ipv4_address: ${UE_RF_IP_ADDR}
+      ran:
+        ipv4_address: ${UE_RAN_IP_ADDR}
     profiles: [ "ue" ]
 
   oai-ran-tracer:

@@ -26,14 +26,14 @@ networks:
                 - subnet: ${RFNET_SUBNET}
         driver_opts:
             parent: ${USRP_IFACE}
-    rfsim:
+    ran:
         driver: bridge
-        name: rfsim
+        name: ran
         ipam:
             config:
-                - subnet: ${RFNET_SUBNET}
+                - subnet: ${RAN_SUBNET}
         driver_opts:
-            com.docker.network.bridge.name: rfsim
+            com.docker.network.bridge.name: ran
     o5gc:
         name: o5gc
         external: true
