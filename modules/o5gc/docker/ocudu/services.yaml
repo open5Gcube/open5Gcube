@@ -1,0 +1,74 @@
+services:
+  base:
+    extends:
+      file: ${MODULES}/base/docker/o5gc/services.yaml
+      service: base-ran
+    image: o5gc/ocudu
+    entrypoint: [ "/mnt/ocudu/entrypoint.sh" ]
+    environment:
+      - OCUDU_LOGLEVEL=${OPEN5GS_LOGLEVEL:-info}
+      - DOCKER_TARGET_HOSTNAME=${GNB_HOSTNAME}
+    volumes:
+      - .:/mnt/ocudu/:ro
+    networks: !reset []
+    profiles: [ ocudu ]
+
+  gnb:
+    extends:
+      service: base
+    container_name: gnb
+    command: gnb
+    networks:
+      rfnet:
+        ipv4_address: ${RF_IP_ADDR}
+      corenet:
+        ipv4_address: ${GNB_IP_ADDR}
+    profiles: [ "gnb" ]
+
+  cu:
+    extends:
+      service: base
+    container_name: cu
+    command: cu
+    networks:
+      corenet:
+        ipv4_address: ${GNB_IP_ADDR}
+      ran:
+        ipv4_address: ${CU_CP_RAN_IP_ADDR}
+    profiles: [ "cu" ]
+
+  cu-cp:
+    extends:
+      service: base
+    container_name: cu-cp
+    command: cu_cp
+    networks:
+      corenet:
+        ipv4_address: ${CU_CP_IP_ADDR}
+      ran:
+        ipv4_address: ${CU_CP_RAN_IP_ADDR}
+    profiles: [ "cu-cp" ]
+
+  cu-up:
+    extends:
+      service: base
+    container_name: cu-up
+    command: cu_up
+    networks:
+      corenet:
+        ipv4_address: ${CU_UP_IP_ADDR}
+      ran:
+        ipv4_address: ${CU_UP_RAN_IP_ADDR}
+    profiles: [ "cu-up" ]
+
+  du:
+    extends:
+      service: base
+    container_name: du
+    command: du
+    networks:
+      rfnet:
+        ipv4_address: ${RF_IP_ADDR}
+      ran:
+        ipv4_address: ${DU_RAN_IP_ADDR}
+    profiles: [ "du" ]

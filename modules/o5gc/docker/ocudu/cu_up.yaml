@@ -1,0 +1,18 @@
+cu_up:
+  e1ap:
+    addrs: ${CU_CP_RAN_IP_ADDR}
+    bind_addrs: ${CU_UP_RAN_IP_ADDR}
+  ngu:
+    socket:
+      - bind_addr: ${CU_UP_IP_ADDR}
+  f1u:
+    socket:
+      - bind_addr: ${CU_UP_RAN_IP_ADDR}
+
+log:
+  filename: stdout
+  all_level: ${OCUDU_LOGLEVEL}
+
+pcap:
+  e1ap_enable: false
+  e1ap_filename: /tmp/cu_up_e1ap.pcap

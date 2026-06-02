@@ -1,0 +1,95 @@
+services:
+  du:
+    extends:
+      file: ${DOCKER}/ocudu/services.yaml
+      service: du
+
+  cu-cp:
+    extends:
+      file: ${DOCKER}/ocudu/services.yaml
+      service: cu-cp
+
+  cu-up:
+    extends:
+      file: ${DOCKER}/ocudu/services.yaml
+      service: cu-up
+
+  mongo:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: mongo
+  mongo-express:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: mongo-express
+
+  open5gs-webui:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: open5gs-webui
+
+  open5gs-init:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: open5gs-init
+
+  nrf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: nrf
+
+  ausf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: ausf
+
+  udr:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: udr
+
+  udm:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: udm
+
+  pcf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: pcf
+
+  bsf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: bsf
+
+  nssf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: nssf
+
+  smf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: smf
+
+  upf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: upf
+
+  amf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: amf
+
+  pcrf:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: pcrf
+    depends_on: [ mongo ]
+
+  scp:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: scp
