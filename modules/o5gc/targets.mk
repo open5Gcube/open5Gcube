@@ -222,18 +222,19 @@ run-oai-ran-macpdu2wireshark-%:
 	cd docker/oai; export OAI_TRACEE=$*;                                      \
 	$(DOCKER_COMPOSE) --profile=oai-ran-macpdu2wireshark up
 
+DOCKER_RUN_SRSRAN_4G = docker run --rm --privileged --tty                     \
+    --entrypoint /bin/bash --volume="/dev/bus/usb:/dev/bus/usb" o5gc/srsran-4g
 run-srsran-4g-cell_search: ${O5GC_ENV}  ##
 	source ${O5GC_ENV};                                                       \
-	docker run --rm --privileged --tty --entrypoint /bin/bash                 \
-	    --volume="/dev/bus/usb:/dev/bus/usb"                                  \
-	  o5gc/srsran -xc "build/lib/examples/cell_search                         \
+	${DOCKER_RUN_SRSRAN_4G} -xc "build/lib/examples/cell_search               \
 	    -b $${EUTRA_BAND} -s $${EUTRA_ARFCN_DL} -e $$((EUTRA_ARFCN_DL+1))"
-
+run-srsran-4g-cell_search-band: ${O5GC_ENV}  ##
+	source ${O5GC_ENV};                                                       \
+	${DOCKER_RUN_SRSRAN_4G} -xc "build/lib/examples/cell_search               \
+	    -b $${EUTRA_BAND}"
 run-srsran-4g-cell_measurement: ${O5GC_ENV}  ##
 	source ${O5GC_ENV};                                                       \
-	docker run --rm --privileged --tty --entrypoint /bin/bash                 \
-	    --volume="/dev/bus/usb:/dev/bus/usb"                                  \
-	  o5gc/srsran -xc "build/lib/examples/cell_measurement -d                 \
+	${DOCKER_RUN_SRSRAN_4G} -xc "build/lib/examples/cell_measurement -d       \
 	    -f $$(scripts/band_helper.py earfcn_to_freq_dl $${EUTRA_BAND} $${EUTRA_ARFCN_DL})"
 
 run-sigdigger run-osmocom_fft run-swagger-ui: .xhost  ##
