@@ -77,17 +77,17 @@ services:
       service: phpmyadmin
     profiles: [ "core" ]
 
-  fhoss:
+  pyhss:
     extends:
       file: ${DOCKER}/volte/services.yaml
-      service: fhoss
+      service: pyhss
     depends_on: [ mysql, volte-dns ]
 
   icscf:
     extends:
       file: ${DOCKER}/volte/services.yaml
       service: icscf
-    depends_on: [ fhoss, mysql, volte-dns ]
+    depends_on: [ pyhss, mysql, volte-dns ]
 
   pcscf:
     extends:
@@ -99,7 +99,7 @@ services:
     extends:
       file: ${DOCKER}/volte/services.yaml
       service: scscf
-    depends_on: [ fhoss, mysql, volte-dns ]
+    depends_on: [ pyhss, mysql, volte-dns ]
 
   smsc:
     extends:
@@ -111,7 +111,7 @@ services:
     extends:
       file: ${DOCKER}/volte/services.yaml
       service: rtpengine
-    depends_on: [ fhoss, mysql, volte-dns ]
+    depends_on: [ pyhss, mysql, volte-dns ]
 
   # 2G components are started if SMS_DOMAIN is set to 'SMS-over-SGs'
   osmo-msc:

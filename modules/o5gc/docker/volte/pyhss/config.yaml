@@ -1,5 +1,5 @@
 ## HSS Parameters
-hss:  
+hss:
   # Transport Type. "TCP" and "SCTP" are valid options.
   # Note: SCTP works but is still experimental. TCP has been load-tested and performs in a production environment.
   transport: "TCP"
@@ -13,7 +13,7 @@ hss:
   OriginHost: "hss.${IMS_DOMAIN}"
 
   #Value to populate as the OriginRealm in Diameter responses
-  OriginRealm: "${EPC_DOMAIN}"
+  OriginHost: "hss.${${IMS_DOMAIN}}"
 
   #Value to populate as the Product name in Diameter responses
   ProductName: "pyHSS"
@@ -35,9 +35,6 @@ hss:
   #The maximum time to wait, in seconds, before disconnecting a client when no data is received.
   client_socket_timeout: 120
 
-  #The maximum time to wait, in seconds, before disconnecting a client when no data is received.
-  client_socket_timeout: 300
-
   #The maximum time to wait, in seconds, before discarding a diameter request.
   diameter_request_timeout: 3
 
@@ -48,7 +45,7 @@ hss:
   lock_provisioning: False
 
   #Provisioning Key for this HSS, alias for an API key. Required to be present in the header of requests to this HSS' api, if lock_provisioning is True.
-  provisioning_key: "changeThisKeyInProduction"
+  provisioning_key: "hss"
 
   #If enabled sends CLRs to old MME when new MME attaches active sub
   CancelLocationRequest_Enabled: False
@@ -65,7 +62,7 @@ hss:
 
   #S-CSCF Pool
   scscf_pool:
-    - 'scscf.${IMS_DOMAIN}'
+    - 'sip:scscf.${${IMS_DOMAIN}}:6060'
 
   roaming:
     outbound:
@@ -81,7 +78,7 @@ hss:
 api:
   page_size: 200
   # Whether or not to return key-based data when querying the AUC. Disable in production systems.
-  enable_insecure_auc: False
+  enable_insecure_auc: True
 
 benchmarking:
   # Whether to enable benchmark logging
@@ -94,8 +91,6 @@ eir:
   no_match_response: 2       #Greylist
   store_offnet_imsi: False  # Whether or not to store an IMEI / IMSI pair that doesn't exist in the AUC
   simSwapNotification: False # If the IMEI for a stored IMSI/IMEI combo changes, notify the webhook endpoint
-  # Define an optional TAC csv file path
-  #tac_database_csv: '/etc/pyhss/tac_database.csv'
 
 logging:
   level: INFO
@@ -104,7 +99,8 @@ logging:
     diameter_logging_file: /var/log/pyhss/diameter.log
     geored_logging_file: /var/log/pyhss/geored.log
     metric_logging_file: /var/log/pyhss/metrics.log
-  sqlalchemy_sql_echo: False
+  log_to_terminal: false
+  sqlalchemy_sql_echo: True
   sqlalchemy_pool_recycle: 15
   sqlalchemy_pool_size: 30
   sqlalchemy_max_overflow: 0
@@ -125,17 +121,11 @@ webhooks:
   endpoints:
     - 'http://127.0.0.1:8181'
 
-### Notifications to OCS on Credit Control Requests
-ocs:
-  enabled: False
-  endpoints:
-    - 'http://127.0.0.1:8282'
-
 ## Geographic Redundancy Parameters
 geored:
   enabled: False
   sync_actions: ['HSS', 'IMS', 'PCRF', 'EIR']    #What event actions should be synced
-  endpoints:                         #List of PyHSS API Endpoints to update
+  sync_endpoints:                         #List of PyHSS API Endpoints to update
     - 'http://hss01.mnc001.mcc001.3gppnetwork.org:8080'
     - 'http://hss02.mnc001.mcc001.3gppnetwork.org:8080'
 
@@ -147,14 +137,8 @@ redis:
   # sentinel - Connect to one or more redis sentinel hosts.
   connectionType: "tcp"
   unixSocketPath: '/var/run/redis/redis-server.sock'
-  host: localhost
+  host: 127.0.0.1
   port: 6379
-  sentinel:
-    masterName: exampleMaster
-    hosts:
-      - exampleSentinel.mnc001.mcc001.3gppnetwork.org:
-        port: 6379
-        password: ''
 
 prometheus:
   enabled: False

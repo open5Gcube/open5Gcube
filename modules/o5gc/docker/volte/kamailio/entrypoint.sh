@@ -4,6 +4,8 @@ set -eux
 
 cf=$1
 
+export IMS_SLASH_DOMAIN=`echo ${IMS_DOMAIN} | sed 's/\./\\\./g'`
+
 envsubst.sh /mnt/volte/kamailio/kamctlrc.cfg /usr/local/etc/kamailio/kamctlrc
 envsubst.sh /mnt/volte/kamailio/kamailio.cfg /usr/local/etc/kamailio/kamailio.cfg
 

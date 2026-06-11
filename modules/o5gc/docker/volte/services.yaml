@@ -6,6 +6,7 @@ services:
     environment:
       - IMS_DOMAIN=ims.mnc${MNC03}.mcc${MCC}.3gppnetwork.org
       - EPC_DOMAIN=epc.mnc${MNC03}.mcc${MCC}.3gppnetwork.org
+      - REGISTRATION_EXPIRES=3600
     volumes:
       - ${DOCKER}/volte:/mnt/volte:ro
     labels:
@@ -46,7 +47,7 @@ services:
       corenet:
         ipv4_address: ${ICSCF_IP_ADDR}
     depends_on:
-      fhoss:
+      pyhss:
         condition: service_started
       mysql:
         condition: service_healthy
@@ -82,7 +83,7 @@ services:
       corenet:
         ipv4_address: ${SCSCF_IP_ADDR}
     depends_on:
-      fhoss:
+      pyhss:
         condition: service_healthy
       mysql:
         condition: service_healthy
@@ -116,38 +117,15 @@ services:
         ipv4_address: ${RTPENGINE_IP_ADDR}
     dns: ${VOLTE_DNS_IP_ADDR}
 
-  fhoss:
-    extends:
-      service: base
-    image: o5gc/volte-fhoss
-    container_name: fhoss
-    entrypoint: [ "/mnt/volte/fhoss/entrypoint.sh" ]
-    environment:
-      - SMS_DOMAIN=${SMS_DOMAIN:-SMS-over-IMS}
-    volumes:
-      - ${MODULES}/base/docker/o5gc/core-init.sh:/mnt/o5gc/core-init.sh:ro
-      - ${BASE}/etc:/mnt/o5gc/etc:ro
-    networks:
-      corenet:
-        ipv4_address: ${VOLTE_HSS_IP_ADDR}
-      o5gc:
-        gw_priority: 1
-    ports:
-      - ${O5GC_WEBUI_HOST_ADDR}:${FHOSS_HOST_PORT}:8080
-    labels:
-      o5gc.link.title: "FHOSS"
-      o5gc.link.url: "http://{{host}}:${FHOSS_HOST_PORT}/"
-    depends_on: [ volte-dns ]
-    healthcheck:
-      test: bash -c "exec 6<> /dev/tcp/localhost/8080"
-    dns: ${VOLTE_DNS_IP_ADDR}
-
   pyhss:
     extends:
       service: base
     image: o5gc/volte-pyhss
     container_name: pyhss
     entrypoint: [ "/mnt/volte/pyhss/entrypoint.sh" ]
+    volumes:
+      - ${MODULES}/base/docker/o5gc/core-init.sh:/mnt/o5gc/core-init.sh:ro
+      - ${BASE}/etc:/mnt/o5gc/etc:ro
     networks:
       corenet:
         ipv4_address: ${VOLTE_HSS_IP_ADDR}

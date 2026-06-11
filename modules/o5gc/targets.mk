@@ -60,8 +60,8 @@ docker-build-osmocom-base-% docker-build-osmocom-trx-%:
 	$(call parse-stem,$*)
 	$(call docker-build,o5gc,osmocom,$(word 4,$(subst -, ,$@)),,,,${$@_H})
 
-docker-build-volte: docker-build-volte-kamailio docker-build-volte-fhoss      \
-                    docker-build-volte-dns docker-build-volte-rtpengine
+docker-build-volte: docker-build-volte-kamailio docker-build-volte-dns        \
+                    docker-build-volte-rtpengine
 	docker image ls o5gc/volte-*
 docker-build-volte-%: docker-build-o5gc-base
 	$(call docker-build,o5gc,volte/$*)

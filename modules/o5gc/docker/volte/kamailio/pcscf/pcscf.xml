@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<DiameterPeer 
+<DiameterPeer
 	FQDN="pcscf.${IMS_DOMAIN}"
 	Realm="${IMS_DOMAIN}"
 	Vendor_Id="10415"
@@ -11,10 +11,10 @@
 	QueueLength="8"
 	TransactionTimeout="5"
 	SessionsHashSize="128"
-	DefaultAuthSessionTimeout="3600"
-	MaxAuthSessionTimeout="3600"
+	DefaultAuthSessionTimeout="${REGISTRATION_EXPIRES}"
+	MaxAuthSessionTimeout="${REGISTRATION_EXPIRES}"
 >
-	<Peer FQDN="pcrf.${EPC_DOMAIN}" Realm="${EPC_DOMAIN}" port="3868"/> 
+	<Peer FQDN="pcrf.${EPC_DOMAIN}" Realm="${EPC_DOMAIN}" port="3868"/>
 
 	<Acceptor port="3871" bind="${PCSCF_IP_ADDR}"/>
 
