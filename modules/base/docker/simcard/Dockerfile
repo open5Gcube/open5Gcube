@@ -13,7 +13,7 @@ RUN apt-get.sh install                                                        \
 
 WORKDIR /o5gc/pysim
 RUN git clone https://gitea.osmocom.org/sim-card/pysim.git .                  \
-    && git checkout 6bfa8a8533                                                \
+    && git checkout 4fb393e6ea5b36c81b7adefc9131fd77e4cbeaf4                  \
     && pip3 install --no-cache-dir wheel                                      \
     && pip3 install --no-cache-dir -r requirements.txt
 

@@ -1,0 +1,10 @@
+# Disable SQN checking
+
+set echo true
+set debug true
+
+select ADF.USIM/EF.USIM_SQN
+
+read_binary_decoded
+update_binary_decoded --json-path $.flag1.sqn_check false
+read_binary_decoded

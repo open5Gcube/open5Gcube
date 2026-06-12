@@ -58,6 +58,7 @@ Documentation-serve-stop:
 	$(DOCKER_COMPOSE) --profile=docu down || true
 
 docker-volume-simcard-scripts:
+	docker volume rm --force o5gc-simcard-scripts
 	docker volume create o5gc-simcard-scripts
 	docker container create --name o5gc-tmp -v o5gc-simcard-scripts:/scripts busybox
 	docker cp modules/base/docker/simcard/scripts/ o5gc-tmp:/
