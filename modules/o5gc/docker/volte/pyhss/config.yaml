@@ -12,9 +12,6 @@ hss:
   #Value to populate as the OriginHost in Diameter responses
   OriginHost: "hss.${IMS_DOMAIN}"
 
-  #Value to populate as the OriginRealm in Diameter responses
-  OriginHost: "hss.${${IMS_DOMAIN}}"
-
   #Value to populate as the Product name in Diameter responses
   ProductName: "pyHSS"
 
@@ -55,14 +52,14 @@ hss:
 
   #Default Initial Filter Criteria for IMS Subscribers
   #Jinja Formatted Template, see the example for variables passed to it.
-  Default_iFC: 'default_ifc.xml'
+  Default_iFC: '/o5gc/pyhss/default_ifc.xml'
 
   #Default Sh User Data
-  Default_Sh_UserData: 'default_sh_user_data.xml'
+  Default_Sh_UserData: '/o5gc/pyhss/default_sh_user_data.xml'
 
   #S-CSCF Pool
   scscf_pool:
-    - 'sip:scscf.${${IMS_DOMAIN}}:6060'
+    - 'sip:scscf.${IMS_DOMAIN}:6060'
 
   roaming:
     outbound:
@@ -99,8 +96,8 @@ logging:
     diameter_logging_file: /var/log/pyhss/diameter.log
     geored_logging_file: /var/log/pyhss/geored.log
     metric_logging_file: /var/log/pyhss/metrics.log
-  log_to_terminal: false
-  sqlalchemy_sql_echo: True
+  log_to_terminal: true
+  sqlalchemy_sql_echo: false
   sqlalchemy_pool_recycle: 15
   sqlalchemy_pool_size: 30
   sqlalchemy_max_overflow: 0

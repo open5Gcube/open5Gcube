@@ -47,10 +47,10 @@ services:
       corenet:
         ipv4_address: ${ICSCF_IP_ADDR}
     depends_on:
-      pyhss:
-        condition: service_started
       mysql:
         condition: service_healthy
+      pyhss:
+        condition: service_started
       volte-dns:
         condition: service_started
 
@@ -83,9 +83,9 @@ services:
       corenet:
         ipv4_address: ${SCSCF_IP_ADDR}
     depends_on:
-      pyhss:
-        condition: service_healthy
       mysql:
+        condition: service_healthy
+      pyhss:
         condition: service_healthy
       volte-dns:
         condition: service_started
@@ -132,4 +132,11 @@ services:
       o5gc:
         gw_priority: 1
     depends_on: [ mysql, volte-dns ]
+    healthcheck:
+      test: /bin/bash -c "/mnt/volte/pyhss/healthcheck.sh"
+      start_period: 15s
+      start_interval: 1s
+      interval: 10s
+      timeout: 1s
+      retries: 2
     dns: ${VOLTE_DNS_IP_ADDR}
