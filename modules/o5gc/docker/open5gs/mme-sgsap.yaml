@@ -1,14 +1,16 @@
 mme:
     sgsap:
-      addr: ${OSMO_MSC_IP_ADDR}
-      map:
-        tai:
-          plmn_id:
-            mcc: ${MCC}
-            mnc: ${MNC}
-          tac: 1
-        lai:
-          plmn_id:
-            mcc: ${MCC}
-            mnc: ${MNC}
-          lac: 1
+      client:
+        - address: ${OSMO_MSC_IP_ADDR}
+          local_address: ${MME_IP_ADDR}
+          map:
+            tai:
+              plmn_id:
+                mcc: ${MCC}
+                mnc: ${MNC}
+              tac: ${TAC}
+            lai:
+              plmn_id:
+                mcc: ${MCC}
+                mnc: ${MNC}
+              lac: 1
