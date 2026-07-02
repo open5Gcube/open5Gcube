@@ -220,12 +220,6 @@ In the table on the top the [configured UEs](#uedbenv) are shown. The *SIM Reade
 used to read the content of a SIM card. The text output is shown in the console on the right.
 The *SIM Writer* can be used to change the MMC, MNC and IMSI as well as the Key and OPc of a card.
 
-The *SIM Writer* provides a *Select provided SIM (UE DB)* drop-down listing the
-[configured UEs](#uedbenv). Selecting an entry autofills the form: the MCC and MNC are derived
-from the IMSI (first three and following two digits), and the IMSI, Key and OPc are filled in.
-If the entry has an optional ADM key (4th field in the UE DB), it is autofilled as well;
-otherwise the ADM field is left blank for manual entry.
-
 !!! warning
     Make always sure to use the correct ADM1 for the specific card!
     Using a wrong ADM1 value several times consecutively, will likely permanently lock the card.
