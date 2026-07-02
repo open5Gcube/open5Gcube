@@ -12,7 +12,8 @@ const SIM_DEFAULT_TYPE = 'sysmoISIM-SJA2';
  *       "id": 1,
  *       "imsi": "262 01 9876543210",
  *       "key": "F18E5DB0A8B5B8A0304E9113D644DFE3",
- *       "opc": "E83C9CF3683B9E82EBC005A696E86AD8"
+ *       "opc": "E83C9CF3683B9E82EBC005A696E86AD8",
+ *       "adm": "12345678"   // optional 4th field (ADM key for SIM writing)
  *     },
  *     ...
  *   },
@@ -49,7 +50,8 @@ type UeType = {
     id: number,
     imsi: `${number}`,
     key: string,
-    opc: string
+    opc: string,
+    adm?: string
 }
 
 type UeDbType = UeType[];
@@ -193,13 +195,14 @@ export const useSimWriterStore = defineStore('simWriter', {
             } catch {}
             this._busy.writeCard = false;
         },
-        copyUeDataToWriterContent(imsi: string, key: string, opc: string) {
-            this.simWriterContent.mcc = '';
-            this.simWriterContent.mnc = '';
+        copyUeDataToWriterContent(imsi: string, key: string, opc: string, adm?: string) {
+            // Derive MCC (first 3 digits) and MNC (next 2 digits) from the IMSI.
+            this.simWriterContent.mcc = imsi.slice(0, 3);
+            this.simWriterContent.mnc = imsi.slice(3, 5);
             this.simWriterContent.imsi = imsi;
             this.simWriterContent.ki = key;
             this.simWriterContent.opc = opc;
-            this.simWriterContent.adm = '';
+            this.simWriterContent.adm = adm ?? '';
         },
         async autogenKeyOpc() {
             this._busy.autogen = true;

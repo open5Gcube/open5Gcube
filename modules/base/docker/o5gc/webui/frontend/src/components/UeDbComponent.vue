@@ -35,11 +35,16 @@
                     <span style="font-family: monospace;">{{ props.value }}</span>
                 </q-td>
             </template>
+            <template #body-cell-adm="props">
+                <q-td :props="props">
+                    <span style="font-family: monospace;">{{ props.value }}</span>
+                </q-td>
+            </template>
             <template #body-cell-functions="props">
                 <q-td :props="props">
                     <div>
                         <q-icon name="edit" style="font-size: large;" class="q-mx-xs cursor-not-allowed"><q-tooltip>Edit</q-tooltip></q-icon>
-                        <q-icon name="keyboard_double_arrow_down" style="font-size: large;" class="q-mx-xs cursor-pointer" @click="copyUeDataToWriterContent(props.row.imsi, props.row.key, props.row.opc)"><q-tooltip>Copy to SIM Writer</q-tooltip></q-icon>
+                        <q-icon name="keyboard_double_arrow_down" style="font-size: large;" class="q-mx-xs cursor-pointer" @click="copyUeDataToWriterContent(props.row.imsi, props.row.key, props.row.opc, props.row.adm)"><q-tooltip>Copy to SIM Writer</q-tooltip></q-icon>
                         <q-icon :name="symOutlinedDelete" style="font-size: large;" class="text-negative q-mx-xs cursor-not-allowed"><q-tooltip>Delete</q-tooltip>
                             <q-menu>
                                 <q-list dense>
@@ -90,6 +95,12 @@ const columns = [
         name: 'opc',
         label: 'OPC',
         field: 'opc',
+        sortable: false
+    },
+    {
+        name: 'adm',
+        label: 'ADM',
+        field: 'adm',
         sortable: false
     },
     {

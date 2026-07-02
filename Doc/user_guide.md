@@ -69,12 +69,16 @@ this settings to program the corresponding databases of the particular Core Netw
 
 ```shell title="etc/uedb.env"
 UE_DB+="
-#IMSI           Key                              OPc
+#IMSI           Key                              OPc                              [ADM]
 # add one subscriper per line, like for example
 001010000052100 F18E5DB0A8B5B8A0304E9113D121DFE3 E83C9CF73E3B9E82E48005A696E86AD8
+# optionally with an ADM key as 4th field, like for example
+001010000052101 F18E5DB0A8B5B8A0304E9113D121DFE3 E83C9CF73E3B9E82E48005A696E86AD8 12345678
 ...
 "
 ```
+An optional 4th field, the **ADM key**, may be appended per line. It is used only by the SIM Writer to authenticate when programming physical cards and is ignored by core-network provisioning. Existing 3-field lines remain valid.
+
 In addition, each .env file in the optional directory ``etc/uedb.d/`` is included to extend the UE_DB. This can be used to organize the subscriber information in a separate repository.
 
 ### ``network.env``
@@ -215,6 +219,12 @@ tools from the [pySim project](https://osmocom.org/projects/pysim/wiki).
 In the table on the top the [configured UEs](#uedbenv) are shown. The *SIM Reader* below can be
 used to read the content of a SIM card. The text output is shown in the console on the right.
 The *SIM Writer* can be used to change the MMC, MNC and IMSI as well as the Key and OPc of a card.
+
+The *SIM Writer* provides a *Select provided SIM (UE DB)* drop-down listing the
+[configured UEs](#uedbenv). Selecting an entry autofills the form: the MCC and MNC are derived
+from the IMSI (first three and following two digits), and the IMSI, Key and OPc are filled in.
+If the entry has an optional ADM key (4th field in the UE DB), it is autofilled as well;
+otherwise the ADM field is left blank for manual entry.
 
 !!! warning
     Make always sure to use the correct ADM1 for the specific card!

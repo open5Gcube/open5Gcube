@@ -129,12 +129,16 @@ This file contains the *database* for all SIM Cards, including the IMSI, Key and
 
 ```shell
 UE_DB+="
-#IMSI           Key                              OPc
+#IMSI           Key                              OPc                              [ADM]
 # add one subscriper per line, like for example
 001010000052100 F18E5DB0A8B5B8A0304E9113D121DFE3 E83C9CF73E3B9E82E48005A696E86AD8
+# optionally with an ADM key as 4th field, like for example
+001010000052101 F18E5DB0A8B5B8A0304E9113D121DFE3 E83C9CF73E3B9E82E48005A696E86AD8 12345678
 ...
 "
 ```
+An optional 4th field, the **ADM key**, may be appended per line. It is used only by the SIM Writer to authenticate when programming physical cards and is ignored by core-network provisioning. Existing 3-field lines remain valid.
+
 In addition, each .env file in the optional directory ``etc/uedb.d/`` is included to extend the UE_DB. This can be used to organize the subscriber information in a separate repository.
 
 ### Stack specific settings

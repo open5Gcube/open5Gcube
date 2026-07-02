@@ -306,12 +306,17 @@ def get_uedb():
             e = ''.join(line for line in f if not line.lstrip().startswith('#'))
             for ue in dotenv.dotenv_values(stream=StringIO(e)).get('UE_DB+', '').splitlines():
                 if not ue.strip(): continue
-                uedb.append({
+                fields = ue.split()
+                entry = {
                     "id": idx,
-                    "imsi": ue.split()[0],
-                    "key": ue.split()[1],
-                    "opc": ue.split()[2],
-                })
+                    "imsi": fields[0],
+                    "key": fields[1],
+                    "opc": fields[2],
+                }
+                # Optional 4th field: ADM key, used only by the SIM Writer.
+                if len(fields) > 3:
+                    entry["adm"] = fields[3]
+                uedb.append(entry)
                 idx += 1
     return uedb
 
