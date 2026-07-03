@@ -196,9 +196,8 @@ export const useSimWriterStore = defineStore('simWriter', {
             this._busy.writeCard = false;
         },
         copyUeDataToWriterContent(imsi: string, key: string, opc: string, adm?: string) {
-            // Derive MCC (first 3 digits) and MNC (next 2 digits) from the IMSI.
-            this.simWriterContent.mcc = imsi.slice(0, 3);
-            this.simWriterContent.mnc = imsi.slice(3, 5);
+            this.simWriterContent.mcc = '';
+            this.simWriterContent.mnc = '';
             this.simWriterContent.imsi = imsi;
             this.simWriterContent.ki = key;
             this.simWriterContent.opc = opc;
