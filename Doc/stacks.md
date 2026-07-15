@@ -68,7 +68,8 @@ environment variables in the docker-compose file. Alternatively, the configurati
 be overwritten with a Stack specific version as described above.
 
 The HSS / CN5G databases are initialized using short-lived ``init`` containers. They program
-the settings (especially IMSI, Key, OPc) for all UEs configured in ``etc/uedb.env``.
+the settings (especially IMSI, Key, OPc) for all UEs configured in ``etc/uedb.env``. The
+optional 4th ADM field of a UE DB entry is used only by the SIM Writer and is ignored here.
 
 #### 5G NSA
 The OAI 4G Core Network uses the MME from the [Magma](https://github.com/magma/magma) project.

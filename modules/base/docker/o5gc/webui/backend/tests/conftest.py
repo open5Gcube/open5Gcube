@@ -15,6 +15,8 @@ def app(tmp_path):
         "STATUS_MODULE_PATH": tmp_path / "test_instance" / "status.py",
         "BASE_DIR": tmp_path / "test_instance",
         "GLOBAL_ENV_PATH": tmp_path / "test_instance" / "etc" / "settings.env",
+        "UE_ENV_PATH": tmp_path / "test_instance" / "etc" / "uedb.env",
+        "UE_ENV_D_PATH": tmp_path / "test_instance" / "etc" / "uedb.d",
         "STACK_ENV_FILENAME": "settings.env",
         "MODULE_ENV_FILENAME": "settings.env",
         "ENV_OVERRIDES_DIR": tmp_path / "test_instance" / "var" / "etc"

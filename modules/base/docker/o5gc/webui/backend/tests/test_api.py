@@ -364,6 +364,27 @@ def test_get_global_env_doesnt_exist(tmp_path, client):
     assert response.status_code == 404
 
 
+def test_get_uedb_successful(client):
+    response = client.get('/api/uedb')
+
+    assert response.status_code == 200
+    assert response.content_type == "application/json"
+
+    assert response.json == [
+        {"id": 1, "imsi": "001010000052100", "key": "AAA0000000000000000000000000000A", "opc": "BBB0000000000000000000000000000B"},
+        {"id": 2, "imsi": "001010000052101", "key": "CCC0000000000000000000000000000C", "opc": "DDD0000000000000000000000000000D", "adm": "12345678"},
+        {"id": 3, "imsi": "001010000052200", "key": "EEE0000000000000000000000000000E", "opc": "FFF0000000000000000000000000000F", "adm": "87654321"},
+    ]
+
+
+def test_get_uedb_doesnt_exist(tmp_path, client):
+    os.remove(tmp_path / "test_instance" / "etc" / "uedb.env")
+
+    response = client.get('/api/uedb')
+
+    assert response.status_code == 404
+
+
 def test_get_specific_env_successful(tmp_path, client):
     response = client.get('/api/stack/stack1_correct_makefile/env')
 

@@ -15,7 +15,7 @@ function call_for_each_subscriber {
     i=1
     while IFS= read -r subscriber ; do
         [[ -z "${subscriber}" ]] && continue
-        read -r imsi key opc <<< "${subscriber}"
+        read -r imsi key opc adm <<< "${subscriber}"
         ${1} ${imsi} ${key} ${opc} ${i}
         i=$((i + 1))
     done <<< "${UE_DB}"
