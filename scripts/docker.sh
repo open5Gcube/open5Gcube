@@ -75,6 +75,36 @@ function build()
     if [[ -n "${CONTEXT_TAR}" ]]; then rm -fv "${CONTEXT_TAR}"; fi
 }
 
+function purge-old-images()
+{
+    local images img img_created age old_images=
+    images=$(docker images 'o5gc/*' --format '{{.Repository}}:{{.Tag}}'      \
+        | grep -v build-cacher | sort || true)
+    echo "Old images:"
+    for img in ${images}; do
+        img_created=$(docker inspect --format                                \
+            '{{index .Config.Labels "org.opencontainers.image.created"}}' "${img}")
+        age=$(( ($(date +%s) - $(date +%s -d "${img_created}")) / (60*60*24) ))
+        if [[ ${age} -gt 0 ]]; then
+            echo "${img} build ${age} days ago"
+            old_images+=" ${img}"
+        fi
+    done
+    [[ -z "${old_images}" ]] && return 0
+    read -r -p 'Purge? [y/n] ' x
+    [[ "${x}" == "y" ]] || return 1
+    docker image rm --force ${old_images}
+}
+
+function purge-all-images()
+{
+    local images
+    read -r -p 'Purge all o5gc images? [y/n] ' x
+    [[ "${x}" == "y" ]] || return 1
+    images=$(docker images 'o5gc/*' -q | sort -u)
+    [[ -z "${images}" ]] || docker image rm --force ${images}
+}
+
 
 [[ $# -lt 1 ]] && exit 1
 "$1" "${@:2}"

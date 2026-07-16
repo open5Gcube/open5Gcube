@@ -195,28 +195,12 @@ docker-cleanup-%:
 	${$@_DOCKER} system prune --filter label!=o5gc-bridge --force --volumes
 
 docker-purge-old-images:
-	@echo "Old images:";                                                      \
-	images=$$(docker images o5gc/* --format "{{.Repository}}:{{.Tag}}"        \
-	    | grep -v build-cacher | sort);                                       \
-	for img in $${images}; do                                                 \
-	  img_created=$$(docker inspect --format                                  \
-	      '{{index .Config.Labels "${OCI_IMG_KEY}.created"}}' $${img});       \
-	  age=$$((($$(date +%s)-$$(date +%s -d "$${img_created}") )/(60*60*24))); \
-	  if [ $${age} -gt 0 ]; then                                              \
-	    echo "$${img} build $${age} days ago";                                \
-		old_images="$${old_images} $${img}";                                  \
-	  fi;                                                                     \
-	done;                                                                     \
-	if [ -z "$${old_images}" ]; then exit 0; fi;                              \
-	echo -n 'Purge? [y/n] '; read 'x';                                        \
-	[ "$$x" == 'y' ] && docker image rm --force $${old_images}
+	@${O5GC} docker purge-old-images
 	$(MAKE) docker-cleanup clean
 
 
 docker-purge-all-images: build-cacher-stop webui-stop  ## purge all project related Docker images
-	@echo -n 'Purge all o5gc images? [y/n] ' && read 'x' && [ $$x == 'y' ]
-	images=$$(docker images o5gc/* -q | sort -u);                           \
-	[ -z "$${images}" ] || docker image rm --force $${images}
+	@${O5GC} docker purge-all-images
 	$(MAKE) docker-cleanup clean
 
 clean:
