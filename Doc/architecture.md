@@ -62,6 +62,10 @@ the building of the actual images by incorporating the following features:
   avoiding repeated fetches.
 ``Downloads``: Large downloaded files are cached to accelerate subsequent builds.
 
+The cacher runs on the Controller host only. To make it available for the builds on the RAN
+hosts, the cacher ports have to be forwarded over ssh, see
+[Forward the build-cacher Ports to the RAN Hosts](installation.md#forward-the-build-cacher-ports-to-the-ran-hosts).
+
 The usage of the cacher can be disabled in the installation specific settings file
   [``etc/local.env``](user_guide.md#localenv) by setting
 ```shell

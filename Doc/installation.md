@@ -116,6 +116,33 @@ ssh-copy-id o5gc2
 ssh-copy-id o5gc3
 ```
 
+### Forward the build-cacher Ports to the RAN Hosts
+The [build-cacher](architecture.md#docker-images) runs on the Controller host only, but the
+image builds triggered on the RAN hosts need to reach it as well. Since the builds run inside
+Docker containers, the cacher must be reachable on the Docker bridge address ``172.17.0.1`` of
+the RAN hosts. This is achieved by remote-forwarding the three cacher ports (rsync ``40860``,
+apt-cacher-ng ``40861`` and git-cache-http-server ``40862``) over the existing ssh connections.
+
+1. On the Controller host, add the following to ``~/.ssh/config``:
+```
+Host o5gc2 o5gc3
+    RemoteForward 172.17.0.1:40860 172.17.0.1:40860
+    RemoteForward 172.17.0.1:40861 172.17.0.1:40861
+    RemoteForward 172.17.0.1:40862 172.17.0.1:40862
+```
+2. On each RAN host, the sshd must be allowed to bind forwarded ports to an address other than
+``localhost``. Set in ``/etc/ssh/sshd_config``:
+```
+GatewayPorts clientspecified
+```
+and reload the ssh daemon:
+```console
+sudo systemctl reload ssh
+```
+
+Without these settings, the builds on the RAN hosts cannot use the cacher. As an alternative,
+the cacher can be disabled entirely by setting ``USE_BUILD_CACHER=0`` in ``etc/local.env``.
+
 ## Project Installation
 Extract / Checkout / Clone the project on the Controller server into an arbitrary directory,
 like ``/home/user/o5gc`` and change into it.

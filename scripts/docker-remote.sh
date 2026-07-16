@@ -58,7 +58,10 @@ ${DOCKER_COMPOSE} up --force-recreate --no-log-prefix &
 docker_pid=$!
 wait -n ${docker_pid}
 
-exit_code=$(${DOCKER_COMPOSE} ps -a -q                                        \
-    | xargs docker -H ssh://${DOCKER_TARGET_HOSTNAME}                         \
-        inspect -f '{{ .State.ExitCode }}' | grep -v "^0")
-exit ${exit_code}
+codes=$(${DOCKER_COMPOSE} ps -a -q                                            \
+    | xargs docker -H "ssh://${DOCKER_TARGET_HOSTNAME}"                       \
+        inspect -f '{{ .State.ExitCode }}')
+for c in ${codes}; do
+    [ "${c}" -ne 0 ] && exit "${c}"
+done
+exit 0
