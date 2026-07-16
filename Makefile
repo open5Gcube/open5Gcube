@@ -48,7 +48,8 @@ system-enroll-mok: var/ssl/MOK.der
 system-test-mok: var/ssl/MOK.der
 	sudo mokutil --test-key $<
 
-DOCKER_BUILD = SYNC_CACHES="${SYNC_CACHES}" ${BASE_DIR}/scripts/docker.sh build
+O5GC = ${BASE_DIR}/o5gc
+DOCKER_BUILD = SYNC_CACHES="${SYNC_CACHES}" ${O5GC} docker build
 
 define docker-build-remotely
     $(MAKE) ${PARALLEL_JOBS} RUN_PARALLEL=1 $(foreach host,${1},$@-at-${host})
@@ -157,9 +158,9 @@ git-update-modules:
 .xhost:
 	xhost local:root
 
-STACK_SH = ${BASE_DIR}/scripts/stack.sh
-run_stack = DETACHED=${DETACHED} ${STACK_SH} up ${2} ${3}
-stop_stack = ${STACK_SH} down ${2} ${3}
+O5GC_STACK_CMD = ${O5GC} stack
+run_stack = DETACHED=${DETACHED} ${O5GC_STACK_CMD} up ${2} ${3}
+stop_stack = ${O5GC_STACK_CMD} down ${2} ${3}
 
 # Explicit run-/stop- targets (kept in make's database, so shell completion
 # sees them) for every stack that declares its default profiles via a
@@ -171,17 +172,17 @@ STACK_TARGETS := $(shell awk 'sub(/^x-o5gc-profiles: */,"") {              \
     for(i=1;i<=NF;i++) printf " run-%s-%s",s,$$i; print "" }'              \
     ${MODULES_DIR}/*/stacks/*/docker-compose.yaml)
 $(filter run-%,${STACK_TARGETS}): run-%: .create-running-env
-	@DETACHED=${DETACHED} ${STACK_SH} up $*
+	@DETACHED=${DETACHED} ${O5GC_STACK_CMD} up $*
 $(filter stop-%,${STACK_TARGETS}): stop-%:
-	@${STACK_SH} down $*
+	@${O5GC_STACK_CMD} down $*
 
 # fallback for undeclared stack/profile combinations
 run-%: .create-running-env  ## Run a stack, or a single profile via run-<stack>-<profile>
-	@DETACHED=${DETACHED} ${STACK_SH} up $*
+	@DETACHED=${DETACHED} ${O5GC_STACK_CMD} up $*
 stop-%:  ## Stop a stack
-	@${STACK_SH} down $*
+	@${O5GC_STACK_CMD} down $*
 list-stacks:  ## List all stacks and their default profiles
-	@${STACK_SH} list
+	@${O5GC_STACK_CMD} list
 
 uhd_image_loader:  ##
 	scripts/uhd_image_loader.sh
@@ -278,7 +279,7 @@ lint:
 	$(MAKE) --ignore-errors shellcheck yamllint codespell hadolint            \
 	    dclint markdownlint space-end-check
 
-SHELLCHECK_FILES = $(filter-out ${SHELLCHECK_FILES_IGNORE}, $(shell find modules/ etc/ scripts/ -name '*.sh'))
+SHELLCHECK_FILES = o5gc $(filter-out ${SHELLCHECK_FILES_IGNORE}, $(shell find modules/ etc/ scripts/ -name '*.sh'))
 SHELLCHECK_FILES_IGNORE += $(foreach m,${GIT_SUBMODULES},${m}/%) %/wait-for-it.sh
 SHELLCHECK_IGNORE = SC1091 SC2016 SC2046 SC3037 SC2086 SC2059 SC2155 SC2153   \
                     SC2291 SC3040 SC1090 SC2317
