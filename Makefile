@@ -194,8 +194,31 @@ git-update-modules:
 .xhost:
 	xhost local:root
 
-run_stack = cd modules/${1}/stacks/${2}; $(DOCKER_COMPOSE) $(foreach p,${3},--profile ${p}) up $(if ${DETACHED},--detach)
-stop_stack = cd modules/${1}/stacks/${2}; $(DOCKER_COMPOSE) $(foreach p,${3},--profile ${p}) down
+STACK_SH = ${BASE_DIR}/scripts/stack.sh
+run_stack = DETACHED=${DETACHED} ${STACK_SH} up ${2} ${3}
+stop_stack = ${STACK_SH} down ${2} ${3}
+
+# Explicit run-/stop- targets (kept in make's database, so shell completion
+# sees them) for every stack that declares its default profiles via a
+# top-level 'x-o5gc-profiles:' key in its docker-compose.yaml, plus a
+# run-<stack>-<profile> target for each declared profile.
+STACK_TARGETS := $(shell awk 'sub(/^x-o5gc-profiles: */,"") {              \
+    gsub(/[][,"]/," "); n=split(FILENAME,a,"/"); s=a[n-1];                 \
+    printf "run-%s stop-%s",s,s;                                           \
+    for(i=1;i<=NF;i++) printf " run-%s-%s",s,$$i; print "" }'              \
+    ${MODULES_DIR}/*/stacks/*/docker-compose.yaml)
+$(filter run-%,${STACK_TARGETS}): run-%: .create-running-env
+	@DETACHED=${DETACHED} ${STACK_SH} up $*
+$(filter stop-%,${STACK_TARGETS}): stop-%:
+	@${STACK_SH} down $*
+
+# fallback for undeclared stack/profile combinations
+run-%: .create-running-env  ## Run a stack, or a single profile via run-<stack>-<profile>
+	@DETACHED=${DETACHED} ${STACK_SH} up $*
+stop-%:  ## Stop a stack
+	@${STACK_SH} down $*
+list-stacks:  ## List all stacks and their default profiles
+	@${STACK_SH} list
 
 uhd_image_loader:  ##
 	scripts/uhd_image_loader.sh

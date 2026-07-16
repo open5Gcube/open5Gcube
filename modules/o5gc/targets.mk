@@ -89,69 +89,17 @@ docker-build-misc-nrscope: docker-build-o5gc-base
 	$(call docker-build,o5gc,srsran/4g,,,develop,develop)
 	$(call docker-build,o5gc,misc,nrscope)
 
-run-oai-5g-basic: .create-running-env  ##
-	export OAI_CN5G_TYPE=basic;                                               \
-	$(call run_stack,o5gc,oai-5g-basic,gnb core)
-stop-oai-5g-basic:  ##
-	export OAI_CN5G_TYPE=basic;                                               \
-	$(call stop_stack,o5gc,oai-5g-basic,gnb core)
-run-oai-5g-basic-gnb run-oai-5g-basic-core run-oai-5g-basic-ue: .create-running-env
-	export OAI_CN5G_TYPE=basic;                                               \
-	$(call run_stack,o5gc,oai-5g-basic,$(subst run-oai-5g-basic-,,$@))
+# Most stacks are started/stopped via the generated run-/stop- targets
+# (see 'make list-stacks'); their default profiles come from the top-level
+# 'x-o5gc-profiles:' key in the stack's docker-compose.yaml.  Only targets
+# that need extra environment variables or dynamic profiles are listed here.
+
 run-oai-5g-basic-rfsim: .create-running-env
-	export OAI_RFSIM_ENABLE=1; export OAI_CN5G_TYPE=basic;                    \
+	export OAI_RFSIM_ENABLE=1;                                                \
 	$(call run_stack,o5gc,oai-5g-basic,gnb core ue)
-
-run-oai-5g-minimalist: .create-running-env  ##
-	export OAI_CN5G_TYPE=minimalist;                                          \
-	$(call run_stack,o5gc,oai-5g-minimalist,gnb core)
-stop-oai-5g-minimalist:  ##
-	export OAI_CN5G_TYPE=minimalist;                                          \
-	$(call stop_stack,o5gc,oai-5g-minimalist,gnb core)
-run-oai-5g-minimalist-gnb run-oai-5g-minimalist-core run-oai-5g-minimalist-ue: .create-running-env
-	export OAI_CN5G_TYPE=minimalist;                                          \
-	$(call run_stack,o5gc,oai-5g-minimalist,$(subst run-oai-5g-minimalist-,,$@))
 run-oai-5g-minimalist-rfsim: .create-running-env
-	export OAI_RFSIM_ENABLE=1; OAI_CN5G_TYPE=minimalist;                      \
+	export OAI_RFSIM_ENABLE=1;                                                \
 	$(call run_stack,o5gc,oai-5g-minimalist,gnb core ue)
-
-run-oairan-open5gs-5g: .create-running-env  ##
-	$(call run_stack,o5gc,oairan-open5gs-5g,core gnb)
-stop-oairan-open5gs-5g:  ##
-	$(call stop_stack,o5gc,oairan-open5gs-5g,core gnb)
-run-oairan-open5gs-5g-gnb run-oairan-open5gs-5g-core: .create-running-env
-	$(call run_stack,o5gc,oairan-open5gs-5g,$(subst run-oairan-open5gs-5g-,,$@))
-
-run-oairan-free5gc-5g: .create-running-env  ##
-	$(call run_stack,o5gc,oairan-free5gc-5g,core gnb)
-stop-oairan-free5gc-5g:  ##
-	$(call stop_stack,o5gc,oairan-free5gc-5g,core gnb)
-run-oairan-free5gc-5g-gnb run-oairan-free5gc-5g-core: .create-running-env
-	$(call run_stack,o5gc,oairan-free5gc-5g,$(subst run-oairan-free5gc-5g-,,$@))
-
-run-osmocom-2g: .create-running-env  ##
-	$(call run_stack,o5gc,osmocom-2g,osmocom)
-stop-osmocom-2g:  ##
-	$(call stop_stack,o5gc,osmocom-2g,osmocom)
-
-run-srsran-4g-emu: .create-running-env
-	$(call run_stack,o5gc,srsran-4g-emu,enb core ue)
-stop-srsran-4g-emu: .create-running-env
-	$(call stop_stack,o5gc,srsran-4g-emu,enb core ue)
-
-run-srsran-open5gs-4g: .create-running-env  ##
-	$(call run_stack,o5gc,srsran-open5gs-4g,enb core)
-stop-srsran-open5gs-4g: .create-running-env  ##
-	$(call stop_stack,o5gc,srsran-open5gs-4g,enb core)
-run-srsran-open5gs-4g-enb run-srsran-open5gs-4g-core: .create-running-env
-	$(call run_stack,o5gc,srsran-open5gs-4g,$(subst run-srsran-open5gs-4g-,,$@))
-
-run-srsran-open5gs-4g-emu: .create-running-env  ##
-	$(call run_stack,o5gc,srsran-open5gs-4g-emu,enb core ue)
-stop-srsran-open5gs-4g-emu: .create-running-env  ##
-	$(call stop_stack,o5gc,srsran-open5gs-4g-emu,enb core ue)
-run-srsran-open5gs-4g-emu-enb run-srsran-open5gs-4g-emu-core run-srsran-open5gs-4g-emu-ue: .create-running-env
-	$(call run_stack,o5gc,srsran-open5gs-4g-emu,$(subst run-srsran-open5gs-4g-emu-,,$@))
 
 run-srsran-open5gs-4g-volte: ${ENV_DIR}/srsran-open5gs-4g-volte.env .create-running-env  ##
 	$(call run_stack,o5gc,srsran-open5gs-4g-volte,enb core volte                   \
@@ -161,53 +109,6 @@ stop-srsran-open5gs-4g-volte: .create-running-env  ##
 run-srsran-open5gs-4g-volte-core: ${ENV_DIR}/srsran-open5gs-4g-volte.env .create-running-env
 	$(call run_stack,o5gc,srsran-open5gs-4g-volte,core volte                       \
 	    $(if $(subst SMS-over-SGs,,$(call get_env,SMS_DOMAIN,$<)),smsc,osmocom))
-run-srsran-open5gs-4g-volte-enb: .create-running-env
-	$(call run_stack,o5gc,srsran-open5gs-4g-volte,enb)
-
-run-srsran-open5gs-5g: .create-running-env  ##
-	$(call run_stack,o5gc,srsran-open5gs-5g,gnb core)
-stop-srsran-open5gs-5g: .create-running-env  ##
-	$(call stop_stack,o5gc,srsran-open5gs-5g,gnb core)
-run-srsran-open5gs-5g-gnb run-srsran-open5gs-5g-core: .create-running-env
-	$(call run_stack,o5gc,srsran-open5gs-5g,$(subst run-srsran-open5gs-5g-,,$@))
-
-run-srsran-open5gs-5g-emu: .create-running-env  ##
-	$(call run_stack,o5gc,srsran-open5gs-5g-emu,gnb core ue)
-stop-srsran-open5gs-5g-emu: .create-running-env  ##
-	$(call stop_stack,o5gc,srsran-open5gs-5g-emu,gnb core ue)
-run-srsran-open5gs-5g-emu-gnb run-srsran-open5gs-5g-emu-core run-srsran-open5gs-5g-emu-ue: .create-running-env
-	$(call run_stack,o5gc,srsran-open5gs-5g-emu,$(subst run-srsran-open5gs-5g-emu-,,$@))
-
-run-ocudu-open5gs-5g: .create-running-env  ##
-	$(call run_stack,o5gc,ocudu-open5gs-5g,gnb core)
-stop-ocudu-open5gs-5g: .create-running-env  ##
-	$(call stop_stack,o5gc,ocudu-open5gs-5g,gnb core)
-run-ocudu-open5gs-5g-gnb run-ocudu-open5gs-5g-core: .create-running-env
-	$(call run_stack,o5gc,ocudu-open5gs-5g,$(subst run-ocudu-open5gs-5g-,,$@))
-
-run-ocudu-split-open5gs-5g: .create-running-env  ##
-	$(call run_stack,o5gc,ocudu-split-open5gs-5g,du cu-cp cu-up core)
-stop-ocudu-split-open5gs-5g: .create-running-env  ##
-	$(call stop_stack,o5gc,ocudu-split-open5gs-5g,du cu-cp cu-up core)
-run-ocudu-split-open5gs-5g-cu-cp run-ocudu-split-open5gs-5g-cu-up \
-run-ocudu-split-open5gs-5g-core run-ocudu-split-open5gs-5g-du: .create-running-env
-	$(call run_stack,o5gc,ocudu-split-open5gs-5g,$(subst run-ocudu-split-open5gs-5g-,,$@))
-
-run-ueransim-open5gs run-ueransim-free5gc run-ueransim-oai run-ueransim-ellacore: .create-running-env  ##
-	export OAI_CN5G_TYPE=basic;                                               \
-	$(call run_stack,o5gc,$(subst run-,,$@),core gnb ue metrics)
-stop-ueransim-open5gs stop-ueransim-free5gc stop-ueransim-oai stop-ueransim-ellacore:  ##
-	$(call stop_stack,o5gc,$(subst stop-,,$@),core gnb ue metrics)
-
-run-packetrusher-open5gs run-packetrusher-open5gs-roaming: .create-running-env  ##
-	$(call run_stack,o5gc,$(subst run-,,$@),core gnb-ue metrics)
-stop-packetrusher-open5gs stop-packetrusher-open5gs-roaming:  ##
-	$(call stop_stack,o5gc,$(subst stop-,,$@),core gnb-ue metrics)
-
-run-ltesniffer: .create-running-env  ##
-	$(call run_stack,o5gc,ltesniffer,ltesniffer)
-stop-ltesniffer:  ##
-	$(call stop_stack,o5gc,ltesniffer,ltesniffer)
 
 run-oai-spgwu-iperf:
 	docker exec spgwu iperf3 -s
