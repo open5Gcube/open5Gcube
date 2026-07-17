@@ -45,6 +45,7 @@ services:
       - SNIFF_DEBUG
     volumes:
       - ./ltesniffer-entrypoint.sh:/o5gc/ltesniffer/entrypoint.sh:ro
+      - ${BASE}/var/traces:/mnt/traces
       - ${BASE}/scripts/band_helper.py:/o5gc/band_helper.py:ro
       - /dev/bus/usb:/dev/bus/usb
     profiles: [ "ltesniffer" ]

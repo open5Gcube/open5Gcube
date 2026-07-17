@@ -18,6 +18,8 @@ fi
 
 [ -n "${SNIFF_DEBUG}" ] && DEBUG_ARG="-d"
 
+cd /mnt/traces
+
 exec /bin/tini -- LTESniffer                                                  \
     -m 0 `# sniffer mode, 0 for downlink and 1 for uplink sniffing`           \
     -a "num_recv_frames=512" `# extends the receiving buffer for USRP B210`   \
