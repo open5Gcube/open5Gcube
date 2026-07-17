@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+BASE_DIR=$(realpath "$(dirname "$(realpath "$0")")/..")
+
 log() { echo "+ $*" ; "$@" ; }
 
 function build()
@@ -103,6 +105,25 @@ function purge-all-images()
     [[ "${x}" == "y" ]] || return 1
     images=$(docker images 'o5gc/*' -q | sort -u)
     [[ -z "${images}" ]] || docker image rm --force ${images}
+}
+
+# Prune stale containers, networks, images and volumes on --host (default:
+# localhost).  The o5gc bridge is labelled so that it survives.
+function cleanup()
+{
+    HOST="localhost"
+    args=$(getopt -a -o h: --long host: -- "$@") || exit 1
+    eval set -- ${args}
+    while true; do
+    case "$1" in
+        -h|--host) HOST=$2; shift 2 ;;
+        --) shift; break ;;
+        *) echo "Unsupported option: $1" >&2; exit 3 ;;
+    esac
+    done
+    DOCKER="docker"
+    [[ "${HOST}" == "localhost" ]] || DOCKER="docker -H ssh://${HOST}"
+    log ${DOCKER} system prune --filter label!=o5gc-bridge --force --volumes
 }
 
 

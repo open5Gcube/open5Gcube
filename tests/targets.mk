@@ -10,7 +10,7 @@ tests/.venv.build: tests/requirements.txt
 	$(ACTIVATE_TEST_VENV); pip install -r $<
 	@touch $@
 
-tests-run-emulated: tests-install-venv .create-running-env
+tests-run-emulated: tests-install-venv docker-cleanup
 	$(ACTIVATE_TEST_VENV); robot -N "open5Gcube" -i Emulated                  \
 	    -d tests/results/emulated/$$(date '+%Y%m%d-%H%M') etc
 

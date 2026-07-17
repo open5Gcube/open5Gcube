@@ -1,18 +1,25 @@
 ## Develop Own Stacks
-To define a new Stack, create a sub-directory in ``etc`` and add a ``docker-compose.yaml`` file.
-The easiest way is to use an existing Stack as a template.
+To define a new Stack, create a sub-directory in ``modules/<module>/stacks`` and add a
+``docker-compose.yaml`` file. The easiest way is to use an existing Stack as a template.
 
-Add Makefile targets to run and stop the Stack like the following:
-```makefile
-run-<stackname>: .create-running-env  ##
-    cd etc/<stackname>;                                                       \
-    $(DOCKER_COMPOSE) --profile=gnb --profile=core up ${DOCKER_COMPOSE_DETACH}
-stop-<stackname>: .create-running-env  ##
-    cd etc/<stackname>;                                                       \
-    $(DOCKER_COMPOSE) --profile=gnb --profile=core down
+Declare the profiles the Stack runs by default with a top-level ``x-o5gc-profiles`` key:
+```yaml
+x-o5gc-profiles: [ gnb, core ]
 ```
-Adjust the ``--profile`` parameter as needed by the Stack definition in the ``docker-compose.yaml``
-file.
+That is all that is needed: the ``run-<stackname>`` and ``stop-<stackname>`` targets are generated
+from this key, along with a ``run-<stackname>-<profile>`` target for each profile listed. Use
+``make list-stacks`` to show all Stacks and their default profiles.
+
+Only Stacks needing extra environment variables or dynamically chosen profiles have to define their
+own targets, which pass the module, the Stack and the profiles to the ``run_stack``/``stop_stack``
+macros:
+```makefile
+run-<stackname>:  ##
+    export SOME_VAR=1;                                                        \
+    $(call run_stack,<module>,<stackname>,gnb core)
+stop-<stackname>:  ##
+    $(call stop_stack,<module>,<stackname>,gnb core)
+```
 
 ## Use external Core Networks / RANs
 The use of ``macvlan`` to interconnect the Docker container across the hosts, makes the integration

@@ -82,19 +82,19 @@ docker-build-misc-nrscope: docker-build-o5gc-base
 # 'x-o5gc-profiles:' key in the stack's docker-compose.yaml.  Only targets
 # that need extra environment variables or dynamic profiles are listed here.
 
-run-oai-5g-basic-rfsim: .create-running-env
+run-oai-5g-basic-rfsim:
 	export OAI_RFSIM_ENABLE=1;                                                \
 	$(call run_stack,o5gc,oai-5g-basic,gnb core ue)
-run-oai-5g-minimalist-rfsim: .create-running-env
+run-oai-5g-minimalist-rfsim:
 	export OAI_RFSIM_ENABLE=1;                                                \
 	$(call run_stack,o5gc,oai-5g-minimalist,gnb core ue)
 
-run-srsran-open5gs-4g-volte: ${ENV_DIR}/srsran-open5gs-4g-volte.env .create-running-env  ##
+run-srsran-open5gs-4g-volte: ${ENV_DIR}/srsran-open5gs-4g-volte.env  ##
 	$(call run_stack,o5gc,srsran-open5gs-4g-volte,enb core volte                   \
 	    $(if $(subst SMS-over-SGs,,$(call get_env,SMS_DOMAIN,$<)),smsc,osmocom))
-stop-srsran-open5gs-4g-volte: .create-running-env  ##
+stop-srsran-open5gs-4g-volte:  ##
 	$(call stop_stack,o5gc,srsran-open5gs-4g-volte,enb core volte)
-run-srsran-open5gs-4g-volte-core: ${ENV_DIR}/srsran-open5gs-4g-volte.env .create-running-env
+run-srsran-open5gs-4g-volte-core: ${ENV_DIR}/srsran-open5gs-4g-volte.env
 	$(call run_stack,o5gc,srsran-open5gs-4g-volte,core volte                       \
 	    $(if $(subst SMS-over-SGs,,$(call get_env,SMS_DOMAIN,$<)),smsc,osmocom))
 

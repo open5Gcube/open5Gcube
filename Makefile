@@ -3,6 +3,7 @@ BASE_DIR := $(realpath $(dir $(realpath $(firstword $(MAKEFILE_LIST)))))
 ENV_DIR = ${BASE_DIR}/var/etc
 ETC_DIR = ${BASE_DIR}/etc
 MODULES_DIR = ${BASE_DIR}/modules
+SCRIPTS_DIR = ${BASE_DIR}/scripts
 DOCKER_HOST_BRIDGE := $(shell docker network inspect bridge -f '{{range .IPAM.Config}}{{.Gateway}}{{end}}')
 HOST_USER_GROUP_ID := $(shell echo $$(id -u):$$(id -g))
 
@@ -48,8 +49,9 @@ system-enroll-mok: var/ssl/MOK.der
 system-test-mok: var/ssl/MOK.der
 	sudo mokutil --test-key $<
 
-O5GC = ${BASE_DIR}/o5gc
-DOCKER_BUILD = SYNC_CACHES="${SYNC_CACHES}" ${O5GC} docker build
+DOCKER_SH = ${SCRIPTS_DIR}/docker.sh
+STACK_SH = ${SCRIPTS_DIR}/stack.sh
+DOCKER_BUILD = SYNC_CACHES="${SYNC_CACHES}" ${DOCKER_SH} build
 
 define docker-build-remotely
     $(MAKE) ${PARALLEL_JOBS} RUN_PARALLEL=1 $(foreach host,${1},$@-at-${host})
@@ -153,14 +155,13 @@ git-update-modules:
 	    git -C $${module} pull --rebase;                                      \
 	done
 
-.create-running-env: docker-cleanup
-
 .xhost:
 	xhost local:root
 
-O5GC_STACK_CMD = ${O5GC} stack
-run_stack = DETACHED=${DETACHED} ${O5GC_STACK_CMD} up ${2} ${3}
-stop_stack = ${O5GC_STACK_CMD} down ${2} ${3}
+# Starting a stack always prunes stale Docker artifacts on all hosts first.
+run_stack = $(MAKE) docker-cleanup &&                                         \
+    DETACHED=${DETACHED} ${STACK_SH} up ${2} ${3}
+stop_stack = ${STACK_SH} down ${2} ${3}
 
 # Explicit run-/stop- targets (kept in make's database, so shell completion
 # sees them) for every stack that declares its default profiles via a
@@ -171,18 +172,18 @@ STACK_TARGETS := $(shell awk 'sub(/^x-o5gc-profiles: */,"") {              \
     printf "run-%s stop-%s",s,s;                                           \
     for(i=1;i<=NF;i++) printf " run-%s-%s",s,$$i; print "" }'              \
     ${MODULES_DIR}/*/stacks/*/docker-compose.yaml)
-$(filter run-%,${STACK_TARGETS}): run-%: .create-running-env
-	@DETACHED=${DETACHED} ${O5GC_STACK_CMD} up $*
+$(filter run-%,${STACK_TARGETS}): run-%:
+	@$(call run_stack,,$*)
 $(filter stop-%,${STACK_TARGETS}): stop-%:
-	@${O5GC_STACK_CMD} down $*
+	@$(call stop_stack,,$*)
 
 # fallback for undeclared stack/profile combinations
-run-%: .create-running-env  ## Run a stack, or a single profile via run-<stack>-<profile>
-	@DETACHED=${DETACHED} ${O5GC_STACK_CMD} up $*
+run-%:  ## Run a stack, or a single profile via run-<stack>-<profile>
+	@$(call run_stack,,$*)
 stop-%:  ## Stop a stack
-	@${O5GC_STACK_CMD} down $*
+	@$(call stop_stack,,$*)
 list-stacks:  ## List all stacks and their default profiles
-	@${O5GC_STACK_CMD} list
+	@${STACK_SH} list
 
 uhd_image_loader:  ##
 	scripts/uhd_image_loader.sh
@@ -190,17 +191,15 @@ uhd_image_loader:  ##
 docker-cleanup: ${O5GC_ENV}  ## Cleanup old Docker related artifacts
 	$(MAKE) $(foreach host,${DOCKER_ALL_HOSTS},docker-cleanup-${host})
 docker-cleanup-%:
-	$(eval $@_HOST = $(if $(subst localhost,,$*),$*))
-	$(eval $@_DOCKER = docker $(if ${$@_HOST},-H ssh://${$@_HOST}))
-	${$@_DOCKER} system prune --filter label!=o5gc-bridge --force --volumes
+	@${DOCKER_SH} cleanup --host $*
 
 docker-purge-old-images:
-	@${O5GC} docker purge-old-images
+	@${DOCKER_SH} purge-old-images
 	$(MAKE) docker-cleanup clean
 
 
 docker-purge-all-images: build-cacher-stop webui-stop  ## purge all project related Docker images
-	@${O5GC} docker purge-all-images
+	@${DOCKER_SH} purge-all-images
 	$(MAKE) docker-cleanup clean
 
 clean:
@@ -263,7 +262,7 @@ lint:
 	$(MAKE) --ignore-errors shellcheck yamllint codespell hadolint            \
 	    dclint markdownlint space-end-check
 
-SHELLCHECK_FILES = o5gc $(filter-out ${SHELLCHECK_FILES_IGNORE}, $(shell find modules/ etc/ scripts/ -name '*.sh'))
+SHELLCHECK_FILES = $(filter-out ${SHELLCHECK_FILES_IGNORE}, $(shell find modules/ etc/ scripts/ -name '*.sh'))
 SHELLCHECK_FILES_IGNORE += $(foreach m,${GIT_SUBMODULES},${m}/%) %/wait-for-it.sh
 SHELLCHECK_IGNORE = SC1091 SC2016 SC2046 SC3037 SC2086 SC2059 SC2155 SC2153   \
                     SC2291 SC3040 SC1090 SC2317
