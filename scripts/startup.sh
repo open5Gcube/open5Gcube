@@ -41,4 +41,8 @@ fi
 docker network inspect o5gc &>/dev/null || (
     echo "Create custom Docker bridge 'o5gc'"
     set -x
-    docker network create --driver bridge --label o5gc-bridge o5gc )
+    docker network create                                                     \
+        --driver bridge                                                       \
+        --label o5gc-bridge                                                   \
+        --opt com.docker.network.bridge.name=o5gc                             \
+        o5gc )
