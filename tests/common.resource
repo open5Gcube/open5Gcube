@@ -8,7 +8,7 @@ Library  get_env.py
 
 *** Keywords ***
 Wait
-    [Arguments]  ${time}  ${msg}=
+    [Arguments]  ${time}  ${msg}=${EMPTY}
     Log To Console  Waiting ${time} ${msg}
     Sleep  ${time}
 
@@ -33,8 +33,8 @@ Save Local Files
     END
 
 Save Container Logs
-    ${_}  ${suite output dir} =  Get Suite Paths
     [Arguments]  @{containers}
+    ${_}  ${suite output dir} =  Get Suite Paths
     FOR  ${container}  IN  @{containers}
         ${result} =  Run Process  docker  logs  ${container}
         ...          stdout=${suite output dir}/${container}.log  stderr=STDOUT

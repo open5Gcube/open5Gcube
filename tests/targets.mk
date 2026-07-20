@@ -22,7 +22,7 @@ $(addprefix tests-run-,${TEST_STACKS}): tests-run-%: tests-install-venv .create-
 	    -d tests/results/$*/$$(date '+%Y%m%d-%H%M') $(wildcard modules/*/stacks/$*/tests)
 
 tests-lint: tests-install-venv
-	$(ACTIVATE_TEST_VENV); robocop -A tests/robocop.args
+	$(ACTIVATE_TEST_VENV); robocop check --config tests/robocop.toml modules tests
 
 tests-clean:
 	rm -rf tests/results
