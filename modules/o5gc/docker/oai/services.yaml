@@ -132,12 +132,16 @@ services:
     container_name: "upf"
     command: upf
     privileged: true
+    volumes:
+      - ./upf-healthcheck.sh:/o5gc/oai-cn5g-upf/scripts/healthcheck.sh:ro
     networks:
       extnet:
-        ipv4_address: ${UPF_EXT_IP_ADDR} # eth0
+        ipv4_address: ${UPF_EXT_IP_ADDR}
         gw_priority: 1
+        interface_name: eth0
       corenet:
-        ipv4_address: ${UPF_IP_ADDR} # eth1
+        ipv4_address: ${UPF_IP_ADDR}
+        interface_name: eth1
         aliases:
           - monitor-capture-host
     depends_on:
