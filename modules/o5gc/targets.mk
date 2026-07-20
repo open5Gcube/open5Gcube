@@ -112,7 +112,7 @@ run-oai-5g-minimalist-gnb run-oai-5g-minimalist-core run-oai-5g-minimalist-ue: .
 	export OAI_CN5G_TYPE=minimalist;                                          \
 	$(call run_stack,o5gc,oai-5g-minimalist,$(subst run-oai-5g-minimalist-,,$@))
 run-oai-5g-minimalist-rfsim: .create-running-env
-	export OAI_RFSIM_ENABLE=1; OAI_CN5G_TYPE=minimalist;                      \
+	export OAI_RFSIM_ENABLE=1; export OAI_CN5G_TYPE=minimalist;               \
 	$(call run_stack,o5gc,oai-5g-minimalist,gnb core ue)
 
 run-oairan-open5gs-5g: .create-running-env  ##

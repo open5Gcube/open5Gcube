@@ -4,30 +4,33 @@ services:
       file: ${DOCKER}/oai/services.yaml
       service: mysql
 
-  nrf:
-    extends:
-      file: ${DOCKER}/oai/services.yaml
-      service: nrf
-
   amf:
     extends:
       file: ${DOCKER}/oai/services.yaml
       service: amf
+    volumes:
+      - ./cn5g.yaml:/mnt/oai/cn5g.yaml:ro
     depends_on: !override
       mysql:
-        condition: service_healthy
-      nrf:
         condition: service_healthy
 
   smf:
     extends:
       file: ${DOCKER}/oai/services.yaml
       service: smf
+    volumes:
+      - ./cn5g.yaml:/mnt/oai/cn5g.yaml:ro
     depends_on: !override
       amf:
         condition: service_healthy
-      nrf:
-        condition: service_healthy
+
+  upf:
+    extends:
+      file: ${DOCKER}/oai/services.yaml
+      service: upf
+    volumes:
+      - ./cn5g.yaml:/mnt/oai/cn5g.yaml:ro
+    depends_on: !override []
 
   gnb:
     extends:
@@ -47,10 +50,9 @@ services:
     environment:
       - OAI_RFSIM_SERVERADDR=${GNB_RAN_IP_ADDR}
     volumes:
-      - ./ue.conf:/o5gc/openairinterface5g/etc/ue.conf:ro
+      - ./ue.conf:/o5gc/openairinterface5g/etc/nr-ue.conf:ro
     networks:
-      ran:
-        ipv4_address: ${UE_RAN_IP_ADDR}
+      rfnet: !override {}
 
   o5gc-dns:
     image: cytopia/bind:stable-0.28

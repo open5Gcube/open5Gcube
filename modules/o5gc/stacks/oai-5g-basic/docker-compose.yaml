@@ -58,6 +58,8 @@ services:
       - OAI_RFSIM_SERVERADDR=${GNB_RAN_IP_ADDR}
     volumes:
       - ./ue.conf:/o5gc/openairinterface5g/etc/nr-ue.conf:ro
+    networks:
+      rfnet: !override {}
 
   o5gc-dns:
     image: cytopia/bind:stable-0.28
