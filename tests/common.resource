@@ -36,7 +36,8 @@ Save Container Logs
     ${_}  ${suite output dir} =  Get Suite Paths
     [Arguments]  @{containers}
     FOR  ${container}  IN  @{containers}
-        ${result} =  Run Process  docker  logs  ${container}  stdout=${suite output dir}/${container}.log
+        ${result} =  Run Process  docker  logs  ${container}
+        ...          stdout=${suite output dir}/${container}.log  stderr=STDOUT
         Should Be Equal  ${result.rc}  ${0}
     END
 
@@ -70,7 +71,8 @@ Containers Should Running
 
 Container Log Should Match Regexp
     [Arguments]  ${container}  ${regex}
-    ${result} =  Run Process  docker  logs  ${container}  stdout=${TEMPDIR}/o5gc.test.${container}.log
+    ${result} =  Run Process  docker  logs  ${container}
+    ...          stdout=${TEMPDIR}/o5gc.test.${container}.log  stderr=STDOUT
     Should Be Equal  ${result.rc}  ${0}
     Should Match Regexp  ${result.stdout}  ${regex}
     Remove File  ${TEMPDIR}/o5gc.test.${container}.log
@@ -98,3 +100,14 @@ OAI SMF Log Should Contain PDU Session Setup
     Container Log Should Match Regexp  smf  Set PDU Session Status to PDU_SESSION_ESTABLISHMENT_PENDING
     Container Log Should Match Regexp  smf  PDU_SESSION_ESTABLISHMENT_UE_REQUESTED
     Container Log Should Match Regexp  smf  Set PDU Session Status to PDU_SESSION_ACTIVE
+
+UERANSIM UE Should Can Ping
+    [Arguments]  ${addr}
+    ${result} =  Run Process  docker  exec  ue  ping  -I  uesimtun0  -c  1  ${addr}
+    Should Be Empty  ${result.stderr}
+    Should Be Equal  ${result.rc}  ${0}
+    Log  ${result.stdout}
+
+Open5GS SMF Log Should Contain PDU Session Setup
+    Container Log Should Match Regexp  smf  \\[Added\\] Number of SMF-Sessions is now
+    Container Log Should Match Regexp  smf  UE SUPI\\[imsi-\\d+\\] DNN\\[.*\\] IPv4\\[\\d
