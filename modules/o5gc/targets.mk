@@ -92,7 +92,7 @@ docker-build-misc-nrscope: docker-build-o5gc-base
 run-oai-5g-basic: .create-running-env  ##
 	export OAI_CN5G_TYPE=basic;                                               \
 	$(call run_stack,o5gc,oai-5g-basic,gnb core)
-stop-oai-5g-basic:  ##
+stop-oai-5g-basic stop-oai-5g-basic-rfsim:  ##
 	export OAI_CN5G_TYPE=basic;                                               \
 	$(call stop_stack,o5gc,oai-5g-basic,gnb core)
 run-oai-5g-basic-gnb run-oai-5g-basic-core run-oai-5g-basic-ue: .create-running-env
@@ -105,7 +105,7 @@ run-oai-5g-basic-rfsim: .create-running-env
 run-oai-5g-minimalist: .create-running-env  ##
 	export OAI_CN5G_TYPE=minimalist;                                          \
 	$(call run_stack,o5gc,oai-5g-minimalist,gnb core)
-stop-oai-5g-minimalist:  ##
+stop-oai-5g-minimalist stop-oai-5g-minimalist-rfsim:  ##
 	export OAI_CN5G_TYPE=minimalist;                                          \
 	$(call stop_stack,o5gc,oai-5g-minimalist,gnb core)
 run-oai-5g-minimalist-gnb run-oai-5g-minimalist-core run-oai-5g-minimalist-ue: .create-running-env
@@ -209,8 +209,8 @@ run-ltesniffer: .create-running-env  ##
 stop-ltesniffer:  ##
 	$(call stop_stack,o5gc,ltesniffer,ltesniffer)
 
-run-oai-spgwu-iperf:
-	docker exec spgwu iperf3 -s
+run-oai-upf-iperf:
+	docker exec upf iperf3 -s
 
 run-oai-ran-tracer-enb run-oai-ran-tracer-gnb:  ##
 run-oai-ran-tracer-%:

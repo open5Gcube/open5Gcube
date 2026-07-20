@@ -1,8 +1,9 @@
 *** Settings ***
 Documentation  Common keywords
-Library        OperatingSystem
-Library        Process
-Library        String
+Library  OperatingSystem
+Library  Process
+Library  String
+Library  get_env.py
 
 
 *** Keywords ***
@@ -15,9 +16,6 @@ Get Suite Paths
     ${etc}  ${suite id}  ${_}  ${_} =  Split String From Right  ${SUITE SOURCE}  /  3
     Create Directory  ${OUTPUT_DIR}/${suite id}
     RETURN  ${etc}/${suite id}  ${OUTPUT_DIR}/${suite id}
-
-Terminate All Containers
-    Run Process  docker  ps  -aq  |  xargs  docker  kill  shell=True  stderr=STDOUT
 
 Save Files From Container
     [Arguments]  @{files}
@@ -54,12 +52,20 @@ No Container Should Be Failed
     ...          --filter  status\=exited  |  grep  -v  Exited (0)  shell=True  stderr=STDOUT
     Should Be Empty  ${result.stdout}
 
+No Container Should Running
+    [Arguments]  @{containers}
+    FOR  ${container}  IN  @{containers}
+        ${result} =  Run Process  docker  ps  -q  --filter  status\=running  --filter  name\=${container}
+        Should Be Equal  ${result.rc}  ${0}
+        Should Be Empty  ${result.stdout}
+    END
+
 Containers Should Running
     [Arguments]  @{containers}
     FOR  ${container}  IN  @{containers}
         ${result} =  Run Process  docker  ps  -q  --filter  status\=running  --filter  name\=${container}
         Should Be Equal  ${result.rc}  ${0}
-        Should Not Be Empty  ${result.stdout}
+        Should Not Be Empty  ${result.stdout}  ${container} not running
     END
 
 Container Log Should Match Regexp
