@@ -33,7 +33,7 @@ install_preliminaries() {
 install_docker_cli() {
     case "${OS_DISTRO} ${OS_RELEASE}" in
         "ubuntu 20.04" | "ubuntu 22.04" | "ubuntu 24.04")
-            apt_get_install docker-ce-cli=5:28.* docker-compose-plugin=2.35.* docker-buildx-plugin=0.23.*
+            apt_get_install docker-ce-cli=5:28.* docker-compose-plugin=2.36.* docker-buildx-plugin=0.23.*
             ;;
         *)
             exit 1
