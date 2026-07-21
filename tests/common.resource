@@ -96,10 +96,10 @@ OAI SMF Log Should Contain PDU Session Setup
     # see SMF verifySanityCheckDeployment.py
     Container Log Should Match Regexp  smf  Received a SM context create request from AMF
     Container Log Should Match Regexp  smf  PDU Session Create SM Context Request
-    Container Log Should Match Regexp  smf  Encode PDU Session Establishment Accept
-    Container Log Should Match Regexp  smf  Set PDU Session Status to PDU_SESSION_ESTABLISHMENT_PENDING
+    Container Log Should Match Regexp  smf  PDU_SESSION_ESTABLISHMENT_ACCEPT, encode starting
+    Container Log Should Match Regexp  smf  Set PDU Session Status to PDU Session Status Establishment Pending
     Container Log Should Match Regexp  smf  PDU_SESSION_ESTABLISHMENT_UE_REQUESTED
-    Container Log Should Match Regexp  smf  Set PDU Session Status to PDU_SESSION_ACTIVE
+    Container Log Should Match Regexp  smf  Set PDU Session Status to PDU Session Status Active
 
 UERANSIM UE Should Can Ping
     [Arguments]  ${addr}

@@ -10,6 +10,7 @@ WORKDIR /o5gc/oai-cn5g-lmf
 RUN sync-cache.sh download oai-lmf ccache                                     \
     && cd build/scripts                                                       \
     && ./build_lmf --install-deps --force                                     \
+    && apt-get.sh install liblapacke-dev libopenblas-dev                      \
     && ./build_lmf --clean --Verbose --build-type Release --jobs              \
     && ldconfig                                                               \
     && find ../ \( -name "*.a" -o -name "*.o" \) -type f -delete              \
