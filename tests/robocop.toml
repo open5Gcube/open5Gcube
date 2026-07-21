@@ -2,4 +2,5 @@
 ignore = [
     "missing-doc-keyword",
     "missing-doc-test-case",
+    "wrong-case-in-keyword-name",
 ]
