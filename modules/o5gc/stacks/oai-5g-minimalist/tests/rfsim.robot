@@ -41,13 +41,13 @@ Setup Suite
     Start Process   make  run-${STACK}
     Sleep  5s
     Process Should Be Running
-    Wait  120s  to complete core network, gNB and UE startup
+    Wait Until Startup Complete  OAI SMF Log Should Contain PDU Session Setup
 
 Teardown Suite
     Log To Console  Teardown Suite: run 'make stop-${STACK}'
     Run Process   make  stop-${STACK}
     No Container Should Running  upf  smf  amf  gnb  ue  mysql
-    Terminate All Processes
+    Terminate All Processes  kill=True
 
 Collect Container Logs
     Save Container Logs  upf  smf  amf  gnb  ue

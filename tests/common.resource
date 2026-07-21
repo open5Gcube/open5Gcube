@@ -12,6 +12,24 @@ Wait
     Log To Console  Waiting ${time} ${msg}
     Sleep  ${time}
 
+Wait Until Startup Complete
+    [Documentation]  Poll until the stack is ready instead of sleeping a fixed time.
+    ...              ${pdu_session_keyword} is the stack-specific keyword that asserts
+    ...              the SMF has established a PDU session (the last startup milestone);
+    ...              its log format differs per core (OAI vs Open5GS). ${timeout} is the
+    ...              ceiling; the keyword returns as soon as the core network, gNB and UE
+    ...              have completed startup.
+    [Arguments]  ${pdu_session_keyword}  ${timeout}=120s  ${interval}=3s
+    Log To Console  Waiting up to ${timeout} for core network, gNB and UE startup
+    Wait Until Keyword Succeeds  ${timeout}  ${interval}
+    ...          Startup Should Be Complete  ${pdu_session_keyword}
+
+Startup Should Be Complete
+    [Arguments]  ${pdu_session_keyword}
+    No Running Container Should Be  starting
+    No Running Container Should Be  unhealthy
+    Run Keyword  ${pdu_session_keyword}
+
 Get Suite Paths
     ${etc}  ${suite id}  ${_}  ${_} =  Split String From Right  ${SUITE SOURCE}  /  3
     Create Directory  ${OUTPUT_DIR}/${suite id}
