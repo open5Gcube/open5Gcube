@@ -4,7 +4,7 @@ tests-remove-venv:
 
 ACTIVATE_TEST_VENV = source tests/venv/bin/activate;                          \
     export BASE_DIR=${BASE_DIR}; export ENV_DIR=${ENV_DIR}
-ROBOT = $(ACTIVATE_TEST_VENV); robot --consolewidth $$COLUMNS
+ROBOT = $(ACTIVATE_TEST_VENV); robot --consolewidth $${COLUMNS:-120}
 
 tests/.venv.build: tests/requirements.txt
 	test -d tests/venv || virtualenv --prompt test-env tests/venv

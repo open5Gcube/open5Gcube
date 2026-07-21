@@ -126,6 +126,13 @@ UERANSIM UE Should Can Ping
     Should Be Equal  ${result.rc}  ${0}
     Log  ${result.stdout}
 
+srsRAN UE Should Can Ping
+    [Arguments]  ${addr}
+    ${result} =  Run Process  docker  exec  ue  ping  -I  tun_srsue  -c  1  ${addr}
+    Should Be Empty  ${result.stderr}
+    Should Be Equal  ${result.rc}  ${0}
+    Log  ${result.stdout}
+
 Open5GS SMF Log Should Contain PDU Session Setup
     Container Log Should Match Regexp  smf  \\[Added\\] Number of SMF-Sessions is now
     Container Log Should Match Regexp  smf  UE SUPI\\[imsi-\\d+\\] DNN\\[.*\\] IPv4\\[\\d
