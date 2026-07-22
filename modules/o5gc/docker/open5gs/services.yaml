@@ -249,6 +249,8 @@ services:
       o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
     depends_on: [ mongo ]
     profiles: [ "core" ]
+  healthcheck:
+    test: bash -c "ss -ltn | grep -q ':39607'"
 
   sgwc:
     extends:
@@ -377,7 +379,13 @@ services:
         ipv4_address: ${MME_IP_ADDR}
     labels:
       o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
-    depends_on: [ hss, sgwc, sgwu ]
+    depends_on:
+      hss:
+        condition: service_healthy
+      sgwc:
+        condition: service_started
+      sgwu:
+        condition: service_started
     profiles: [ "core" ]
 
   pcrf:
