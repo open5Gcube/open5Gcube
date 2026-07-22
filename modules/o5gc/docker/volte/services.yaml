@@ -7,7 +7,7 @@ services:
       - IMS_DOMAIN=ims.mnc${MNC03}.mcc${MCC}.3gppnetwork.org
       - EPC_DOMAIN=epc.mnc${MNC03}.mcc${MCC}.3gppnetwork.org
     volumes:
-      - ${DOCKER}/volte:/mnt/volte:ro
+      - .:/mnt/volte:ro
     labels:
       o5gc.stack: ${O5GC_STACK}
       o5gc.webui.priority: ${WEBUI_PRIO_VOLTE}
