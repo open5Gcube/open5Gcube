@@ -24,6 +24,9 @@ ella_api () {
 
 add_subscriber () {
     imsi=$1; key=$2; opc=$3
+    if [[ ${imsi} != ${MCC}${MNC}* ]]; then
+        return
+    fi
     data='{
         "imsi": "'${imsi}'",
         "key": "'${key}'",

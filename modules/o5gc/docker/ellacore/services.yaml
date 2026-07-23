@@ -23,6 +23,11 @@ services:
       o5gc.link.url: "http://{{host}}:${ELLACORE_WEBUI_HOST_PORT}/"
       o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
     profiles: [ "core" ]
+    healthcheck:
+      test: curl -sSf http://localhost:5002/api/v1/status | grep -q '"ready":true'
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   ellacore-init:
     extends:

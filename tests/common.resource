@@ -17,9 +17,11 @@ Library  get_env.py
 &{CORE_PDU_SESSION_KW}   oai=OAI SMF Log Should Contain PDU Session Setup
 ...                      open5gs=Open5GS SMF Log Should Contain PDU Session Setup
 ...                      free5gc=Free5GC SMF Log Should Contain PDU Session Setup
+...                      ellacore=Ellacore SMF Log Should Contain PDU Session Setup
 &{CORE_REGISTRATION_KW}  oai=OAI AMF Log Should Show UE Registered
 ...                      open5gs=Open5GS AMF Log Should Show UE Registered
 ...                      free5gc=Free5GC AMF Log Should Show UE Registered
+...                      ellacore=Ellacore AMF Log Should Show UE Registered
 
 
 *** Keywords ***
@@ -195,3 +197,14 @@ Free5GC SMF Log Should Contain PDU Session Setup
     Container Log Should Match Regexp  smf  In HandlePDUSessionEstablishmentRequest
     Container Log Should Match Regexp  smf  Sending PFCP Session Establishment Request
     Container Log Should Match Regexp  smf  Received PFCP Session Establishment Accepted Response
+
+Ellacore AMF Log Should Show UE Registered
+    [Documentation]  Ella Core is an all-in-one core: the AMF and SMF are components of a
+    ...    single 'ellacore' container, so this and the SMF keyword both read that
+    ...    container's structured (JSON) log rather than separate 'amf'/'smf' containers.
+    [Arguments]  ${imsi}
+    Container Log Should Match Regexp  ellacore  "message_type":"RegistrationComplete","supi":"imsi-${imsi}"
+
+Ellacore SMF Log Should Contain PDU Session Setup
+    Container Log Should Match Regexp  ellacore  "msg":"Allocated IPv4 address","component":"SMF"
+    Container Log Should Match Regexp  ellacore  "msg":"Successfully created PDU session context","component":"SMF"
