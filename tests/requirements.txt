@@ -1,3 +1,5 @@
-robotframework>=5,<6
+robotframework>=6,<7
 robotframework-robocop>=6,<7
 python-dotenv
+click
+typing_extensions

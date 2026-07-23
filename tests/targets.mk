@@ -12,9 +12,14 @@ tests/.venv.build: tests/requirements.txt
 	$(ACTIVATE_TEST_VENV); pip install -r $<
 	@touch $@
 
-tests-run-all-emulated: tests-install-venv
-	${ROBOT} -N "open5Gcube" -i Emulated                                      \
-	    -d tests/results/all-emulated/$$(date '+%Y%m%d-%H%M') modules
+# One `tests-run-all-<tag>` target per tag used by any suite, e.g.
+# `make tests-run-all-open5gs` or `make tests-run-all-oai-cn`. The tag list is
+# derived from the suites' `Test Tags` lines.
+TEST_TAGS := $(sort $(shell sed -n 's/^Test Tags//p'                          \
+    modules/*/stacks/*/tests/*.robot | tr 'A-Z' 'a-z'))
+$(addprefix tests-run-all-,${TEST_TAGS}): tests-run-all-%: tests-install-venv
+	${ROBOT} -N "open5Gcube" -i $*                                            \
+	    -d tests/results/all-$*/$$(date '+%Y%m%d-%H%M') modules
 
 # Explicit tests-run-<stack> targets for every stack that has a tests/ directory
 # e.g. `make tests-run-ueransim-open5gs`.
@@ -24,7 +29,8 @@ $(addprefix tests-run-,${TEST_STACKS}): tests-run-%: tests-install-venv
 	    $(wildcard modules/*/stacks/$*/tests)
 
 tests-lint: tests-install-venv
-	$(ACTIVATE_TEST_VENV); robocop check --config tests/robocop.toml modules tests
+	$(ACTIVATE_TEST_VENV); robocop check --config tests/robocop.toml           \
+	    modules/*/stacks tests
 
 tests-clean:
 	rm -rf tests/results
