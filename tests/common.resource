@@ -12,12 +12,14 @@ Library  get_env.py
 # docker/srsran/4g/entrypoint.sh; UERANSIM creates uesimtun0 itself.
 &{UE_TUN_IFACE}  oai=oaitun_ue1  ueransim=uesimtun0  srsran=tun_srsue
 
-# Core-specific assertions. The AMF and SMF log formats differ between OAI and
-# Open5GS, so each core gets its own keyword and CORE_TYPE picks the pair.
+# Core-specific assertions. The AMF and SMF log formats differ between the cores,
+# so each core gets its own keyword and CORE_TYPE picks the pair.
 &{CORE_PDU_SESSION_KW}   oai=OAI SMF Log Should Contain PDU Session Setup
 ...                      open5gs=Open5GS SMF Log Should Contain PDU Session Setup
+...                      free5gc=Free5GC SMF Log Should Contain PDU Session Setup
 &{CORE_REGISTRATION_KW}  oai=OAI AMF Log Should Show UE Registered
 ...                      open5gs=Open5GS AMF Log Should Show UE Registered
+...                      free5gc=Free5GC AMF Log Should Show UE Registered
 
 
 *** Keywords ***
@@ -183,3 +185,13 @@ OAI SMF Log Should Contain PDU Session Setup
 Open5GS SMF Log Should Contain PDU Session Setup
     Container Log Should Match Regexp  smf  \\[Added\\] Number of SMF-Sessions is now
     Container Log Should Match Regexp  smf  UE SUPI\\[imsi-\\d+\\] DNN\\[.*\\] IPv4\\[\\d
+
+Free5GC AMF Log Should Show UE Registered
+    [Arguments]  ${imsi}
+    Container Log Should Match Regexp  amf  supi:SUPI:imsi-${imsi}.*Handle Registration Complete
+
+Free5GC SMF Log Should Contain PDU Session Setup
+    Container Log Should Match Regexp  smf  Receive Create SM Context Request
+    Container Log Should Match Regexp  smf  In HandlePDUSessionEstablishmentRequest
+    Container Log Should Match Regexp  smf  Sending PFCP Session Establishment Request
+    Container Log Should Match Regexp  smf  Received PFCP Session Establishment Accepted Response
