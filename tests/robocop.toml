@@ -3,4 +3,8 @@ ignore = [
     "missing-doc-keyword",
     "missing-doc-test-case",
     "wrong-case-in-keyword-name",
+    # Suites declare variables (UE_TYPE, STACK, ...) that only common.resource
+    # consumes, as keyword defaults. Robocop analyses each file on its own, so it
+    # cannot see those uses and reports every such variable as unused.
+    "unused-variable",
 ]

@@ -1,60 +1,31 @@
 *** Settings ***
 Documentation   srsRAN 5G SA with Open5GS core, ZMQ RF simulation
-Force Tags      Emulated
+Test Tags       Emulated  srsran  open5gs
 Resource        ../../../../../tests/common.resource
-
-Suite Setup     Setup Suite
-Suite Teardown  Teardown Suite
+Suite Setup     Setup Stack
+Suite Teardown  Teardown Stack
 
 
 *** Variables ***
-${STACK}  srsran-open5gs-5g-emu
+${STACK}          srsran-open5gs-5g-emu
+${UE_TYPE}        srsran
+${CORE_TYPE}      open5gs
+@{CONTAINERS}     upf  smf  amf  nrf  udr  udm  ausf  pcf  bsf  nssf  scp  gnb  ue
+@{FILES_TO_SAVE}  gnb:/mnt/srsran/gnb.yaml
 
 
 *** Test Cases ***
 Verify Successful Startup
-    Containers Should Running  upf  smf  amf  nrf  udr  udm  ausf  pcf  bsf  nssf  scp  gnb  ue  mongo
+    Containers Should Be Running  @{CONTAINERS}
     No Running Container Should Be  unhealthy
     No Running Container Should Be  starting
     No Container Should Be Failed
 
 Verify UE Is Registered At AMF
-    ${MCC}=  Get Env  MCC
-    ${MNC}=  Get Env  MNC
-    ${UE_SOFT_MSIN}=  Get Env  UE_SOFT_MSIN
-    Container Log Should Match Regexp  amf  \\[imsi-${MCC}${MNC}${UE_SOFT_MSIN}\\] Registration complete
+    UE Should Be Registered At AMF
 
 Verify UE Connectivity
-    srsRAN UE Should Can Ping  8.8.8.8
+    UE Should Reach The Internet
 
 Verify PDU Session Establishment At SMF
-    Open5GS SMF Log Should Contain PDU Session Setup
-
-Collect Test Data
-    Collect Container Logs
-    Collect Container Versions
-    Collect Configuration Files
-
-
-*** Keywords ***
-Setup Suite
-    Log To Console  Setup Suite: run 'make run-${STACK}'
-    Start Process   make  run-${STACK}
-    Sleep  5s
-    Process Should Be Running
-    Wait Until Startup Complete  Open5GS SMF Log Should Contain PDU Session Setup
-
-Teardown Suite
-    Log To Console  Teardown Suite: run 'make stop-${STACK}'
-    Run Process   make  stop-${STACK}
-    No Container Should Running  upf  smf  amf  nrf  udr  udm  ausf  pcf  bsf  nssf  scp  gnb  ue  mongo
-    Terminate All Processes  kill=True
-
-Collect Container Logs
-    Save Container Logs  upf  smf  amf  nrf  udr  udm  ausf  pcf  bsf  nssf  scp  gnb  ue  mongo
-
-Collect Container Versions
-    Set Container Versions Metadata  upf  smf  amf  nrf  udr  udm  ausf  pcf  bsf  nssf  scp  gnb  ue
-
-Collect Configuration Files
-    Save Local Files  gnb.yaml
+    SMF Log Should Contain PDU Session Setup
