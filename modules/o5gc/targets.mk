@@ -117,10 +117,13 @@ run-oai-5g-minimalist-rfsim: .create-running-env
 
 run-oairan-open5gs-5g: .create-running-env  ##
 	$(call run_stack,o5gc,oairan-open5gs-5g,core gnb)
-stop-oairan-open5gs-5g:  ##
-	$(call stop_stack,o5gc,oairan-open5gs-5g,core gnb)
+stop-oairan-open5gs-5g stop-oairan-open5gs-5g-rfsim:  ##
+	$(call stop_stack,o5gc,oairan-open5gs-5g,core gnb ue)
 run-oairan-open5gs-5g-gnb run-oairan-open5gs-5g-core: .create-running-env
 	$(call run_stack,o5gc,oairan-open5gs-5g,$(subst run-oairan-open5gs-5g-,,$@))
+run-oairan-open5gs-5g-rfsim: .create-running-env
+	export OAI_RFSIM_ENABLE=1;                                                \
+	$(call run_stack,o5gc,oairan-open5gs-5g,gnb core ue)
 
 run-oairan-free5gc-5g: .create-running-env  ##
 	$(call run_stack,o5gc,oairan-free5gc-5g,core gnb)
