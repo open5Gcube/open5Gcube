@@ -4,6 +4,11 @@ services:
       file: ${DOCKER}/oai/services.yaml
       service: gnb
 
+  ue:
+    extends:
+      file: ${DOCKER}/oai/services.yaml
+      service: ue
+
   mongo:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
