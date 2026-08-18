@@ -152,7 +152,7 @@ services:
     extends:
       file: ${MODULES}/base/docker/o5gc/services.yaml
       service: base-ran
-    image: o5gc/oai-ran
+    image: o5gc/oai-ran:2026.w25-4.4.0.0
     entrypoint: /o5gc/openairinterface5g/ran-entrypoint.sh
     init: true
     environment:
@@ -181,6 +181,7 @@ services:
     extends:
       service: oai-ran
     container_name: gnb
+    command: gnb
     environment:
       - DOCKER_TARGET_HOSTNAME=${GNB_HOSTNAME}
     networks:
@@ -188,6 +189,8 @@ services:
         ipv4_address: ${GNB_RAN_IP_ADDR}
       corenet:
         ipv4_address: ${GNB_IP_ADDR}
+    volumes:
+      - ./gnb.conf:/o5gc/openairinterface5g/etc/gnb.conf:ro
     profiles: [ "gnb" ]
 
   ue:
@@ -197,6 +200,12 @@ services:
     networks:
       ran:
         ipv4_address: ${UE_RAN_IP_ADDR}
+      rfnet: !override {}
+    volumes:
+      - ./ue.conf:/o5gc/openairinterface5g/etc/nr-ue.conf:ro
+    command: nr-ue -r 106 --numerology 1 --band ${NR_BAND} -C $(scripts/band_helper.py arfcn_to_freq ${NR_ARFCN})
+    environment:
+      - OAI_RFSIM_SERVERADDR=${GNB_RAN_IP_ADDR}
     profiles: [ "ue" ]
 
   oai-ran-tracer:

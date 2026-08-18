@@ -36,23 +36,11 @@ services:
     extends:
       file: ${DOCKER}/oai/services.yaml
       service: gnb
-    image: o5gc/oai-ran:2024.w23-4.4.0.0
-    command: gnb --sa
-    volumes:
-      - ./gnb.conf:/o5gc/openairinterface5g/etc/gnb.conf:ro
 
   ue:
     extends:
       file: ${DOCKER}/oai/services.yaml
       service: ue
-    image: o5gc/oai-ran:2024.w23-4.4.0.0
-    command: nr-ue -r 106 --numerology 1 --band 78 -C 3619200000
-    environment:
-      - OAI_RFSIM_SERVERADDR=${GNB_RAN_IP_ADDR}
-    volumes:
-      - ./ue.conf:/o5gc/openairinterface5g/etc/nr-ue.conf:ro
-    networks:
-      rfnet: !override {}
 
   o5gc-dns:
     image: cytopia/bind:stable-0.28

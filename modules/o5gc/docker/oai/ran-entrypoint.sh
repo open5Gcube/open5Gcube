@@ -91,7 +91,7 @@ case "${srv}" in
         fi
         [ -n "${B210_DETECTED}" ] && SOFTMODEM_ARGS+=" -E"
         args=$(eval echo ${@:2})
-        build/nr-uesoftmodem --sa --nokrnmod                                  \
+        build/nr-uesoftmodem                                                  \
             --usrp-args ${USRP_ARGS} --clock-source 1 ${SOFTMODEM_ARGS}       \
             -O ${cfg_file} ${args}
         wait_pid=$!
