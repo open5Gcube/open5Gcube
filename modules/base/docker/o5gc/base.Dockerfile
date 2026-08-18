@@ -29,9 +29,11 @@ RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime                          \
 # setup ccache
 RUN /usr/sbin/update-ccache-symlinks
 ENV PATH="/usr/lib/ccache:${PATH}"
-# setup git caching
-RUN [ ${USE_BUILD_CACHER} -eq 0 ] ||                                          \
-git config --global url."http://o5gc-build-cacher:40862/".insteadOf https://
+# setup git
+RUN ([ ${USE_BUILD_CACHER} -eq 0 ] ||                                         \
+        git config --global url."http://o5gc-build-cacher:40862/".insteadOf https://) \
+    && git config --global user.name 'open5Gcube'                             \
+    && git config --global user.email 'o5gc@open5gcube.de'
 # At login
 # - run updatedb
 # - disable apt proxy

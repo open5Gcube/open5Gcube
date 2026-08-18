@@ -38,8 +38,7 @@ RUN git clone --branch v${OPEN5GS_VERSION} --depth 1                          \
         https://github.com/open5gs/open5gs .
 
 COPY *.patch .
-RUN git -c user.name='o5gc' -c user.email='o5gc@fkie.fraunhofer.de'           \
-        am ./*.patch                                                          \
+RUN git am ./*.patch                                                          \
     && sync-cache.sh download open5gs ccache                                  \
     && meson build --prefix=/o5gc/open5gs/install                             \
     && ninja -C build install                                                 \
