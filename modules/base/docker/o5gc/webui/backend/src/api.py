@@ -5,7 +5,7 @@ import docker
 import subprocess
 import sys
 from io import StringIO
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from types import ModuleType
 from http import HTTPStatus
@@ -206,6 +206,49 @@ def get_containers():
     return {
         "containers": status_module.get_running_containers()
     }
+
+
+# Separate from /containers because that endpoint ships the full inspect JSON of every
+# container (~200 kB per poll) while this one is a ~4 kB projection of raw counters.
+@bp.get('/containers/stats')
+def get_container_stats():
+    status_module = import_status_module()
+
+    try:
+        return status_module.get_container_stats()
+    except docker.errors.DockerException:
+        # A dead socket degrades to an empty readout rather than failing the poll
+        return {"stats": {}, "time": datetime.now(timezone.utc).isoformat()}
+
+
+# Per container by design, see status.get_container_processes()
+@bp.get('/containers/<string:container_id>/processes')
+def get_container_processes(container_id: str):
+    status_module = import_status_module()
+
+    try:
+        return status_module.get_container_processes(container_id)
+    except status_module.ContainerNotFoundException:
+        abort(HTTPStatus.NOT_FOUND)
+    except docker.errors.DockerException:
+        return "Docker is not available.", HTTPStatus.SERVICE_UNAVAILABLE
+
+
+@bp.get('/host')
+def get_host():
+    status_module = import_status_module()
+
+    return status_module.get_host_info()
+
+
+@bp.get('/host/images')
+def get_host_images():
+    status_module = import_status_module()
+
+    try:
+        return status_module.get_host_image_usage()
+    except docker.errors.DockerException:
+        return "Docker is not available.", HTTPStatus.SERVICE_UNAVAILABLE
 
 
 def get_logs(status_module, host_id, container_id, stdout, stderr, timestamps, tail, since, until):

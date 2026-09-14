@@ -9,6 +9,8 @@
           <!---<q-icon name="view_in_ar" class="text-h4" />-->
           {{ toolbarTitleContent }}
         </q-toolbar-title>
+        <!-- Host metrics are shown on every page, independent of the running stack chips below -->
+        <HostStripComponent class="q-mr-lg" />
         <div v-if="$route.path.startsWith('/service')" class="row items-center">
           <span class="text-subtitle2 q-mr-sm">Running Stacks:</span>
           <div v-if="runningStacks && runningStacks.length > 0" class="row items-center q-gutter-x-sm">
@@ -54,6 +56,7 @@
 <script>
 import { ref } from 'vue'
 import DrawerComponent from 'components/DrawerComponent.vue'
+import HostStripComponent from 'components/HostStripComponent.vue'
 import { useStackStore } from 'src/stores/stacks'
 import { useSettingsStore } from 'src/stores/settings'
 import { storeToRefs } from 'pinia'
@@ -61,7 +64,8 @@ import { storeToRefs } from 'pinia'
 export default {
 
   components: {
-    DrawerComponent
+    DrawerComponent,
+    HostStripComponent
   },
 
   setup () {

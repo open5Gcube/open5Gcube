@@ -14,3 +14,7 @@ def get_container_logs(host: str, container_id: str,
                        stdout: bool, stderr: bool, timestamps: bool, tail: int | str,
                        since: datetime | None, until: datetime | None) -> str:
     raise ContainerNotFoundException()
+
+
+def get_container_processes(container_id: str) -> Dict:
+    raise ContainerNotFoundException()

@@ -9,13 +9,23 @@
           indicator-color="white"
           align="center"
         >
+          <q-tab name="overview" label="Overview" />
           <q-tab name="logs" label="Logs" />
+          <q-tab name="environment" label="Environment" />
           <q-tab name="inspect" label="Inspect" />
         </q-tabs>
 
         <q-tab-panels v-model="tab" class="column col">
+          <q-tab-panel name="overview" class="column col q-pa-none">
+            <ServiceOverviewComponent :service-id="$route.params.serviceId" class="column col" />
+          </q-tab-panel>
+
           <q-tab-panel name="logs" class="column col q-pa-none">
             <ServiceLogComponent :key="`${$route.params.serviceId}-detail`" :service-id="$route.params.serviceId" :service-title-as-link="false" :status-line="true" class="column col" />
+          </q-tab-panel>
+
+          <q-tab-panel name="environment" class="column col q-pa-none">
+            <ServiceEnvironmentComponent :service-id="$route.params.serviceId" class="column col" />
           </q-tab-panel>
 
           <q-tab-panel name="inspect" class="column col q-pa-none">
@@ -30,6 +40,8 @@
 import { onMounted, onUnmounted, ref, nextTick } from 'vue';
 import ServiceLogComponent from 'src/components/ServiceLogComponent.vue';
 import ServiceInspectComponent from 'src/components/ServiceInspectComponent.vue';
+import ServiceOverviewComponent from 'src/components/ServiceOverviewComponent.vue';
+import ServiceEnvironmentComponent from 'src/components/ServiceEnvironmentComponent.vue';
 import { useServiceStore } from 'src/stores/services';
 import { useStackStore } from 'src/stores/stacks';
 import { storeToRefs } from 'pinia';
@@ -38,7 +50,7 @@ import { useRoute } from 'vue-router';
 
 export default {
   components: {
-    ServiceLogComponent, ServiceInspectComponent
+    ServiceLogComponent, ServiceInspectComponent, ServiceOverviewComponent, ServiceEnvironmentComponent
   },
   emits: ['tabs', 'toolbar-title-content'],
   setup(_props, context) {

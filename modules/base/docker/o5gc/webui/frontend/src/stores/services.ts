@@ -81,6 +81,52 @@ type ServiceLogApiType = {
   }[]
 }
 
+/*
+ * Container resource usage. The backend sends raw cumulative counters only: the CPU
+ * percentage and the network and block rates are deltas of two samples, computed here.
+ */
+type ContainerStatsType = {
+  cpu_total: number;
+  cpu_system: number|null;
+  online_cpus: number|null;
+  net_rx: number;
+  net_tx: number;
+  blk_read: number;
+  blk_write: number;
+  // Absolute, no delta needed
+  mem_usage: number;
+  mem_limit: number|null;
+  pids: number|null;
+}
+
+type ContainerStatsSampleType = {
+  stats: {[containerId: string]: ContainerStatsType};
+  time: string;
+}
+
+// Titles are whatever the host's ps printed for "docker top", not a fixed set of columns.
+type ContainerProcessesType = {
+  titles: string[];
+  processes: string[][];
+}
+
+// A pair of byte figures; for block devices "rx" is read and "tx" is write.
+type ByteRateType = {
+  rx: number;
+  tx: number;
+}
+
+// Number of CPU samples kept per container: 30 ticks of 2 s = the last minute.
+const CPU_HISTORY_LENGTH = 30;
+
+/*
+ * Longest distance between two samples that still counts as one uninterrupted series.
+ * Only the open detail view polls, so the series pauses whenever that tab is left: a
+ * percentage across such a pause would average over minutes, and the trace would draw the
+ * samples on either side of it as neighbours.
+ */
+const MAX_SAMPLE_GAP_SECONDS = 5;
+
 type UpdateServiceNamesAndStatusIntervalInfoType = {
   nextSubscriberId: number,
   subscribers: {
@@ -97,6 +143,18 @@ export const useServiceStore = defineStore('services', {
   state(){
     const services: ServicesType = {};
     const serviceOrder: string[] = [];
+    const containerStats: ContainerStatsSampleType|null = null;
+    const previousContainerStats: ContainerStatsSampleType|null = null;
+    // Per container ring buffer of cpu percentages, oldest first; a null is a tick whose
+    // value is unknown, so the trace breaks instead of dropping to a zero that never was.
+    const cpuHistory: {[containerId: string]: (number|null)[]} = {};
+    const _statsLoading = false;
+    const _statsLoadedAt: number|null = null;
+    // Only ever holds the container of the detail view that is open, see loadContainerProcesses()
+    const containerProcesses: {[containerId: string]: ContainerProcessesType} = {};
+    // Kept apart so a view can tell "not fetched yet" from "cannot be fetched"
+    const _processesLoadingFor: string|null = null;
+    const _processesFailedFor: string|null = null;
     const _updateMutex = new Mutex();
     const _updateServicesIntervalInfo: UpdateServiceNamesAndStatusIntervalInfoType = {
       nextSubscriberId: 0,
@@ -106,7 +164,10 @@ export const useServiceStore = defineStore('services', {
     }
 
     return {
-        services, serviceOrder, _updateMutex, _updateServicesIntervalInfo
+        services, serviceOrder, containerStats, previousContainerStats, cpuHistory,
+        containerProcesses, _statsLoading, _statsLoadedAt,
+        _processesLoadingFor, _processesFailedFor,
+        _updateMutex, _updateServicesIntervalInfo
     }
   },
   getters: {
@@ -179,6 +240,19 @@ export const useServiceStore = defineStore('services', {
         return state.services[id].status.Config.Image;
       }
     },
+    // Config.Env holds one "NAME=value" string per entry, and a value may contain "=".
+    environment: (state) => {
+      return (id: string): {name: string, value: string}[]|null => {
+        if(!(id in state.services)) return null;
+        if(!('Config' in state.services[id].status) || !('Env' in state.services[id].status.Config)) return null;
+
+        return (state.services[id].status.Config.Env || []).map((entry: string) => {
+          const separator = entry.indexOf('=');
+          if(separator === -1) return {name: entry, value: ''};
+          return {name: entry.slice(0, separator), value: entry.slice(separator + 1)};
+        });
+      }
+    },
     labelValue: (state) => {
       return (id: string, label: string): string|null => {
         if(!(id in state.services)) return null;
@@ -222,6 +296,31 @@ export const useServiceStore = defineStore('services', {
         if(!('State' in state.services[id].status) || !('ExitCode' in state.services[id].status.State)) return null;
 
         return Number(state.services[id].status.State.ExitCode);
+      }
+    },
+    restartCount: (state) => {
+      return (id: string): number|null => {
+        if(!(id in state.services)) return null;
+        if(!('RestartCount' in state.services[id].status)) return null;
+
+        return Number(state.services[id].status.RestartCount);
+      }
+    },
+    restartPolicy: (state) => {
+      return (id: string): string|null => {
+        if(!(id in state.services)) return null;
+        if(!('HostConfig' in state.services[id].status) || !('RestartPolicy' in state.services[id].status.HostConfig)) return null;
+
+        return state.services[id].status.HostConfig.RestartPolicy.Name || 'no';
+      }
+    },
+    // Path and Args are the command line the container runs, not the image's default.
+    command: (state) => {
+      return (id: string): string|null => {
+        if(!(id in state.services)) return null;
+        if(!('Path' in state.services[id].status)) return null;
+
+        return [state.services[id].status.Path, ...(state.services[id].status.Args || [])].join(' ');
       }
     },
     ipv4Addresses: (state) => {
@@ -305,6 +404,160 @@ export const useServiceStore = defineStore('services', {
       return state.visibleServiceIdsSorted.map((serviceId: string) => state.services[serviceId])
     },
     runningVisibleServiceNames: (state) => state.visibleServiceIds.filter((serviceId: string) => state.executionStatus(serviceId) === 'running'),
+
+    // The window the rates are measured over, from the timestamps the server sent.
+    statsSampleSeconds: (state): number|null => {
+      if(!state.containerStats || !state.previousContainerStats) return null;
+      const seconds = (new Date(state.containerStats.time).getTime()
+                       - new Date(state.previousContainerStats.time).getTime()) / 1000;
+      return seconds > 0 ? seconds : null;
+    },
+    // Percentage of one core: a container using four of them reports 400%.
+    cpuPercent: (state) => {
+      return (id: string): number|null => {
+        const current = state.containerStats?.stats[id];
+        const previous = state.previousContainerStats?.stats[id];
+        if(!current || !previous) return null;
+        if(current.cpu_system === null || previous.cpu_system === null) return null;
+
+        const cpuDelta = current.cpu_total - previous.cpu_total;
+        const systemDelta = current.cpu_system - previous.cpu_system;
+
+        // A negative delta means the container restarted and the counters were reset
+        if(systemDelta <= 0 || cpuDelta < 0) return null;
+
+        return cpuDelta / systemDelta * (current.online_cpus || 1) * 100;
+      }
+    },
+    memoryBytes: (state) => {
+      return (id: string): number|null => {
+        const current = state.containerStats?.stats[id];
+        return current ? current.mem_usage : null;
+      }
+    },
+    // The host's RAM, not a container limit: no stack service sets one.
+    memoryLimit: (state) => {
+      return (id: string): number|null => {
+        const current = state.containerStats?.stats[id];
+        return current ? current.mem_limit : null;
+      }
+    },
+    netRate: (state) => {
+      return (id: string): ByteRateType|null => {
+        const current = state.containerStats?.stats[id];
+        const previous = state.previousContainerStats?.stats[id];
+        const seconds = state.statsSampleSeconds;
+        if(!current || !previous || !seconds) return null;
+
+        const rx = current.net_rx - previous.net_rx;
+        const tx = current.net_tx - previous.net_tx;
+        if(rx < 0 || tx < 0) return null;
+
+        return {rx: rx / seconds, tx: tx / seconds};
+      }
+    },
+    blockRate: (state) => {
+      return (id: string): ByteRateType|null => {
+        const current = state.containerStats?.stats[id];
+        const previous = state.previousContainerStats?.stats[id];
+        const seconds = state.statsSampleSeconds;
+        if(!current || !previous || !seconds) return null;
+
+        const read = current.blk_read - previous.blk_read;
+        const write = current.blk_write - previous.blk_write;
+        if(read < 0 || write < 0) return null;
+
+        return {rx: read / seconds, tx: write / seconds};
+      }
+    },
+    // Counters since the container started, which the rates above are deltas of.
+    netTotal: (state) => {
+      return (id: string): ByteRateType|null => {
+        const current = state.containerStats?.stats[id];
+        return current ? {rx: current.net_rx, tx: current.net_tx} : null;
+      }
+    },
+    blockTotal: (state) => {
+      return (id: string): ByteRateType|null => {
+        const current = state.containerStats?.stats[id];
+        return current ? {rx: current.blk_read, tx: current.blk_write} : null;
+      }
+    },
+    processList: (state) => {
+      return (id: string): ContainerProcessesType|null => state.containerProcesses[id] || null;
+    },
+    processListFailed: (state) => {
+      return (id: string): boolean => state._processesFailedFor === id;
+    },
+    // Tasks in the pids cgroup, the PIDS column of "docker stats": every thread counts, so
+    // this is well above the number of processes in processList() for a threaded softmodem.
+    pidCount: (state) => {
+      return (id: string): number|null => {
+        const current = state.containerStats?.stats[id];
+        return current ? current.pids : null;
+      }
+    },
+    /*
+     * The cpu history as plottable points, one segment per uninterrupted run of samples.
+     *
+     * Newest sample at the right edge, the trace growing leftwards as the buffer fills.
+     * The vertical scale is 0..100% (one core) unless a container uses more, in which case
+     * it stretches to the peak of the window - so the common case stays comparable between
+     * services and a softmodem burning four cores is still on screen.
+     */
+    cpuSparklineSegments: (state) => {
+      return (id: string, width = 60, height = 16): {x: number, y: number}[][] => {
+        const samples = state.cpuHistory[id];
+        if(!samples) return [];
+
+        const maximum = Math.max(100, ...samples.filter((value: number|null) => value !== null));
+        const step = width / (CPU_HISTORY_LENGTH - 1);
+        // Leave room for the stroke so a flat 0% line is not clipped at the bottom edge.
+        const top = 1;
+        const bottom = height - 1;
+
+        const segments: {x: number, y: number}[][] = [];
+        let segment: {x: number, y: number}[]|null = null;
+        samples.forEach((value: number|null, index: number) => {
+          if(value === null) {
+            segment = null;
+            return;
+          }
+          if(segment === null) {
+            segment = [];
+            segments.push(segment);
+          }
+          segment.push({
+            x: width - (samples.length - 1 - index) * step,
+            y: bottom - Math.min(value, maximum) / maximum * (bottom - top)
+          });
+        });
+        return segments;
+      }
+    },
+    cpuSparkline: (state) => {
+      return (id: string, width = 60, height = 16): string => {
+        return state.cpuSparklineSegments(id, width, height).map(
+          (segment: {x: number, y: number}[]) => segment.map(
+            (point: {x: number, y: number}, index: number) =>
+              `${index === 0 ? 'M' : 'L'}${point.x.toFixed(1)} ${point.y.toFixed(1)}`
+          ).join('')
+        ).join('');
+      }
+    },
+    // The same trace closed down to the baseline, to be filled underneath the stroke.
+    cpuSparklineArea: (state) => {
+      return (id: string, width = 60, height = 16): string => {
+        const bottom = (height - 1).toFixed(1);
+        return state.cpuSparklineSegments(id, width, height).filter(
+          (segment: {x: number, y: number}[]) => segment.length > 1
+        ).map((segment: {x: number, y: number}[]) =>
+          `M${segment[0].x.toFixed(1)} ${bottom}`
+          + segment.map((point: {x: number, y: number}) => `L${point.x.toFixed(1)} ${point.y.toFixed(1)}`).join('')
+          + `L${segment[segment.length - 1].x.toFixed(1)} ${bottom}Z`
+        ).join('');
+      }
+    },
   },
   actions: {
     async loadServiceNamesAndStatus() {
@@ -366,6 +619,75 @@ export const useServiceStore = defineStore('services', {
 
             this.serviceOrder = serviceOverview.map(l => l.container_id);
         });
+    },
+    /*
+     * One sample of the resource counters of every running container. The in flight flag
+     * and the minimum age collapse the calls of several subscribers into one request.
+     */
+    async loadContainerStats() {
+      const minimumAgeMs = 1000;
+      if(this._statsLoading) return;
+      if(this._statsLoadedAt && Date.now() - this._statsLoadedAt < minimumAgeMs) return;
+
+      this._statsLoading = true;
+      let sample: ContainerStatsSampleType|null = null;
+      try {
+        sample = (await api.get('api/containers/stats')).data;
+      } catch {
+        // Polled continuously: a missed sample leaves the previous one on screen
+        return;
+      } finally {
+        this._statsLoading = false;
+        this._statsLoadedAt = Date.now();
+      }
+
+      if(!sample) return;
+
+      const sampleTime = new Date(sample.time).getTime();
+      const previousTime = this.containerStats ? new Date(this.containerStats.time).getTime() : null;
+      const continuous = previousTime !== null
+                         && (sampleTime - previousTime) / 1000 <= MAX_SAMPLE_GAP_SECONDS;
+
+      this.previousContainerStats = continuous ? this.containerStats : null;
+      this.containerStats = sample;
+
+      if(!continuous) this.cpuHistory = {};
+
+      for(const containerId of Object.keys(sample.stats)) {
+        const history = this.cpuHistory[containerId] || (this.cpuHistory[containerId] = []);
+        history.push(this.cpuPercent(containerId));
+        if(history.length > CPU_HISTORY_LENGTH) history.splice(0, history.length - CPU_HISTORY_LENGTH);
+      }
+
+      // A restarted container comes back under a new id, so its buffer would linger
+      for(const containerId of Object.keys(this.cpuHistory)) {
+        if(!(containerId in sample.stats)) delete this.cpuHistory[containerId];
+      }
+    },
+    /*
+     * The process list of the container whose detail view is open: "docker top" costs
+     * several times a stats sample, so it is not fetched for a whole stack. The sample
+     * replaces the whole map, leaving no list behind per service visited.
+     */
+    async loadContainerProcesses(containerId: string) {
+      // Keyed by container rather than a single in flight flag: skipping the request for
+      // the service just switched to would leave its view empty until the next tick.
+      if(this._processesLoadingFor === containerId) return;
+
+      this._processesLoadingFor = containerId;
+      try {
+        const processes = (await api.get(`api/containers/${containerId}/processes`)).data;
+
+        // A newer request for another container took over while this one was in flight
+        if(this._processesLoadingFor !== containerId) return;
+
+        this.containerProcesses = {[containerId]: processes};
+        this._processesFailedFor = null;
+      } catch {
+        this._processesFailedFor = containerId;
+      } finally {
+        if(this._processesLoadingFor === containerId) this._processesLoadingFor = null;
+      }
     },
     _startUpdateServicesInterval() {
       const intervalPower = Math.min(...Object.values(this._updateServicesIntervalInfo.subscribers).map(sub => sub.intervalPower));

@@ -233,6 +233,145 @@ def test_get_containers_raises(tmp_path, client):
         response = client.get('/api/containers')
 
 
+def test_get_container_stats_successful(tmp_path, client):
+    response = client.get('/api/containers/stats')
+
+    assert response.status_code == 200
+    assert response.content_type == "application/json"
+
+    # Raw cumulative counters pass through untouched: the percentage is a delta of two
+    # polls and is computed in the frontend, not here.
+    assert response.json == {
+        "stats": {
+            "123abc": {
+                "cpu_total": 17376857000,
+                "cpu_system": 541012150000000,
+                "online_cpus": 16,
+                "net_rx": 12345,
+                "net_tx": 67890,
+                "blk_read": 2580480,
+                "blk_write": 16384,
+                "mem_usage": 36663296,
+                "mem_limit": 33240776704,
+                "pids": 3
+            }
+        },
+        "time": "2026-09-09T17:30:00+00:00"
+    }
+
+
+def test_get_container_stats_docker_unavailable(tmp_path, client):
+    # Overwrite with status.py that has no access to the Docker socket
+    shutil.copy(tmp_path / "test_instance" / "status_no_docker.py", tmp_path / "test_instance" / "status.py")
+
+    response = client.get('/api/containers/stats')
+
+    # Like /host, a dead socket degrades to an empty readout instead of failing the poll
+    assert response.status_code == 200
+    assert response.json["stats"] == {}
+    assert response.json["time"]
+
+
+def test_get_container_processes_successful(tmp_path, client):
+    response = client.get('/api/containers/123abc/processes')
+
+    assert response.status_code == 200
+    assert response.content_type == "application/json"
+
+    # The columns are whatever ps printed and are passed through for the frontend to render
+    assert response.json["titles"] == ["USER", "PID", "PRI", "%CPU", "%MEM", "VIRT", "RES",
+                                       "STAT", "START", "TIME", "COMMAND"]
+    # Processes, not tasks: this is where the process count of the detail view comes from,
+    # while the pids counter of /containers/stats counts every thread as well.
+    assert len(response.json["processes"]) == 2
+    assert response.json["processes"][0][-1] == "./build/nr-gnb -c config/gnb.yaml"
+
+
+def test_get_container_processes_container_not_found(tmp_path, client):
+    shutil.copy(tmp_path / "test_instance" / "status_container_not_found.py", tmp_path / "test_instance" / "status.py")
+
+    response = client.get('/api/containers/123abc/processes')
+
+    assert response.status_code == 404
+
+
+def test_get_container_processes_docker_unavailable(tmp_path, client):
+    # Overwrite with status.py that has no access to the Docker socket
+    shutil.copy(tmp_path / "test_instance" / "status_no_docker.py", tmp_path / "test_instance" / "status.py")
+
+    response = client.get('/api/containers/123abc/processes')
+
+    # Nothing to fall back on: unlike the stats there is no previous sample to keep showing
+    assert response.status_code == 503
+
+
+def test_get_host_successful(tmp_path, client):
+    response = client.get('/api/host')
+
+    assert response.status_code == 200
+    assert response.content_type == "application/json"
+
+    assert response.json == {
+        "docker": {
+            "version": "28.5.2",
+            "images": 111
+        },
+        "os": {
+            "name": "Ubuntu 24.04.4 LTS",
+            "kernel": "7.0.0-30-generic",
+            "arch": "x86_64"
+        },
+        "cpu": {
+            "count": 16,
+            "loadavg": [1.11, 0.73, 0.36],
+            "jiffies": {"total": 16768523, "idle": 16254984}
+        },
+        "memory": {
+            "total_bytes": 33240797184,
+            "available_bytes": 21750579200
+        },
+        "time": "2026-09-09T17:30:00+00:00"
+    }
+
+
+def test_get_host_docker_unavailable(tmp_path, client):
+    # Overwrite with status.py that has no access to the Docker socket
+    shutil.copy(tmp_path / "test_instance" / "status_no_docker.py", tmp_path / "test_instance" / "status.py")
+
+    response = client.get('/api/host')
+
+    # A dead Docker socket must degrade the host info, not fail the request
+    assert response.status_code == 200
+    assert response.json["docker"] is None
+    assert response.json["cpu"]["count"] is None
+    assert response.json["cpu"]["loadavg"] == [1.11, 0.73, 0.36]
+    assert response.json["memory"]["available_bytes"] == 21750579200
+
+
+def test_get_host_images_successful(tmp_path, client):
+    response = client.get('/api/host/images')
+
+    assert response.status_code == 200
+    assert response.content_type == "application/json"
+
+    assert response.json == {
+        "count": 111,
+        "size_bytes": 48619000000,
+        "exact": True,
+        "store_total_bytes": 77374000000
+    }
+
+
+def test_get_host_images_docker_unavailable(tmp_path, client):
+    # Overwrite with status.py that has no access to the Docker socket
+    shutil.copy(tmp_path / "test_instance" / "status_no_docker.py", tmp_path / "test_instance" / "status.py")
+
+    response = client.get('/api/host/images')
+
+    # Unlike /host there is nothing to fall back on, so this one reports unavailable
+    assert response.status_code == 503
+
+
 def test_get_container_logs_successful_without_parameters_plain(tmp_path, client):
     response = client.get('/api/container/host1/container123/logs', headers={"Accept": "text/plain"})
 
