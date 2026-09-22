@@ -1,4 +1,4 @@
-FROM node:16-bullseye-slim
+FROM node:16-bookworm-slim
 
 RUN apt-get update                                                            \
     && DEBIAN_FRONTEND=noninteractive                                         \
@@ -15,7 +15,8 @@ RUN echo "dash dash/sh boolean false" | debconf-set-selections                \
 
 ARG SYNC_CACHES
 RUN for cache in ${SYNC_CACHES} downloads; do                                 \
-        echo -e "[$cache]\n"                                                  \
+        /bin/echo -e                                                          \
+            "[$cache]\n"                                                      \
             "path = /var/cache/$cache\n"                                      \
             "read only = no\n"                                                \
             "use chroot = false\n"                                            \
@@ -25,10 +26,11 @@ RUN for cache in ${SYNC_CACHES} downloads; do                                 \
 RUN chmod 666 /etc/default/apt-cacher-ng /etc/apt-cacher-ng/*                 \
     && sed -i 's|^\(RUNDIR=\).*|\1"/tmp/apt-cacher-ng"|'                      \
         /etc/init.d/apt-cacher-ng                                             \
-    && echo -e "SocketPath: /tmp/apt-cacher-ng/socket\n"                      \
-               "PidFile: /tmp/apt-cacher-ng/pid\n"                            \
-               "PassThroughPattern: .*\n"                                     \
-               "LogDir:\n"                                                    \
+    && /bin/echo -e                                                           \
+            "SocketPath: /tmp/apt-cacher-ng/socket\n"                         \
+            "PidFile: /tmp/apt-cacher-ng/pid\n"                               \
+            "PassThroughPattern: .*\n"                                        \
+            "LogDir:\n"                                                       \
         >> /etc/apt-cacher-ng/acng.conf
 
 COPY build-cacher-entrypoint.sh /
