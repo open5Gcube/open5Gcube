@@ -13,7 +13,7 @@ interfaces:
   n3:
     address: "${AMF_IP_ADDR}"
   n6:
-    name: "eth1"
+    name: "eth0"
   api:
     address: "0.0.0.0"
     port: 5002
