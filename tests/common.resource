@@ -221,11 +221,10 @@ Ellacore AMF Log Should Show UE Registered
     ...    single 'ellacore' container, so this and the SMF keyword both read that
     ...    container's structured (JSON) log rather than separate 'amf'/'smf' containers.
     [Arguments]  ${imsi}
-    Container Log Should Match Regexp  ellacore  "message_type":"RegistrationComplete","supi":"imsi-${imsi}"
+    Container Log Should Match Regexp  ellacore  "component":"AMF".*"msg":"UE registration accepted".*"supi":"imsi-${imsi}"
 
 Ellacore SMF Log Should Contain PDU Session Setup
-    Container Log Should Match Regexp  ellacore  "msg":"Allocated IPv4 address","component":"SMF"
-    Container Log Should Match Regexp  ellacore  "msg":"Successfully created PDU session context","component":"SMF"
+    Container Log Should Match Regexp  ellacore  "component":"SMF".*"msg":"PDU session established".*"result":"accept"
 
 srsEPC Log Should Show UE Attached
     [Documentation]  Assert the UE with the given IMSI progressed through NAS security to a completed attach.

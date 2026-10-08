@@ -2,8 +2,12 @@
 
 set -e
 
-wait-for-it -t 60 ${AMF_IP_ADDR}:5002
-sleep 1
+for i in $(seq 1 60); do
+    if curl -sSf http://${AMF_IP_ADDR}:5002/api/v1/status | grep -q '"ready":true'; then
+        break
+    fi
+    sleep 1
+done
 
 WEBUI_URL=http://${AMF_IP_ADDR}:5002
 

@@ -4,18 +4,18 @@ RUN mkdir -p /etc/apt/keyrings                                                \
     && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key   \
         | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg                   \
     && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg]"                \
-            "https://deb.nodesource.com/node_20.x nodistro main"              \
+            "https://deb.nodesource.com/node_24.x nodistro main"              \
         > /etc/apt/sources.list.d/nodesource.list                             \
     && apt-get.sh install nodejs nginx
 
-RUN cached-download.sh https://go.dev/dl/go1.21.3.linux-amd64.tar.gz          \
+RUN cached-download.sh https://go.dev/dl/go1.26.9.linux-amd64.tar.gz          \
     && tar -C /usr/local -zxvf go1.*.tar.gz                                   \
     && rm go1.*.tar.gz
 ENV PATH="$PATH:/usr/local/go/bin"
 
 WORKDIR /o5gc/ellacore
 
-ARG ELLACORE_VERSION=1.11.0
+ARG ELLACORE_VERSION=1.19.0
 RUN git clone --branch v${ELLACORE_VERSION} --depth 1                         \
         https://github.com/ellanetworks/core.git .                            \
     && REVISION=`git rev-parse HEAD`                                          \
