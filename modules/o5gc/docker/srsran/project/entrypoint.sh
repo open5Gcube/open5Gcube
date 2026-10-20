@@ -15,8 +15,13 @@ esac
 case "${srv}" in
     gnb)
         envsubst.sh /mnt/srsran/gnb.yaml gnb.yaml
+        # Optional stack specific config overlay, merged on top of gnb.yaml
+        touch gnb.overlay.yaml
+        if [ -f /mnt/stack/gnb.yaml ]; then
+            envsubst.sh /mnt/stack/gnb.yaml gnb.overlay.yaml
+        fi
         wait-for-it -t 60 ${AMF_IP_ADDR}:7777
-        exec /perf-wrapper.sh ./build/apps/gnb/gnb -c gnb.yaml -c /mnt/srsran/qos.yaml
+        exec /perf-wrapper.sh ./build/apps/gnb/gnb -c gnb.yaml -c /mnt/srsran/qos.yaml -c gnb.overlay.yaml
         ;;
     uhd_image_loader)
         (set +x;

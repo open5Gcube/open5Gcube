@@ -15,9 +15,6 @@ services:
     extends:
       file: ${DOCKER}/oai/services.yaml
       service: ue
-    networks: !override
-      ran:
-        ipv4_address: ${UE_RAN_IP_ADDR}
     # 51 PRB / 20 MHz at 30 kHz SCS with 3/4 sampling (-E) matches the gNB's 23.04 MHz srate
     command: >-
       nr-ue -r 51 --numerology 1 --band ${NR_BAND}

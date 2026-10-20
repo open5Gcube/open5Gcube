@@ -11,7 +11,7 @@ ${STACK}          srsran-open5gs-5g-emu
 ${UE_TYPE}        srsran
 ${CORE_TYPE}      open5gs
 @{CONTAINERS}     upf  smf  amf  nrf  udr  udm  ausf  pcf  bsf  nssf  scp  gnb  ue
-@{FILES_TO_SAVE}  gnb:/mnt/srsran/gnb.yaml
+@{FILES_TO_SAVE}  gnb:/o5gc/srsRAN_Project/gnb.yaml  gnb:/o5gc/srsRAN_Project/gnb.overlay.yaml
 
 
 *** Test Cases ***

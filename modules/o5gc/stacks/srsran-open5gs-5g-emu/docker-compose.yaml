@@ -7,7 +7,7 @@ services:
       - RF_DEVICE_DRIVER=zmq
       - RF_DEVICE_ARGS=tx_port=tcp://${GNB_RAN_IP_ADDR}:2000,rx_port=tcp://${UE_RAN_IP_ADDR}:2001,base_srate=23.04e6
     volumes:
-      - ./gnb.yaml:/mnt/srsran/gnb.yaml:ro
+      - ./gnb.yaml:/mnt/stack/gnb.yaml:ro
 
   ue:
     extends:
