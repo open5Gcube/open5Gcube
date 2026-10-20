@@ -1,0 +1,21 @@
+# Overlay for docker/ocudu/gnb.yaml: ZMQ virtual radio towards the OAI nrUE
+# https://docs.ocudu.org/tutorials/oaiue/
+
+ru_sdr:
+  device_driver: zmq
+  device_args: tx_port=tcp://${GNB_RAN_IP_ADDR}:2000,rx_port=tcp://${UE_RAN_IP_ADDR}:2001
+  tx_gain: -12                      # Backoff, the OAI fixed-point FFT saturates at full scale
+  rx_gain: 0
+  otw_format: default               # The ZMQ driver does not support sc12
+
+cell_cfg:
+  tdd_ul_dl_cfg:
+    dl_ul_tx_period: 5
+    nof_dl_slots: 3
+    nof_dl_symbols: 10
+    nof_ul_slots: 1
+    nof_ul_symbols: 2
+  csi:
+    csi_rs_enabled: false           # The OAI nrUE does not support CSI-RS for tracking (TRS)
+  pucch:
+    nof_cell_csi_res: 0             # Must be 0 when CSI-RS is disabled

@@ -6,7 +6,7 @@ services:
     image: o5gc/ocudu
     entrypoint: [ "/mnt/ocudu/entrypoint.sh" ]
     environment:
-      - OCUDU_LOGLEVEL=${OPEN5GS_LOGLEVEL:-info}
+      - OCUDU_LOGLEVEL=${OCUDU_LOGLEVEL:-info}
       - DOCKER_TARGET_HOSTNAME=${GNB_HOSTNAME}
     volumes:
       - .:/mnt/ocudu/:ro

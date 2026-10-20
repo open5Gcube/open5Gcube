@@ -14,27 +14,32 @@ esac
 
 cd /o5gc/ocudu
 envsubst.sh /mnt/ocudu/${srv}.yaml ./${srv}.yaml
+# Optional stack specific config overlay, merged on top of ${srv}.yaml
+touch ./${srv}.overlay.yaml
+if [ -f /mnt/stack/${srv}.yaml ]; then
+    envsubst.sh /mnt/stack/${srv}.yaml ./${srv}.overlay.yaml
+fi
 
 case "${srv}" in
     gnb)
         wait-for-it -t 60 ${AMF_IP_ADDR}:7777
-        exec /perf-wrapper.sh ./build/apps/gnb/gnb -c gnb.yaml
+        exec /perf-wrapper.sh ./build/apps/gnb/gnb -c gnb.yaml -c gnb.overlay.yaml
         ;;
     cu)
         wait-for-it -t 60 ${AMF_IP_ADDR}:7777
-        exec /perf-wrapper.sh ./build/apps/cu/ocu -c cu.yaml
+        exec /perf-wrapper.sh ./build/apps/cu/ocu -c cu.yaml -c cu.overlay.yaml
         ;;
     cu_cp)
-	    wait-for-it -t 60 ${AMF_IP_ADDR}:7777
-        exec /perf-wrapper.sh ./build/apps/cu_cp/ocucp -c cu_cp.yaml
+        wait-for-it -t 60 ${AMF_IP_ADDR}:7777
+        exec /perf-wrapper.sh ./build/apps/cu_cp/ocucp -c cu_cp.yaml -c cu_cp.overlay.yaml
         ;;
     cu_up)
         retry --until=success --times=10 --delay=5 -- ncat -z --sctp ${CU_CP_RAN_IP_ADDR} 38472
-        exec /perf-wrapper.sh ./build/apps/cu_up/ocuup -c cu_up.yaml
+        exec /perf-wrapper.sh ./build/apps/cu_up/ocuup -c cu_up.yaml -c cu_up.overlay.yaml
         ;;
     du)
         retry --until=success --times=10 --delay=5 -- ncat -z --sctp ${CU_CP_RAN_IP_ADDR} 38472
-        exec /perf-wrapper.sh ./build/apps/du/odu -c du.yaml
+        exec /perf-wrapper.sh ./build/apps/du/odu -c du.yaml -c du.overlay.yaml
         ;;
     uhd_image_loader)
         (set +x;

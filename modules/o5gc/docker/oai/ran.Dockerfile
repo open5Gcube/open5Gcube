@@ -25,7 +25,8 @@ RUN sync-cache.sh download oai-ran ccache                                     \
     && export BUILD_UHD_FROM_SOURCE=True                                      \
     && ./build_oai --ninja -I -w USRP                                         \
     && apt-get.sh purge texlive-base                                          \
-    && ./build_oai --ninja -w USRP --eNB --gNB --RU --UE --nrUE               \
+    && apt-get.sh install libzmq3-dev                                         \
+    && ./build_oai --ninja -w USRP -w ZMQ --eNB --gNB --RU --UE --nrUE        \
     && ldconfig                                                               \
     && cd ..                                                                  \
     && ln -s cmake_targets/ran_build/build/ .                                 \

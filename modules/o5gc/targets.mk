@@ -191,6 +191,13 @@ stop-ocudu-open5gs-5g: .create-running-env  ##
 run-ocudu-open5gs-5g-gnb run-ocudu-open5gs-5g-core: .create-running-env
 	$(call run_stack,o5gc,ocudu-open5gs-5g,$(subst run-ocudu-open5gs-5g-,,$@))
 
+run-ocudu-open5gs-5g-oaiue: .create-running-env  ##
+	$(call run_stack,o5gc,ocudu-open5gs-5g-oaiue,gnb core ue)
+stop-ocudu-open5gs-5g-oaiue: .create-running-env  ##
+	$(call stop_stack,o5gc,ocudu-open5gs-5g-oaiue,gnb core ue)
+run-ocudu-open5gs-5g-oaiue-gnb run-ocudu-open5gs-5g-oaiue-core run-ocudu-open5gs-5g-oaiue-ue: .create-running-env
+	$(call run_stack,o5gc,ocudu-open5gs-5g-oaiue,$(subst run-ocudu-open5gs-5g-oaiue-,,$@))
+
 run-ocudu-split-open5gs-5g: .create-running-env  ##
 	$(call run_stack,o5gc,ocudu-split-open5gs-5g,du cu-cp cu-up core)
 stop-ocudu-split-open5gs-5g: .create-running-env  ##
