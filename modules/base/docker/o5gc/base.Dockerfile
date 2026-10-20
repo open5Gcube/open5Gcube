@@ -9,7 +9,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 COPY base-packages.${BASE_IMG}.txt /tmp/base.packages.txt
 COPY dpkg-excludes.cfg /etc/dpkg/dpkg.cfg.d/excludes
 RUN sed -i 's|http://archive.ubuntu.com|http://de.archive.ubuntu.com|g'       \
-        /etc/apt/sources.list                                                 \
+        $(find /etc/apt -name sources.list -o -name ubuntu.sources)           \
     && apt-get update                                                         \
     && echo 'Acquire::http { Proxy "http://o5gc-build-cacher:40861"; };'      \
         > /etc/apt/apt.conf.d/01proxy                                         \
@@ -19,7 +19,10 @@ RUN sed -i 's|http://archive.ubuntu.com|http://de.archive.ubuntu.com|g'       \
 
 # make /bin/sh symlink to bash instead of dash
 RUN echo "dash dash/sh boolean false" | debconf-set-selections                \
-    && DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash
+    && DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash                   \
+    && ([ "$(readlink -f /bin/sh)" == /usr/bin/bash ] ||                      \
+        (dpkg-divert --local --rename --divert /usr/bin/sh.distrib            \
+             --add /usr/bin/sh && ln -s bash /usr/bin/sh))
 # set timezone
 ARG TZ
 ENV TZ=${TZ}
@@ -74,7 +77,7 @@ COPY install-docker.sh /usr/local/bin/
 RUN install-docker.sh cli-only
 
 RUN --mount=type=secret,id=id_ed25519 --mount=type=secret,id=id_ed25519.pub   \
-    mkdir -m 0700 /root/.ssh && cd /root/.ssh                                 \
+    install -d -m 0700 /root/.ssh && cd /root/.ssh                            \
     && cp /run/secrets/id_ed25519* .                                          \
     && chmod +r id_ed25519.pub                                                \
     && cp id_ed25519.pub authorized_keys
