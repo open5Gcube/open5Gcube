@@ -35,6 +35,8 @@ ENV FHOSS_REVERSION=4ffa54b
 RUN git clone https://github.com/herlesupreeth/FHoSS                          \
     && cd FHoSS                                                               \
     && git checkout ${FHOSS_REVERSION}                                        \
+    && sed -i 's/compiler="javac1.5"/compiler="javac1.5" encoding="UTF-8"/' build.xml \
+    && ulimit -n 65536 \
     && LC_ALL=C.UTF-8 ant compile deploy
 
 RUN echo ${FHOSS_REVERSION} > /etc/image_version
