@@ -1,0 +1,15 @@
+info:
+  version: 1.0.0
+  description: WebUI configuration
+  http-version: 1
+
+configuration:
+  mongodb:
+    name: aether
+    url: mongodb://${MONGO_IP_ADDR}:27017/?replicaSet=rs0
+    authKeysDbName: authentication
+  cfgport: 5000
+
+logger:
+  WEBUI:
+    debugLevel: debug

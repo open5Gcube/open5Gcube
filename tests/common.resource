@@ -23,12 +23,14 @@ ${UE_CONTAINER}  ue
 ...                      open5gs=Open5GS SMF Log Should Contain PDU Session Setup
 ...                      free5gc=Free5GC SMF Log Should Contain PDU Session Setup
 ...                      ellacore=Ellacore SMF Log Should Contain PDU Session Setup
+...                      aether=Aether SMF Log Should Contain PDU Session Setup
 ...                      srsepc=srsEPC Default Bearer Should Be Established
 ...                      open5gs-epc=Open5GS SMF Log Should Contain Default Bearer
 &{CORE_REGISTRATION_KW}  oai=OAI AMF Log Should Show UE Registered
 ...                      open5gs=Open5GS AMF Log Should Show UE Registered
 ...                      free5gc=Free5GC AMF Log Should Show UE Registered
 ...                      ellacore=Ellacore AMF Log Should Show UE Registered
+...                      aether=Aether AMF Log Should Show UE Registered
 ...                      srsepc=srsEPC Log Should Show UE Attached
 ...                      open5gs-epc=Open5GS MME Log Should Show UE Attached
 
@@ -228,6 +230,14 @@ Ellacore AMF Log Should Show UE Registered
 
 Ellacore SMF Log Should Contain PDU Session Setup
     Container Log Should Match Regexp  ellacore  "component":"SMF".*"msg":"PDU session established".*"result":"accept"
+
+Aether AMF Log Should Show UE Registered
+    [Arguments]  ${imsi}
+    Container Log Should Match Regexp  amf  Handle Registration Complete.*"supi": "SUPI:imsi-${imsi}"
+
+Aether SMF Log Should Contain PDU Session Setup
+    Container Log Should Match Regexp  smf  PDU session context create success
+    Container Log Should Match Regexp  smf  PFCP Session Establishment accepted
 
 srsEPC Log Should Show UE Attached
     [Documentation]  Assert the UE with the given IMSI progressed through NAS security to a completed attach.

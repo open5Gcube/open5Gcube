@@ -43,6 +43,14 @@ docker-build-oai-nrf docker-build-oai-smf docker-build-oai-udm                \
 docker-build-oai-udr docker-build-oai-upf: docker-build-oai-cn5g-base
 	$(foreach ver,${OAI_CN5G_VERSIONS} latest,$(call docker-build,o5gc,oai,$(subst docker-build-oai-,,$@),OAI_CN5G_VERSION=${ver}))
 
+AETHER_CORE_IMAGES = amf ausf smf nrf nssf pcf udm udr upf webui
+docker-build-aether-core: $(foreach img,${AETHER_CORE_IMAGES},docker-build-aether-${img})
+	$(call docker_image_ls,aether-*)
+docker-build-aether-core-base: docker-build-o5gc-base
+	$(call docker-build,o5gc,aether,core-base)
+docker-build-aether-%: #docker-build-aether-core-base
+	$(call docker-build,o5gc,aether,$(subst docker-build-aether-,,$@))
+
 OSMOCOM_IMAGES = base hlr mgw stp msc bts trx bsc ggsn sgsn pcu cbc
 docker-build-osmocom: $(foreach img,${OSMOCOM_IMAGES},docker-build-osmocom-${img})
 	$(call docker_image_ls,osmocom-*)
@@ -199,10 +207,10 @@ run-ocudu-split-open5gs-5g-cu-cp run-ocudu-split-open5gs-5g-cu-up \
 run-ocudu-split-open5gs-5g-core run-ocudu-split-open5gs-5g-du: .create-running-env
 	$(call run_stack,o5gc,ocudu-split-open5gs-5g,$(subst run-ocudu-split-open5gs-5g-,,$@))
 
-run-ueransim-open5gs run-ueransim-free5gc run-ueransim-oai run-ueransim-ellacore: .create-running-env  ##
+run-ueransim-open5gs run-ueransim-free5gc run-ueransim-oai run-ueransim-ellacore run-ueransim-aether: .create-running-env  ##
 	export OAI_CN5G_TYPE=basic;                                               \
 	$(call run_stack,o5gc,$(subst run-,,$@),core gnb ue metrics)
-stop-ueransim-open5gs stop-ueransim-free5gc stop-ueransim-oai stop-ueransim-ellacore:  ##
+stop-ueransim-open5gs stop-ueransim-free5gc stop-ueransim-oai stop-ueransim-ellacore stop-ueransim-aether:  ##
 	$(call stop_stack,o5gc,$(subst stop-,,$@),core gnb ue metrics)
 
 run-packetrusher-open5gs run-packetrusher-open5gs-roaming: .create-running-env  ##

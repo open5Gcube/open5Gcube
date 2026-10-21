@@ -1,0 +1,214 @@
+services:
+  base:
+    entrypoint: [ "/mnt/aether/entrypoint.sh" ]
+    env_file: [ "${ENV_FILE}" ]
+    environment:
+      GIN_MODE: release
+    volumes:
+      - .:/mnt/aether/:ro
+    labels:
+      o5gc.corenetwork-function: true
+      o5gc.stack: ${O5GC_STACK}
+      o5gc.webui.priority: ${WEBUI_PRIO_CORE_DEFAULT}
+    profiles: [ "core" ]
+    # start the NFs once subscribers and slices are provisioned, so their first
+    # poll of the webui already returns the configuration (otherwise e.g. the
+    # AMF can reject an early NG Setup with an unknown PLMN)
+    depends_on:
+      mongo:
+        condition: service_healthy
+      aether-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: bash -c "ss -ltn | grep -q ':7777'"
+      start_period: 5s
+      start_interval: 1s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  amf:
+    extends:
+      service: base
+    image: o5gc/aether-amf
+    container_name: amf
+    command: amf
+    hostname: amf
+    # On SIGTERM the AMF closes its NGAP listener but keeps calling accept() on
+    # it, logging "failed to accept" in a tight loop until it is killed
+    stop_signal: SIGKILL
+    networks:
+      corenet:
+        ipv4_address: ${AMF_IP_ADDR}
+    # The AMF accepts NG Setup before its first poll of the webui (after 5s)
+    # and rejects it then with an unknown PLMN. It registers at the NRF only
+    # once it has the configuration, so that marks it as ready for the gNB.
+    healthcheck:
+      test: >
+        bash -c "ss -ltn | grep -q ':7777' && curl -sf
+        'http://${NRF_IP_ADDR}:7777/nnrf-disc/v1/nf-instances?target-nf-type=AMF&requester-nf-type=SMF'
+        | jq -e '.nfInstances | length > 0'"
+      start_period: 30s
+
+  ausf:
+    extends:
+      service: base
+    image: o5gc/aether-ausf
+    container_name: ausf
+    command: ausf
+    hostname: ausf
+    networks:
+      corenet:
+        ipv4_address: ${AUSF_IP_ADDR}
+
+  smf:
+    extends:
+      service: base
+    image: o5gc/aether-smf
+    container_name: smf
+    command: smf
+    hostname: smf
+    networks:
+      corenet:
+        ipv4_address: ${SMF_IP_ADDR}
+
+  nrf:
+    extends:
+      service: base
+    image: o5gc/aether-nrf
+    container_name: nrf
+    command: nrf
+    hostname: nrf
+    networks:
+      corenet:
+        ipv4_address: ${NRF_IP_ADDR}
+
+  nssf:
+    extends:
+      service: base
+    image: o5gc/aether-nssf
+    container_name: nssf
+    command: nssf
+    hostname: nssf
+    networks:
+      corenet:
+        ipv4_address: ${NSSF_IP_ADDR}
+
+  pcf:
+    extends:
+      service: base
+    image: o5gc/aether-pcf
+    container_name: pcf
+    command: pcf
+    hostname: pcf
+    networks:
+      corenet:
+        ipv4_address: ${PCF_IP_ADDR}
+
+  udm:
+    extends:
+      service: base
+    image: o5gc/aether-udm
+    container_name: udm
+    command: udm
+    hostname: udm
+    networks:
+      corenet:
+        ipv4_address: ${UDM_IP_ADDR}
+
+  udr:
+    extends:
+      service: base
+    image: o5gc/aether-udr
+    container_name: udr
+    command: udr
+    hostname: udr
+    networks:
+      corenet:
+        ipv4_address: ${UDR_IP_ADDR}
+
+  upf:
+    extends:
+      service: base
+    image: o5gc/aether-upf
+    container_name: upf
+    command: upf
+    hostname: upf
+    networks:
+      corenet:
+        ipv4_address: ${UPF_IP_ADDR}
+        interface_name: access
+      extnet:
+        ipv4_address: ${UPF_EXT_IP_ADDR}
+        interface_name: core
+        gw_priority: 1
+    cap_add: [ NET_ADMIN, NET_RAW, IPC_LOCK, SYS_NICE ]
+    ulimits:
+      memlock: -1
+    depends_on: !reset {}
+    healthcheck:
+      test: bash -c "ss -lun | grep -q ':8805' && ss -ltn | grep -q ':10514'"
+
+  aether-webui:
+    extends:
+      service: base
+    image: o5gc/aether-webui
+    container_name: aether-webui
+    command: webui
+    hostname: webui
+    depends_on: !override
+      mongo:
+        condition: service_healthy
+    networks:
+      corenet:
+        ipv4_address: ${AETHER_WEBUI_IP_ADDR}
+      o5gc:
+        gw_priority: 1
+    ports:
+      - ${O5GC_WEBUI_HOST_ADDR}:${AETHER_WEBUI_HOST_PORT}:5000
+    labels:
+      o5gc.link.title: "Aether SD Core WebUI"
+      o5gc.link.url: "http://{{host}}:${AETHER_WEBUI_HOST_PORT}/"
+      o5gc.webui.priority: 0
+    healthcheck:
+      test: bash -c "ss -ltn | grep -q ':5000' && ss -ltn | grep -q ':5001'"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  aether-init:
+    extends:
+      file: ${MODULES}/base/docker/o5gc/services.yaml
+      service: core-init
+    container_name: aether-init
+    entrypoint: /mnt/init-core.sh
+    labels:
+      o5gc.stack: ${O5GC_STACK}
+    volumes:
+      - ./init-core.sh:/mnt/init-core.sh:ro
+    depends_on: [ aether-webui ]
+
+  mongo:
+    image: mongo:6.0
+    container_name: mongo
+    hostname: mongo
+    command: mongod --bind_ip_all --replSet rs0
+    networks:
+      corenet:
+        ipv4_address: ${MONGO_IP_ADDR}
+    labels:
+      o5gc.stack: ${O5GC_STACK}
+      o5gc.webui.priority: 0
+    profiles: [ "core" ]
+    # initiates the single node replica set (needed by the webui) and is
+    # healthy once it has become primary
+    healthcheck:
+      test: >
+        mongosh --quiet --eval "try { rs.status() } catch (e) {
+        rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'mongo:27017' }] }) }
+        db.hello().isWritablePrimary || quit(1)"
+      start_period: 5s
+      start_interval: 1s
+      interval: 10s
+      timeout: 5s
+      retries: 5

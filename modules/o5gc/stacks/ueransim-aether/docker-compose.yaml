@@ -1,0 +1,77 @@
+services:
+  gnb:
+    extends:
+      file: ${DOCKER}/ueransim/services.yaml
+      service: ueransim-gnb
+    depends_on:
+      amf:
+        condition: service_healthy
+
+  ue:
+    extends:
+      file: ${DOCKER}/ueransim/services.yaml
+      service: ueransim-ue
+
+  mongo:
+    extends:
+      file: ${DOCKER}/aether/services.yaml
+      service: mongo
+  mongo-express:
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: mongo-express
+
+  amf:
+    extends:
+      file: ${DOCKER}/aether/services.yaml
+      service: amf
+
+  ausf:
+    extends:
+      file: ${DOCKER}/aether/services.yaml
+      service: ausf
+
+  smf:
+    extends:
+      file: ${DOCKER}/aether/services.yaml
+      service: smf
+
+  nrf:
+    extends:
+      file: ${DOCKER}/aether/services.yaml
+      service: nrf
+
+  nssf:
+    extends:
+      file: ${DOCKER}/aether/services.yaml
+      service: nssf
+
+  pcf:
+    extends:
+      file: ${DOCKER}/aether/services.yaml
+      service: pcf
+
+  udm:
+    extends:
+      file: ${DOCKER}/aether/services.yaml
+      service: udm
+
+  udr:
+    extends:
+      file: ${DOCKER}/aether/services.yaml
+      service: udr
+
+  upf:
+    extends:
+      file: ${DOCKER}/aether/services.yaml
+      service: upf
+
+  aether-webui:
+    extends:
+      file: ${DOCKER}/aether/services.yaml
+      service: aether-webui
+
+  aether-init:
+    extends:
+      file: ${DOCKER}/aether/services.yaml
+      service: aether-init

@@ -1,0 +1,23 @@
+info:
+  version: 1.0.0
+  description: UDR configuration
+
+configuration:
+  mongodb:
+    name: aether
+    url: mongodb://${MONGO_IP_ADDR}:27017/?replicaSet=rs0
+    authKeysDbName: authentication
+  nrfUri: http://${NRF_IP_ADDR}:7777
+  webuiUri: http://${AETHER_WEBUI_IP_ADDR}:5001
+  sbi:
+    scheme: http
+    registerIPv4: ${UDR_IP_ADDR}
+    bindingIPv4: ${UDR_IP_ADDR}
+    port: 7777
+    tls:
+      pem: cert/nrf.pem
+      key: cert/nrf.key
+
+logger:
+  UDR:
+    debugLevel: info

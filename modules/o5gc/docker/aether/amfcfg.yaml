@@ -1,0 +1,179 @@
+info:
+  version: 1.0.0
+  description: AMF configuration
+
+configuration:
+  amfName: AMF
+
+  # AMF identifier used in GUAMIs. Must match pattern: ^[A-Fa-f0-9]{6}$
+  amfId: cafe00
+
+  # MongoDB database name for AMF persistent state (UE contexts, etc.)
+  # Only used when enableDBStore: true.
+  amfDBName: amf
+
+  # MongoDB connection settings (required when enableDBStore: true)
+  mongodb:
+    name: amf
+    url: mongodb://${MONGO_IP_ADDR}:27017/?replicaSet=rs0
+
+  # List of IPs for the N2 (NGAP/SCTP) interface
+  ngapIpList:
+    - ${AMF_IP_ADDR}
+
+  # SCTP port for the N2 (NGAP) interface.
+  # 3GPP default: 38412
+  ngappPort: 38412
+
+  # gRPC port used to communicate with the SCTP load-balancer sidecar.
+  # Only used when enableSctpLb: true.
+  sctpGrpcPort: 9000
+
+  # Service-based interface (SBI / HTTP) settings
+  sbi: # Service-based interface information
+    scheme: http # the protocol for sbi (http or https)
+    registerIPv4: ${AMF_IP_ADDR} # IP used to register to NRF
+    bindingIPv4: ${AMF_IP_ADDR}  # IP used to bind the service
+    port: 7777 # port used to bind the service
+    tls: # the local path of TLS key
+      pem: cert/amf.pem # AMF TLS Certificate
+      key: cert/amf.key # AMF TLS Private key
+
+  # SBI services advertised by this AMF (TS 29.518)
+  serviceNameList:
+    - namf-comm   # Namf_Communication
+    - namf-evts   # Namf_EventExposure
+    - namf-mt     # Namf_MT
+    - namf-loc    # Namf_Location
+    - namf-oam    # OAM (Operations and Maintenance)
+
+  # Data Network Names (DNNs) supported by this AMF
+  supportDnnList:
+    - ${APN}
+
+  # URI of the NRF used for NF registration and discovery
+  nrfUri: http://${NRF_IP_ADDR}:7777
+
+  # URI of the WebConsole for subscriber data lookup.
+  # Must use http:// or https:// with a valid hostname.
+  webuiUri: http://${AETHER_WEBUI_IP_ADDR}:5001
+
+  # NAS security algorithm priority lists (highest priority first)
+  security:
+    # Integrity algorithms: NIA0 (null), NIA1 (SNOW), NIA2 (AES), NIA3 (ZUC)
+    integrityOrder:
+      - NIA2
+      - NIA1
+      # - NIA0  # null integrity — insecure, avoid in production
+    # Ciphering algorithms: NEA0 (null), NEA1 (SNOW), NEA2 (AES), NEA3 (ZUC)
+    cipheringOrder:
+      - NEA2
+      - NEA1
+      - NEA0
+
+  # Human-readable network name sent to UEs during registration
+  networkName:
+    full: open5Gcube
+    short: open5Gcube
+
+  # 5GS Network Feature Support IE (TS 24.501 § 9.11.3.5)
+  # Appended to Registration Accept messages when enable: true
+  networkFeatureSupport5GS:
+    enable: true
+    imsVoPS: 0  # IMS voice over PS session (0 = not supported, 1 = supported)
+    emc: 0      # Emergency service support for 3GPP access (0–3)
+    emf: 0      # Emergency service fallback for 3GPP access (0–3)
+    iwkN26: 0   # Interworking without N26 interface (0 = not supported, 1 = supported)
+    mpsi: 0     # MPS indicator (0 = not supported, 1 = supported)
+    emcN3: 0    # Emergency service support for Non-3GPP access (0–1)
+    mcsi: 0     # MCS indicator (0 = not supported, 1 = supported)
+
+  # T3502: timer at UE side for re-registration after connection failure (seconds)
+  t3502Value: 720
+
+  # T3512: periodic registration update timer at UE side (seconds)
+  t3512Value: 3600
+
+  # Non-3GPP deregistration timer at UE side (seconds)
+  non3gppDeregistrationTimerValue: 3240
+
+  # T3513: retransmission timer for Paging messages
+  t3513:
+    enable: true
+    expireTime: 6s
+    maxRetryTimes: 4
+
+  # T3522: retransmission timer for NAS Deregistration Request
+  t3522:
+    enable: true
+    expireTime: 6s
+    maxRetryTimes: 4
+
+  # T3550: retransmission timer for NAS Registration Accept
+  t3550:
+    enable: true
+    expireTime: 6s
+    maxRetryTimes: 4
+
+  # T3560: retransmission timer for NAS Authentication Request / Security Mode Command
+  t3560:
+    enable: true
+    expireTime: 6s
+    maxRetryTimes: 4
+
+  # T3565: retransmission timer for NAS Notification
+  t3565:
+    enable: true
+    expireTime: 6s
+    maxRetryTimes: 4
+
+  # Enable SCTP load-balancer sidecar. When true, sctpGrpcPort must be set.
+  # The AMF will communicate with the SCTP LB via gRPC instead of listening
+  # directly on the SCTP port.
+  # Default: false
+  enableSctpLb: false
+
+  # Persist UE contexts and RAN associations to MongoDB across restarts.
+  # Requires a working mongodb connection (see mongodb section above).
+  # Default: false
+  enableDBStore: false
+
+  # Cache NRF discovery responses in-memory to reduce NRF query load.
+  # Default: false
+  enableNrfCaching: false
+
+  # Interval in seconds between NRF cache eviction runs.
+  # Only used when enableNrfCaching: true.
+  # Default: 900 (15 minutes)
+  nrfCacheEvictionInterval: 900
+
+  # Kafka event streaming configuration
+  kafkaInfo:
+    # Publish AMF events (UE state changes, etc.) to Kafka.
+    # Default: true (enabled unless explicitly set to false)
+    enableKafka: false
+    # Kafka broker hostname or IP
+    brokerUri: kafka
+    # Kafka broker port
+    brokerPort: 9092
+    # Kafka topic name for AMF events
+    topicName: amf
+
+  # OpenTelemetry distributed tracing configuration
+  telemetry:
+    # Enable OTLP trace export. Default: false
+    enabled: false
+    # OTLP gRPC endpoint — REQUIRED when enabled: true (host:port, no scheme)
+    otlp_endpoint: otel-collector:4317
+    # Trace sampling ratio: 0.0 (no traces) to 1.0 (all traces).
+    # Default: 1.0
+    ratio: 1.0
+
+  # Go pprof HTTP profiling endpoint port.
+  # Set to a non-zero value to enable (e.g. 5001); 0 disables profiling.
+  debugProfilePort: 0
+
+logger:
+  # AMF service log level. Valid values: debug, info, warn, error, dpanic, panic, fatal
+  AMF:
+    debugLevel: info

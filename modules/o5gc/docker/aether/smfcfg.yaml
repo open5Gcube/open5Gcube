@@ -1,0 +1,121 @@
+# SMF (Session Management Function) - Full Example Configuration
+# Usage: smf -cfg <path-to-this-file> [-uerouting <path-to-uerouting.yaml>]
+#
+# Two config files are required:
+#   1. This file  — main SMF config (passed via -cfg)
+#   2. uerouting.yaml — UE routing / route profile / PFD config (passed via -uerouting)
+#
+# kafkaInfo.enableKafka defaults to true if the field is omitted
+# UPF topology (user plane info, SNSSAI/DNN) is fetched dynamically from the
+#   webconsole NF Config API via polling — it is NOT set in this file.
+
+info:
+  version: 1.0.0
+  description: SMF configuration
+
+configuration:
+  # Human-readable name for this SMF instance
+  smfName: SMF
+
+  # MongoDB database name for SMF persistent state.
+  # Only used when enableDBStore: true.
+  smfDBName: smf
+
+  # MongoDB connection (required when enableDBStore: true)
+  mongodb:
+    name: smf
+    url: mongodb://${MONGO_IP_ADDR}:27017/?replicaSet=rs0
+
+  # Service-based interface (SBI / HTTP) settings
+  sbi:
+    scheme: http
+    registerIPv4: ${SMF_IP_ADDR}
+    bindingIPv4: ${SMF_IP_ADDR}
+    port: 7777
+
+  # SBI services advertised by this SMF (TS 29.502)
+  serviceNameList:
+    - nsmf-pdusession       # Nsmf_PDUSession
+    - nsmf-event-exposure   # Nsmf_EventExposure
+
+  # PFCP (N4 interface) settings — communication with UPFs
+  pfcp:
+    # IP address or hostname this SMF uses as its PFCP node ID / source address
+    addr: ${SMF_IP_ADDR}
+    # PFCP UDP port. Default: 8805
+    port: 8805
+
+  # URI of the NRF for NF registration and discovery
+  nrfUri: http://${NRF_IP_ADDR}:7777
+
+  # URI of the WebConsole NF Config API for dynamic UPF/slice topology.
+  # Must use http:// or https:// with a valid hostname.
+  webuiUri: http://${AETHER_WEBUI_IP_ADDR}:5001
+
+  # Static IP address assignments per DNN.
+  # Maps SUPI (supi-<imsi>) to a fixed IP for a given DNN.
+  # These are consulted before dynamic allocation.
+  staticIpInfo:
+    - dnn: ${APN}
+      # imsiIpInfo:
+      #   supi-208930000000001: 10.45.0.10
+      #   supi-208930000000002: 10.45.0.11
+
+  # Enterprise/slice label map: maps network-slice name to enterprise name.
+  # Used to tag PDU sessions with an enterprise identifier in Kafka events.
+  enterpriseList:
+    slice-1: enterprise-a
+
+  # Enable ULCL (Uplink Classifier) branching point support.
+  # Requires matching routeProfile entries in uerouting.yaml.
+  # Default: false
+  ulcl: false
+
+  # Route PFCP messages through the UPF adapter service instead of sending
+  # them directly to each UPF. The adapter endpoint is hardcoded to
+  # http://upf-adapter:8090.
+  # Default: false
+  enableUPFAdapter: false
+
+  # Persist SMF session state to MongoDB across restarts.
+  # Requires a working mongodb connection (see mongodb section above).
+  # Default: false
+  enableDBStore: false
+
+  # Cache NRF discovery responses in-memory to reduce NRF query load.
+  # Default: false
+  enableNrfCaching: false
+
+  # Interval in seconds between NRF cache eviction runs.
+  # Only used when enableNrfCaching: true.
+  # Default: 900 (15 minutes)
+  nrfCacheEvictionInterval: 900
+
+  # Kafka event streaming configuration
+  kafkaInfo:
+    # Publish SMF events (PDU session lifecycle, etc.) to Kafka.
+    # Default: true (enabled unless explicitly set to false)
+    enableKafka: false
+    # Kafka broker hostname or IP
+    brokerUri: kafka
+    # Kafka broker port
+    brokerPort: 9092
+    # Kafka topic name for SMF events
+    topicName: smf
+
+  # Go pprof HTTP profiling endpoint port.
+  # Set to a non-zero value to enable (e.g. 5001); 0 disables profiling.
+  debugProfilePort: 0
+
+logger:
+  # SMF service log level. Valid values: debug, info, warn, error, dpanic, panic, fatal
+  SMF:
+    debugLevel: info
+  NAS:
+    debugLevel: info
+  NGAP:
+    debugLevel: info
+  OpenApi:
+    debugLevel: info
+  Util:
+    debugLevel: info

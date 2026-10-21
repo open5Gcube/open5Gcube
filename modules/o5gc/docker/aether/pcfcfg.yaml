@@ -1,0 +1,42 @@
+info:
+  version: 1.0.0
+  description: PCF configuration
+
+configuration:
+  pcfName: PCF
+
+  # nrfUri: URI of the Network Repository Function (NRF)
+  nrfUri: http://${NRF_IP_ADDR}:7777
+
+  # webuiUri: URI of the Web UI for subscriber data management.
+  # Must be a valid http:// or https:// URI with a non-empty hostname.
+  webuiUri: http://${AETHER_WEBUI_IP_ADDR}:5001
+
+  # enableNrfCaching: Cache NRF discovery results to reduce lookup traffic
+  enableNrfCaching: false
+
+  # Service-based interface (SBI / HTTP) settings
+  sbi:
+    scheme: http
+    registerIPv4: ${PCF_IP_ADDR}
+    bindingIPv4: ${PCF_IP_ADDR}
+    port: 7777
+
+  # NF services registered at the NRF
+  serviceList:
+    - serviceName: npcf-am-policy-control
+    - serviceName: npcf-smpolicycontrol
+      suppFeat: 3fff
+    - serviceName: npcf-bdtpolicycontrol
+    - serviceName: npcf-policyauthorization
+      suppFeat: 3
+    - serviceName: npcf-eventexposure
+    - serviceName: npcf-ue-policy-control
+
+  # Prefix string used when generating BDT Policy Reference IDs.
+  defaultBdtRefId: BdtPolicyId-
+
+logger:
+  # PCF service log level. Valid values: debug, info, warn, error, dpanic, panic, fatal
+  PCF:
+    debugLevel: info

@@ -1,0 +1,26 @@
+info:
+  version: 1.0.0
+  description: NRF configuration
+
+configuration:
+  MongoDBName: aether
+  MongoDBUrl: mongodb://${MONGO_IP_ADDR}:27017/?replicaSet=rs0
+  mongoDBStreamEnable: false
+  nfProfileExpiryEnable: false
+  nfKeepAliveTime: 60
+  webuiUri: http://${AETHER_WEBUI_IP_ADDR}:5001
+  sbi:
+    scheme: http
+    registerIPv4: ${NRF_IP_ADDR}
+    bindingIPv4: ${NRF_IP_ADDR}
+    port: 7777
+    tls:
+      pem: cert/nrf.pem
+      key: cert/nrf.key
+  serviceNameList:
+    - nnrf-nfm
+    - nnrf-disc
+
+logger:
+  NRF:
+    debugLevel: info

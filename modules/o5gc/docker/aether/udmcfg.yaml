@@ -1,0 +1,69 @@
+info:
+  version: 1.0.0
+  description: UDM configuration
+
+configuration:
+  # udmName: Logical name for this UDM instance (optional)
+  udmName: udm
+
+  # nrfUri: URI of the Network Repository Function (NRF)
+  nrfUri: http://${NRF_IP_ADDR}:7777
+
+  # webuiUri: URI of the Web UI for subscriber data management.
+  # Must be a valid http:// or https:// URI with a non-empty hostname.
+  webuiUri: http://${AETHER_WEBUI_IP_ADDR}:5001
+
+  # enableNrfCaching: Cache NRF discovery results to reduce lookup traffic
+  enableNrfCaching: false
+
+  # nrfCacheEvictionInterval: How often (in seconds) cached NRF entries are
+  # evicted. Only relevant when enableNrfCaching is true.
+  nrfCacheEvictionInterval: 900
+
+  # serviceList: The NF services this UDM exposes.
+  serviceList:
+    - nudm-sdm
+    - nudm-uecm
+    - nudm-ueau
+    - nudm-ee
+    - nudm-pp
+
+  # sbi: Service-Based Interface (HTTP server) settings
+  sbi:
+    # scheme: Transport scheme. One of: http, https
+    scheme: http
+
+    # registerIPv4: IP address registered with the NRF (external/advertised IP)
+    # Default: 127.0.0.3
+    registerIPv4: ${UDM_IP_ADDR}
+
+    # bindingIPv4: IP address the server listens on locally
+    # Use 0.0.0.0 to listen on all interfaces.
+    bindingIPv4: ${UDM_IP_ADDR}
+
+    # port: TCP port the SBI server listens on
+    port: 7777
+
+    # tls: TLS certificate/key configuration (required when scheme is https)
+    tls:
+      # log: Path to the SSL/TLS key log file (for traffic inspection/debugging)
+      log: /opt/sslkey.log
+      pem: /var/run/certs/tls.pem
+      key: /var/run/certs/tls.key
+
+  # keys: Cryptographic keys used for SUCI de-concealment (3GPP TS 33.501)
+  # Profile A uses X25519 (Curve25519); Profile B uses EC P-256.
+  # Each profile has a separate Home Network (HN) key pair.
+  keys:
+    # udmProfileAHNPrivateKey: Home Network private key for SUCI Profile A (X25519)
+    udmProfileAHNPrivateKey: c53c22208b61860b06c62e5406a7b330c2b577aa5558981510d128247d38bd1d
+    # udmProfileAHNPublicKey: Home Network public key for SUCI Profile A (X25519)
+    udmProfileAHNPublicKey: 5a8d38864820197c3394b92613b20b91633cbd897119273bf8e4a6f4eec0a650
+    # udmProfileBHNPrivateKey: Home Network private key for SUCI Profile B (EC P-256)
+    udmProfileBHNPrivateKey: F1AB1074477EBCC7F554EA1C5FC368B1616730155E0041AC447D6301975FECDA
+    # udmProfileBHNPublicKey: Home Network public key for SUCI Profile B (EC P-256)
+    udmProfileBHNPublicKey: 0472DA71976234CE833A6907425867B82E074D44EF907DFB4B3E21C1C2256EBCD15A7DED52FCBB097A4ED250E036C7B9C8C7004C4EEDC4F068CD7BF8D3F900E3B4
+
+logger:
+  UDM:
+    debugLevel: info

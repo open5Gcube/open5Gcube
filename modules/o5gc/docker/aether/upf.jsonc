@@ -1,0 +1,44 @@
+{
+    // af_packet: BESS attaches to the kernel interfaces, no DPDK NIC binding
+    // or hugepages needed
+    "mode": "af_packet",
+    "log_level": "info",
+    "workers": 1,
+    "hwcksum": false,
+    "gtppsc": true,
+    "measure_upf": true,
+    "measure_flow": false,
+
+    // N3 (corenet) and N6 (extnet), names pinned via interface_name
+    "access": {
+        "ifname": "access"
+    },
+    "core": {
+        "ifname": "core",
+        // SNAT the UE traffic to the UPF's extnet address inside BESS
+        "ip_masquerade": "${UPF_EXT_IP_ADDR}"
+    },
+
+    "cpiface": {
+        // PFCP node ID; SMF reaches the UPF via its slice's upf-name "upf"
+        "hostname": "${UPF_IP_ADDR}",
+        "http_port": "8080"
+    },
+
+    "slice_rate_limit_config": {
+        "n6_bps": 1000000000,
+        "n6_burst_bytes": 12500000,
+        "n3_bps": 1000000000,
+        "n3_burst_bytes": 12500000
+    },
+    "qci_qos_config": [
+        {
+            "qci": 0,
+            "cbs": 50000,
+            "ebs": 50000,
+            "pbs": 50000,
+            "burst_duration_ms": 10,
+            "priority": 7
+        }
+    ]
+}
