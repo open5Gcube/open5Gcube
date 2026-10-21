@@ -52,7 +52,10 @@ Setup Stack
     [Documentation]  Start the stack and wait until it is ready.
     ...    Used as Suite Setup; the suite only supplies ${STACK}.
     Log To Console  Setup Stack: run 'make run-${STACK}'
-    Start Process  make  run-${STACK}
+    # The attached 'docker compose up' prints the output of all containers. Write
+    # it to a file: an unread pipe fills up and then blocks the containers' stdout.
+    ${suite_output_dir} =  Get Suite Output Dir
+    Start Process  make  run-${STACK}  stdout=${suite_output_dir}/compose.log  stderr=STDOUT
     # Give 'make' a moment to fork the compose stack before we assert the process
     # is alive; actual readiness is polled by Wait Until Startup Complete below.
     Sleep  5s
