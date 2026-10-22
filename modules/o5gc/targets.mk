@@ -80,6 +80,10 @@ docker-build-free5gc: docker-build-o5gc-base
 
 docker-build-ellacore: docker-build-o5gc-base
 	$(call docker-build,o5gc,ellacore)
+docker-build-ellacore-ims: docker-build-o5gc-base
+	$(call docker-build,o5gc,ellacore,ims)
+docker-build-ellacore-smsc: docker-build-o5gc-base
+	$(call docker-build,o5gc,ellacore,smsc)
 
 docker-build-misc-falcon docker-build-misc-sigdigger                          \
 docker-build-misc-gr-osmosdr docker-build-misc-ltesniffer                     \

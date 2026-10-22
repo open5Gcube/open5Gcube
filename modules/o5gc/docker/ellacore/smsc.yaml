@@ -1,0 +1,11 @@
+logging:
+  level: info
+db:
+  path: smsc.db
+api:
+  address: 0.0.0.0
+  port: 5010
+# Local address of the SGd/S6c Diameter link, Ella Core connects to it
+diameter:
+  address: ${SMSC_IP_ADDR}
+  port: 3868

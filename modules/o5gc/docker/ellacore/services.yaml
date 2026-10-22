@@ -2,12 +2,12 @@ services:
   ellacore:
     image: o5gc/ellacore
     container_name: ellacore
-    entrypoint: >
-      bash -c "envsubst.sh /mnt/core.yaml /o5gc/ellacore/core.yaml && ./main --config /o5gc/ellacore/core.yaml"
+    entrypoint: [ "/mnt/ellacore/entrypoint.sh" ]
+    command: core
     privileged: true
     env_file: [ "${ENV_FILE}" ]
     volumes:
-      - ./core.yaml:/mnt/core.yaml:ro
+      - .:/mnt/ellacore/:ro
     networks:
       extnet:
         ipv4_address: ${UPF_EXT_IP_ADDR}
@@ -31,12 +31,88 @@ services:
       timeout: 5s
       retries: 5
 
+  ellacore-ims:
+    image: o5gc/ellacore-ims
+    container_name: ellacore-ims
+    entrypoint: [ "/mnt/ellacore/entrypoint.sh" ]
+    command: ims
+    # P-CSCF installs IPsec security associations towards the UEs
+    cap_add:
+      - NET_ADMIN
+    env_file: [ "${ENV_FILE}" ]
+    volumes:
+      - .:/mnt/ellacore/:ro
+    networks:
+      extnet:
+        ipv4_address: ${PCSCF_EXT_IP_ADDR}
+        interface_name: eth0
+      corenet:
+        ipv4_address: ${PCSCF_IP_ADDR}
+        interface_name: eth1
+      o5gc:
+        gw_priority: 1
+        interface_name: eth2
+    ports:
+      - ${O5GC_WEBUI_HOST_ADDR}:${ELLACORE_IMS_WEBUI_HOST_PORT}:5020
+    labels:
+      o5gc.stack: ${O5GC_STACK}
+      o5gc.link.title: "Ella-IMS WebUI"
+      o5gc.link.url: "http://{{host}}:${ELLACORE_IMS_WEBUI_HOST_PORT}/"
+      o5gc.webui.priority: ${WEBUI_PRIO_VOLTE}
+    profiles: [ "volte" ]
+    healthcheck:
+      test: curl -sSf http://localhost:5020/api/v1/status
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ellacore-smsc:
+    image: o5gc/ellacore-smsc
+    container_name: ellacore-smsc
+    entrypoint: [ "/mnt/ellacore/entrypoint.sh" ]
+    command: smsc
+    env_file: [ "${ENV_FILE}" ]
+    volumes:
+      - .:/mnt/ellacore/:ro
+    networks:
+      corenet:
+        ipv4_address: ${SMSC_IP_ADDR}
+      o5gc:
+        gw_priority: 1
+    ports:
+      - ${O5GC_WEBUI_HOST_ADDR}:${ELLACORE_SMSC_WEBUI_HOST_PORT}:5010
+    labels:
+      o5gc.stack: ${O5GC_STACK}
+      o5gc.link.title: "Ella-SMSC WebUI"
+      o5gc.link.url: "http://{{host}}:${ELLACORE_SMSC_WEBUI_HOST_PORT}/"
+      o5gc.webui.priority: ${WEBUI_PRIO_VOLTE}
+    profiles: [ "smsc" ]
+    healthcheck:
+      test: curl -sSf http://localhost:5010/api/v1/status
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   ellacore-init:
     extends:
       file: ${MODULES}/base/docker/o5gc/services.yaml
       service: core-init
     container_name: ellacore-init
     entrypoint: /mnt/init-subscribers.sh
+    environment:
+      # E.164 country code of the subscribers' MSISDNs (+<code><MSIN>), and of
+      # the numbering plans of Ella IMS and SMSC
+      - MSISDN_COUNTRY_CODE=${MSISDN_COUNTRY_CODE:-999}
     volumes:
       - ./init-subscribers.sh:/mnt/init-subscribers.sh:ro
-    depends_on: [ ellacore ]
+    depends_on:
+      ellacore:
+        condition: service_started
+      # Ella IMS and SMSC are optional: when the stack runs them, set them up
+      # (the script waits for their API, after it has added the subscribers)
+      ellacore-ims:
+        condition: service_started
+        required: false
+      ellacore-smsc:
+        condition: service_started
+        required: false

@@ -1,0 +1,24 @@
+logging:
+  level: info
+db:
+  path: ims.db
+api:
+  address: 0.0.0.0
+  port: 5020
+# P-, I- and S-CSCF share this address on Ella Core's N6 network; it is the
+# P-CSCF address given to UEs
+sip:
+  addresses: [${PCSCF_EXT_IP_ADDR}]
+pcscf:
+  port: 5060
+  ipsec:
+    server_port: 5063
+    client_ports: [5064, 5065]
+icscf:
+  port: 5070
+scscf:
+  port: 5080
+# Local address of the Cx/Rx Diameter link to Ella Core (HSS and PCRF)
+diameter:
+  address: ${PCSCF_IP_ADDR}
+  port: 3868
