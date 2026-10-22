@@ -24,6 +24,8 @@ dnnList:
   - dnn: ${APN} # Data Network Name
     cidr: 192.168.100.1/24 # Classless Inter-Domain Routing for assigned IPv4 pool of UE
     # natifname: eth0
+  - dnn: ims
+    cidr: 192.168.101.1/24
 
 logger: # log output setting
   enable: true # true or false

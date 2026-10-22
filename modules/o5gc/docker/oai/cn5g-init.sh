@@ -93,6 +93,22 @@ add_user () {
                             "downlink": "100Mbps" },
                         "staticIpAddress": [{
                             "ipv4Addr": "'$(ue_ip $id)'" }]
+                    },
+                    "ims": {
+                        "pduSessionTypes": {
+                            "defaultSessionType": "IPV4" },
+                        "sscModes": {
+                            "defaultSscMode": "SSC_MODE_1" },
+                        "5gQosProfile": {
+                            "5qi": 5,
+                            "arp": {
+                                "priorityLevel": 1,
+                                "preemptCap": "NOT_PREEMPT",
+                                "preemptVuln": "NOT_PREEMPTABLE" },
+                            "priorityLevel": 1 },
+                        "sessionAmbr": {
+                            "uplink": "100Mbps",
+                            "downlink": "100Mbps" }
                     }}' )'"
             );'
         exec_sql 'INSERT INTO `AccessAndMobilitySubscriptionData`

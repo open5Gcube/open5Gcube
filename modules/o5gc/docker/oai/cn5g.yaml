@@ -174,12 +174,19 @@ smf:
       - sNssai: *custom_slice
         dnnSmfInfoList:
           - dnn: "${APN}"
+          - dnn: "ims"
   local_subscription_infos:
     - single_nssai: *custom_slice
       dnn: "${APN}"
       qos_profile:
         5qi: 9
         session_ambr_ul: "50Mbps"
+        session_ambr_dl: "100Mbps"
+    - single_nssai: *custom_slice
+      dnn: "ims"
+      qos_profile:
+        5qi: 5
+        session_ambr_ul: "100Mbps"
         session_ambr_dl: "100Mbps"
 
 upf:
@@ -194,6 +201,7 @@ upf:
       - sNssai: *custom_slice
         dnnUpfInfoList:
           - dnn: "${APN}"
+          - dnn: "ims"
 
 ## DNN configuration
 dnns:
@@ -201,5 +209,5 @@ dnns:
     pdu_session_type: "IPV4"
     ipv4_subnet: "${UE_IP_SUBNET}"
   - dnn: "ims"
-    pdu_session_type: "IPV4V6"
-    ipv4_subnet: "14.1.1.2/24"
+    pdu_session_type: "IPV4"
+    ipv4_subnet: "${UE_IMS_IP_SUBNET}"

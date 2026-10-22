@@ -25,6 +25,10 @@ configuration:
           dns: # the IP address of DNS
             ipv4: 8.8.8.8
             ipv6: 2001:4860:4860::8888
+        - dnn: ims
+          dns:
+            ipv4: 8.8.8.8
+            ipv6: 2001:4860:4860::8888
   plmnList: # the list of PLMN IDs that this SMF belongs to (optional, remove this key when unnecessary)
     - mcc: ${MCC} # Mobile Country Code (3 digits string, digit: 0~9)
       mnc: ${MNC} # Mobile Network Code (2 or 3 digits string, digit: 0~9)
@@ -52,12 +56,16 @@ configuration:
                   - cidr: 192.168.100.1/24
                 staticPools:
                   - cidr: 10.60.1.0/24
+              - dnn: ims
+                pools:
+                  - cidr: 192.168.101.1/24
         interfaces: # Interface list for this UPF
           - interfaceType: N3 # the type of the interface (N3 or N9)
             endpoints: # the IP address of this N3/N9 interface on this UPF
               - ${UPF_IP_ADDR}
             networkInstances:  # Data Network Name (DNN)
               - ${APN}
+              - ims
     links: # the topology graph of userplane, A and B represent the two nodes of each link
       - A: gNB1
         B: UPF

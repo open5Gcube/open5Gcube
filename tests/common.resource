@@ -12,6 +12,9 @@ Library  get_env.py
 # docker/srsran/4g/entrypoint.sh; UERANSIM creates uesimtun0 itself. PacketRusher is
 # absent here because it derives the name from the MSIN: see Get UE Tunnel Interface.
 &{UE_TUN_IFACE}  oai=oaitun_ue1  ueransim=uesimtun0  srsran=tun_srsue
+# Tunnel interface of the UE's second PDU session, on the ims data network. Only
+# UERANSIM requests it (docker/ueransim/ue.yaml).
+&{UE_IMS_TUN_IFACE}  ueransim=uesimtun1
 
 # Container running the UE. Stacks that combine the gNB and UE in a single container
 # (PacketRusher) override this in their suite.
@@ -160,6 +163,21 @@ UE Should Reach The Internet
     Should Be Equal  ${result.rc}  ${0}
     Log  ${result.stdout}
 
+UE Should Have IMS Session
+    [Documentation]  Assert the UE brought up its PDU session on the ims data network: its
+    ...    IMS tunnel interface (UE_IMS_TUN_IFACE) has an IPv4 address of the IMS pool
+    ...    UE_IMS_IP_SUBNET. ${ue} and ${container} default to the suite's UE_TYPE and UE_CONTAINER.
+    [Arguments]  ${ue}=${UE_TYPE}  ${container}=${UE_CONTAINER}
+    ${iface} =  Set Variable  ${UE_IMS_TUN_IFACE}[${ue}]
+    ${subnet} =  Get Env  UE_IMS_IP_SUBNET
+    ${result} =  Run Process  docker  exec  ${container}  ip  -4  -o  addr  show  dev  ${iface}
+    Should Be Equal  ${result.rc}  ${0}  no ${iface} in ${container}: ${result.stderr}
+    ${addr} =  Get Regexp Matches  ${result.stdout}  inet ([0-9.]+)/  1
+    Should Not Be Empty  ${addr}  no IPv4 address on ${iface} in ${container}
+    ${in_pool} =  Evaluate  ipaddress.ip_address($addr[0]) in ipaddress.ip_network($subnet)
+    ...    modules=ipaddress
+    Should Be True  ${in_pool}  ${addr}[0] of ${iface} in ${container} is not in ${subnet}
+
 Get UE Tunnel Interface
     [Documentation]  Name of the tunnel interface the UE brings up. Most implementations use a
     ...    fixed name (UE_TUN_IFACE), but PacketRusher names one interface per subscriber,
@@ -221,7 +239,9 @@ Ellacore AMF Log Should Show UE Registered
     ...    single 'ellacore' container, so this and the SMF keyword both read that
     ...    container's structured (JSON) log rather than separate 'amf'/'smf' containers.
     [Arguments]  ${imsi}
-    Container Log Should Match Regexp  ellacore  "component":"AMF".*"msg":"UE registration accepted".*"supi":"imsi-${imsi}"
+    ${regex} =  Catenate  SEPARATOR=${EMPTY}
+    ...    "component":"AMF".*  "msg":"UE registration accepted".*  "supi":"imsi-${imsi}"
+    Container Log Should Match Regexp  ellacore  ${regex}
 
 Ellacore SMF Log Should Contain PDU Session Setup
     Container Log Should Match Regexp  ellacore  "component":"SMF".*"msg":"PDU session established".*"result":"accept"

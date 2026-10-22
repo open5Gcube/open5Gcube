@@ -50,6 +50,12 @@ sessions:
     slice:
       sst: ${NSSAI_SST}
       sd: ${NSSAI_SD}
+  # IMS signalling and media (uesimtun1), for the cores that offer it
+  - type: 'IPv4'
+    apn: 'ims'
+    slice:
+      sst: ${NSSAI_SST}
+      sd: ${NSSAI_SD}
 
 # Configured NSSAI for this UE by HPLMN
 configured-nssai:

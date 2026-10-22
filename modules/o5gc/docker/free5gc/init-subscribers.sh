@@ -59,13 +59,25 @@ add_subscriber () {
                     },
                     "sessionAmbr": {"uplink": "200 Mbps", "downlink": "100 Mbps"},
                     "5gQosProfile": { "5qi": 9, "arp": {"priorityLevel": 8}, "priorityLevel": 8 }
+                },
+                "ims": {
+                    "sscModes": {
+                        "defaultSscMode": "SSC_MODE_1",
+                        "allowedSscModes": ["SSC_MODE_2", "SSC_MODE_3"]
+                    },
+                    "pduSessionTypes": {
+                        "defaultSessionType": "IPV4",
+                        "allowedSessionTypes": ["IPV4"]
+                    },
+                    "sessionAmbr": {"uplink": "100 Mbps", "downlink": "100 Mbps"},
+                    "5gQosProfile": { "5qi": 5, "arp": {"priorityLevel": 1}, "priorityLevel": 1 }
                 }
             }
         } ],
         "SmfSelectionSubscriptionData": {
             "subscribedSnssaiInfos": {
                 "01'${NSSAI_SD}'": {
-                    "dnnInfos": [ {"dnn": "'${APN}'"} ]
+                    "dnnInfos": [ {"dnn": "'${APN}'"}, {"dnn": "ims"} ]
                 }
             }
         },
@@ -78,7 +90,8 @@ add_subscriber () {
                         "sd": "'${NSSAI_SD}'"
                     },
                     "smPolicyDnnData": {
-                        "'${APN}'" : {"dnn": "'${APN}'" }
+                        "'${APN}'" : {"dnn": "'${APN}'" },
+                        "ims" : {"dnn": "ims" }
                     }
                 }
             }
