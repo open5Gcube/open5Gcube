@@ -27,5 +27,8 @@ Verify UE Is Registered At AMF
 Verify UE Connectivity
     UE Should Reach The Internet
 
+Verify UE IMS PDU Session
+    UE Should Have IMS Session
+
 Verify PDU Session Establishment At SMF
     SMF Log Should Contain PDU Session Setup

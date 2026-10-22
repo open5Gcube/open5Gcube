@@ -9,6 +9,21 @@ services:
       file: ${DOCKER}/ueransim/services.yaml
       service: ueransim-ue
 
+  # second UE, as callee of the IMS tests
+  ue2:
+    extends:
+      file: ${DOCKER}/ueransim/services.yaml
+      service: ueransim-ue
+    container_name: ue2
+    environment:
+      - UE_SOFT_MSIN=${UE_SOFT_MSIN_0}
+      - UE_SOFT_KEY=${UE_SOFT_KEY_0}
+      - UE_SOFT_OPC=${UE_SOFT_OPC_0}
+    networks:
+      ran:
+        # not the static address of ue, any address of the ran network will do
+        ipv4_address: !reset null
+
   ellacore:
     extends:
       file: ${DOCKER}/ellacore/services.yaml

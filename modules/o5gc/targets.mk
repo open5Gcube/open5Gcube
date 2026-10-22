@@ -210,11 +210,15 @@ run-ocudu-split-open5gs-5g-cu-cp run-ocudu-split-open5gs-5g-cu-up \
 run-ocudu-split-open5gs-5g-core run-ocudu-split-open5gs-5g-du: .create-running-env
 	$(call run_stack,o5gc,ocudu-split-open5gs-5g,$(subst run-ocudu-split-open5gs-5g-,,$@))
 
-run-ueransim-open5gs run-ueransim-free5gc run-ueransim-oai run-ueransim-ellacore: .create-running-env  ##
+run-ueransim-open5gs run-ueransim-free5gc run-ueransim-oai: .create-running-env  ##
 	export OAI_CN5G_TYPE=basic;                                               \
 	$(call run_stack,o5gc,$(subst run-,,$@),core gnb ue metrics)
-stop-ueransim-open5gs stop-ueransim-free5gc stop-ueransim-oai stop-ueransim-ellacore:  ##
+stop-ueransim-open5gs stop-ueransim-free5gc stop-ueransim-oai:  ##
 	$(call stop_stack,o5gc,$(subst stop-,,$@),core gnb ue metrics)
+run-ueransim-ellacore: .create-running-env  ##
+	$(call run_stack,o5gc,ueransim-ellacore,core gnb ue volte smsc metrics)
+stop-ueransim-ellacore:  ##
+	$(call stop_stack,o5gc,ueransim-ellacore,core gnb ue volte smsc metrics)
 
 run-packetrusher-open5gs run-packetrusher-open5gs-roaming: .create-running-env  ##
 	$(call run_stack,o5gc,$(subst run-,,$@),core gnb-ue metrics)
