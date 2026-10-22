@@ -40,4 +40,4 @@ NSSAI_SST=$(printf "%02d" ${NSSAI_SST})
 TAC=$(printf "%06d" ${TAC})
 envsubst.sh /mnt/packetrusher/config.yaml config/config.yml
 
-exec ./packetrusher ue
+exec ./packetrusher multi-ue --number-of-ues 1 --tunnel --dedicatedGnb --tunnel-vrf=false

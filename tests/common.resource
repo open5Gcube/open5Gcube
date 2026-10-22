@@ -163,11 +163,11 @@ UE Should Reach The Internet
 Get UE Tunnel Interface
     [Documentation]  Name of the tunnel interface the UE brings up. Most implementations use a
     ...    fixed name (UE_TUN_IFACE), but PacketRusher names one interface per subscriber,
-    ...    derived from the MSIN, e.g. MSIN 0010000001 gives val0010000001.
+    ...    derived from the MSIN, e.g. MSIN 0010000001 gives gtp00010000001.
     [Arguments]  ${ue}=${UE_TYPE}
     IF  '${ue}' == 'packetrusher'
         ${msin} =  Get Env  UE_SOFT_MSIN
-        RETURN  val${msin}
+        RETURN  gtp0${msin}
     END
     RETURN  ${UE_TUN_IFACE}[${ue}]
 
