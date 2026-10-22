@@ -1,5 +1,12 @@
 FROM o5gc/o5gc-base:jammy
 
+# Keep Go identical to packetrusher/Dockerfile, ims/smsc.Dockerfile (shared)
+RUN cached-download.sh https://go.dev/dl/go1.27.3.linux-amd64.tar.gz          \
+    && tar -C /usr/local -zxvf go1.*.tar.gz                                   \
+    && rm go1.*.tar.gz
+ENV PATH="$PATH:/usr/local/go/bin"
+
+# Keep Node.js identical to ims.Dockerfile and smsc.Dockerfile (shared layer)
 RUN mkdir -p /etc/apt/keyrings                                                \
     && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key   \
         | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg                   \
@@ -8,14 +15,9 @@ RUN mkdir -p /etc/apt/keyrings                                                \
         > /etc/apt/sources.list.d/nodesource.list                             \
     && apt-get.sh install nodejs nginx
 
-RUN cached-download.sh https://go.dev/dl/go1.26.9.linux-amd64.tar.gz          \
-    && tar -C /usr/local -zxvf go1.*.tar.gz                                   \
-    && rm go1.*.tar.gz
-ENV PATH="$PATH:/usr/local/go/bin"
-
 WORKDIR /o5gc/ellacore
 
-ARG ELLACORE_VERSION=1.19.0
+ARG ELLACORE_VERSION=1.20.0
 RUN git clone --branch v${ELLACORE_VERSION} --depth 1                         \
         https://github.com/ellanetworks/core.git .                            \
     && REVISION=`git rev-parse HEAD`                                          \
