@@ -1,7 +1,9 @@
 db_uri: ${DB_URI}
 
 logger:
-    file: /open5gs/install/var/log/open5gs/pcf.log
+    file:
+      path: /var/log/open5gs/pcf.log
+    level: ${OPEN5GS_LOGLEVEL}
 
 sbi:
     server:
@@ -19,16 +21,18 @@ pcf:
         - address: ${PCF_IP_ADDR}
           port: 7777
       client:
-#        nrf:
-#          - uri: http://nrf.5gc.mnc${MNC03}.mcc${MCC}.3gppnetwork.org:7777
+        nrf:
+          - uri: http://${NRF_IP_ADDR}:7777
         scp:
-          - uri: http://scp.5gc.mnc${MNC03}.mcc${MCC}.3gppnetwork.org:7777
+          - uri: http://${SCP_IP_ADDR}:7777
+    # the visited network has no subscription data of the roaming UEs: the
+    # policy for their locally broken out sessions
     policy:
       - plmn_id:
           mcc: ${HOME_MCC}
           mnc: ${HOME_MNC}
         slice:
-          - sst: ${NSSAI_SST}  # 1,2,3,4
+          - sst: ${NSSAI_SST}
             sd: ${NSSAI_SD}
             default_indicator: true
             session:
@@ -42,9 +46,9 @@ pcf:
                     value: 1
                     unit: 3
                 qos:
-                  index: 9  # 1, 2, 3, 4, 65, 66, 67, 75, 71, 72, 73, 74, 76, 5, 6, 7, 8, 9, 69, 70, 79, 80, 82, 83, 84, 85, 86
+                  index: 9
                   arp:
-                    priority_level: 8  # 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+                    priority_level: 8
                     pre_emption_vulnerability: 1  # 1: Disabled, 2:Enabled
                     pre_emption_capability: 1  # 1: Disabled, 2:Enabled
     metrics:

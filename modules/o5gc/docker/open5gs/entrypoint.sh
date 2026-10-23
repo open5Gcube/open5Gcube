@@ -13,14 +13,6 @@ if [[ -z "${service}" ]]; then
     exit 1;
 fi
 
-open5gs_init_host=open5gs-init
-if [[ "${OPEN5GS_ROAMING}" == "1" ]]; then
-    open5gs_init_host=${OPEN5GS_ROAMING_NETWORK,,}-open5gs-init
-    var="${OPEN5GS_ROAMING_NETWORK}_CORENET_HOST_IP_ADDR"
-    export ${service^^}_IP_ADDR=$(ip route get ${!var} | sed -n 's|.* src \([0-9.]*\) .*|\1|p')
-    sleep 1
-fi
-
 if [[ -f ${mnt}/${service}.yaml ]]; then
     envsubst.sh ${mnt}/${service}.yaml install/etc/open5gs/${service}.yaml
     cat install/etc/open5gs/${service}.yaml
@@ -54,7 +46,7 @@ case "${service}" in
 #        gdb -batch -ex "run" -ex "bt" install/bin/open5gs-${service}d 2>&1 | grep --line-buffered -v ^"No stack."$
 #        ;;
     nrf | ausf | udr | udm | pcf | bsf | nssf | hss | sgwc | sgwu | smf | amf | mme | pcrf | upf | scp | sepp)
-        while [[ -n "$(dig +short ${open5gs_init_host})" ]]; do sleep 2; done
+        while [[ -n "$(dig +short ${OPEN5GS_INIT_HOST:-open5gs-init})" ]]; do sleep 2; done
         exec install/bin/open5gs-${service}d
         ;;
     *)

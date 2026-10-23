@@ -14,6 +14,8 @@ add_subscriber () {
         return
     fi
     [ "${NSSAI_SD}" != "ffffff" ] && NSSAI_SD=$(printf "%06d" ${NSSAI_SD})
+    # lbo_roaming_allowed: a visited network breaks the internet session out
+    # locally instead of routing it to the home network
     data='{
         "imsi": "'$imsi'",
         "msisdn": ["'${imsi: -5}'" ],
@@ -36,6 +38,7 @@ add_subscriber () {
             "session": [ {
                 "name": "internet",
                 "type": 1,
+                "lbo_roaming_allowed": true,
                 "pcc_rule": [],
                 "ambr": {
                     "uplink": { "value": 1, "unit": 3 },

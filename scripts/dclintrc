@@ -22,7 +22,8 @@
           "Environment Configuration": [ "env_file", "environment" ],
           "Networking": [ "domainname", "hostname", "networks", "network_mode", "ports", "extra_hosts" ],
           "Runtime Behavior": [ "entrypoint", "command", "init", "privileged", "working_dir" ],
-          "Others": [ "profiles", "restart", "healthcheck" ]
+          "Others": [ "profiles", "restart", "healthcheck" ],
+          "Merge Keys (any position)": [ "<<" ]
         }
     } ],
     "top-level-properties-order": [ 2, {

@@ -13,11 +13,6 @@ if [[ "${INSTALL_GTP5G_MODULE}" == "1" ]]; then
     popd
 fi
 
-if [[ "${OPEN5GS_ROAMING}" == "1" ]]; then
-    var="${OPEN5GS_ROAMING_NETWORK}_CORENET_HOST_IP_ADDR"
-    export GNB_IP_ADDR=$(ip route get ${!var} | sed -n 's|.* src \([0-9.]*\) .*|\1|p')
-fi
-
 wait-for-it -t 60 ${AMF_IP_ADDR}:7777
 
 # wait until all initialisation containers are completed

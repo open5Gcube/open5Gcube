@@ -19,6 +19,10 @@ Library  get_env.py
 # Container running the UE. Stacks that combine the gNB and UE in a single container
 # (PacketRusher) override this in their suite.
 ${UE_CONTAINER}  ue
+# Containers running the AMF and SMF. Stacks that name them differently (the roaming
+# stack runs visited-amf and visited-smf) override these in their suite.
+${AMF_CONTAINER}  amf
+${SMF_CONTAINER}  smf
 
 # Core-specific assertions. The AMF and SMF log formats differ between the cores,
 # so each core gets its own keyword and CORE_TYPE picks the pair.
@@ -206,33 +210,34 @@ SMF Log Should Contain PDU Session Setup
 
 OAI AMF Log Should Show UE Registered
     [Arguments]  ${imsi}
-    Container Log Should Match Regexp  amf  5GMM-REGISTERED\\s+\\|\\s+${imsi}
+    Container Log Should Match Regexp  ${AMF_CONTAINER}  5GMM-REGISTERED\\s+\\|\\s+${imsi}
 
 Open5GS AMF Log Should Show UE Registered
     [Arguments]  ${imsi}
-    Container Log Should Match Regexp  amf  \\[imsi-${imsi}\\] Registration complete
+    Container Log Should Match Regexp  ${AMF_CONTAINER}  \\[imsi-${imsi}\\] Registration complete
 
 OAI SMF Log Should Contain PDU Session Setup
-    Container Log Should Match Regexp  smf  Received a SM context create request from AMF
-    Container Log Should Match Regexp  smf  PDU Session Create SM Context Request
-    Container Log Should Match Regexp  smf  PDU_SESSION_ESTABLISHMENT_ACCEPT, encode starting
-    Container Log Should Match Regexp  smf  Set PDU Session Status to PDU Session Status Establishment Pending
-    Container Log Should Match Regexp  smf  PDU_SESSION_ESTABLISHMENT_UE_REQUESTED
-    Container Log Should Match Regexp  smf  Set PDU Session Status to PDU Session Status Active
+    Container Log Should Match Regexp  ${SMF_CONTAINER}  Received a SM context create request from AMF
+    Container Log Should Match Regexp  ${SMF_CONTAINER}  PDU Session Create SM Context Request
+    Container Log Should Match Regexp  ${SMF_CONTAINER}  PDU_SESSION_ESTABLISHMENT_ACCEPT, encode starting
+    Container Log Should Match Regexp  ${SMF_CONTAINER}
+    ...    Set PDU Session Status to PDU Session Status Establishment Pending
+    Container Log Should Match Regexp  ${SMF_CONTAINER}  PDU_SESSION_ESTABLISHMENT_UE_REQUESTED
+    Container Log Should Match Regexp  ${SMF_CONTAINER}  Set PDU Session Status to PDU Session Status Active
 
 Open5GS SMF Log Should Contain PDU Session Setup
-    Container Log Should Match Regexp  smf  \\[Added\\] Number of SMF-Sessions is now
-    Container Log Should Match Regexp  smf  UE SUPI\\[imsi-\\d+\\] DNN\\[.*\\] IPv4\\[\\d
+    Container Log Should Match Regexp  ${SMF_CONTAINER}  \\[Added\\] Number of SMF-Sessions is now
+    Container Log Should Match Regexp  ${SMF_CONTAINER}  UE SUPI\\[imsi-\\d+\\] DNN\\[.*\\] IPv4\\[\\d
 
 Free5GC AMF Log Should Show UE Registered
     [Arguments]  ${imsi}
-    Container Log Should Match Regexp  amf  supi:SUPI:imsi-${imsi}.*Handle Registration Complete
+    Container Log Should Match Regexp  ${AMF_CONTAINER}  supi:SUPI:imsi-${imsi}.*Handle Registration Complete
 
 Free5GC SMF Log Should Contain PDU Session Setup
-    Container Log Should Match Regexp  smf  Receive Create SM Context Request
-    Container Log Should Match Regexp  smf  In HandlePDUSessionEstablishmentRequest
-    Container Log Should Match Regexp  smf  Sending PFCP Session Establishment Request
-    Container Log Should Match Regexp  smf  Received PFCP Session Establishment Accepted Response
+    Container Log Should Match Regexp  ${SMF_CONTAINER}  Receive Create SM Context Request
+    Container Log Should Match Regexp  ${SMF_CONTAINER}  In HandlePDUSessionEstablishmentRequest
+    Container Log Should Match Regexp  ${SMF_CONTAINER}  Sending PFCP Session Establishment Request
+    Container Log Should Match Regexp  ${SMF_CONTAINER}  Received PFCP Session Establishment Accepted Response
 
 Ellacore AMF Log Should Show UE Registered
     [Documentation]  Ella Core is an all-in-one core: the AMF and SMF are components of a
@@ -264,5 +269,5 @@ Open5GS MME Log Should Show UE Attached
     Container Log Should Match Regexp  mme  \\[${imsi}\\] Attach complete
 
 Open5GS SMF Log Should Contain Default Bearer
-    Container Log Should Match Regexp  smf  \\[Added\\] Number of SMF-Sessions is now
-    Container Log Should Match Regexp  smf  UE IMSI\\[\\d+\\] APN\\[.*\\] IPv4\\[\\d
+    Container Log Should Match Regexp  ${SMF_CONTAINER}  \\[Added\\] Number of SMF-Sessions is now
+    Container Log Should Match Regexp  ${SMF_CONTAINER}  UE IMSI\\[\\d+\\] APN\\[.*\\] IPv4\\[\\d

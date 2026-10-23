@@ -1,3 +1,24 @@
+# network functions of the home network
+x-home-nf: &home-nf
+  extends:
+    service: home-base
+  profiles: [ "core" ]
+
+x-sbi-healthcheck: &sbi-healthcheck
+  healthcheck:
+    test: bash -c "ss -ltn | grep -q ':7777'"
+    start_period: 5s
+    start_interval: 1s
+    interval: 10s
+    timeout: 5s
+    retries: 5
+
+# network functions of the visited network
+x-visited-nf: &visited-nf
+  extends:
+    service: visited-base
+  profiles: [ "core" ]
+
 # ---------------------------------------------------------------------
 networks:
   # ---------------------------------------------------------------------
@@ -12,7 +33,7 @@ networks:
       com.docker.network.bridge.name: home-corenet
   home-extnet:
     driver: bridge
-    name: home_extnet
+    name: home-extnet
     ipam:
       config:
         - subnet: ${HOME_EXTNET_SUBNET}
@@ -33,7 +54,7 @@ networks:
       com.docker.network.bridge.name: visited-corenet
   visited-extnet:
     driver: bridge
-    name: visited_extnet
+    name: visited-extnet
     ipam:
       config:
         - subnet: ${VISITED_EXTNET_SUBNET}
@@ -44,573 +65,388 @@ networks:
 # ---------------------------------------------------------------------
 services:
   # ---------------------------------------------------------------------
+  # The UE of the home network attaches to the gNB of the visited network
   gnb-ue:
-    image: o5gc/packetrusher
-    container_name: gnb-ue
-    entrypoint: [ "/mnt/packetrusher/entrypoint.sh" ]
-    privileged: true
-    env_file: [ "${ENV_FILE}" ]
+    extends:
+      file: ${DOCKER}/packetrusher/services.yaml
+      service: gnb-ue
     environment:
-      - OPEN5GS_ROAMING_NETWORK=VISITED
+      - GNB_IP_ADDR=${VISITED_GNB_IP_ADDR}
       - GNB_MCC=${VISITED_MCC}
       - GNB_MNC=${VISITED_MNC}
-      - GNB_MNC03=${VISITED_MNC03}
-      - AMF_IP_ADDR=visited-amf
-      #            - UE_MCC=${VISITED_MCC}
-      #            - UE_MNC=${VISITED_MNC}
       - UE_MCC=${HOME_MCC}
       - UE_MNC=${HOME_MNC}
-    volumes:
-      - ${DOCKER}/packetrusher:/mnt/packetrusher:ro
-      - ${BASE}/var/ssl:/mnt/o5gc/ssl:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /lib/modules:/lib/modules:ro
-      - /usr/src:/usr/src:ro
-    networks:
-      - visited-corenet
-    labels:
-      o5gc.stack: ${O5GC_STACK}
-      o5gc.webui.priority: ${WEBUI_PRIO_RAN}
-    profiles: [ "gnb-ue" ]
+      - AMF_IP_ADDR=visited-amf
+    networks: !override
+      visited-corenet:
+        ipv4_address: ${VISITED_GNB_IP_ADDR}
 
   # -----------------------------------------------------------------
-
+  # The network functions use the default configurations of
+  # docker/open5gs, filled in with the PLMN and addresses of their network.
+  # The SBI network functions listen on and reach each other by their FQDN,
+  # which their network aliases resolve: the SEPPs route the requests of the
+  # other network by the FQDN in the NF profiles. Diameter, PFCP and GTP-U
+  # need IP addresses, so SMF, UPF and PCRF have static ones.
+  
   home-base:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
       service: base
     environment:
-      - OPEN5GS_ROAMING_NETWORK=HOME
+      - OPEN5GS_INIT_HOST=home-open5gs-init
+      - DB_URI=mongodb://home-mongo/open5gs
+      - MONGO_IP_ADDR=home-mongo
       - MCC=${HOME_MCC}
       - MNC=${HOME_MNC}
       - MNC03=${HOME_MNC03}
-    domainname: 5gc.mnc${HOME_MNC03}.mcc${HOME_MCC}.3gppnetwork.org
+      - NRF_IP_ADDR=nrf.5gc.${HOME_PLMN_DOMAIN}
+      - SCP_IP_ADDR=scp.5gc.${HOME_PLMN_DOMAIN}
+      - AUSF_IP_ADDR=ausf.5gc.${HOME_PLMN_DOMAIN}
+      - UDM_IP_ADDR=udm.5gc.${HOME_PLMN_DOMAIN}
+      - UDR_IP_ADDR=udr.5gc.${HOME_PLMN_DOMAIN}
+      - PCF_IP_ADDR=pcf.5gc.${HOME_PLMN_DOMAIN}
+      - BSF_IP_ADDR=bsf.5gc.${HOME_PLMN_DOMAIN}
+      - NSSF_IP_ADDR=nssf.5gc.${HOME_PLMN_DOMAIN}
+      - AMF_IP_ADDR=amf.5gc.${HOME_PLMN_DOMAIN}
+      - SEPP_IP_ADDR=sepp.5gc.${HOME_PLMN_DOMAIN}
+      - SMF_IP_ADDR=${HOME_SMF_IP_ADDR}
+      - UPF_IP_ADDR=${HOME_UPF_IP_ADDR}
+      - UPF_ADVERTISE_IP=${HOME_UPF_IP_ADDR}
+      - PCRF_IP_ADDR=${HOME_PCRF_IP_ADDR}
+      - EPC_DOMAIN=epc.${HOME_PLMN_DOMAIN}
+      - IMS_DOMAIN=ims.${HOME_PLMN_DOMAIN}
+    domainname: 5gc.${HOME_PLMN_DOMAIN}
     networks:
       - home-corenet
 
   home-mongo:
-    image: mongo:6.0
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: mongo
     container_name: home-mongo
-    command: --bind_ip 0.0.0.0
-    networks:
+    networks: !override
       - home-corenet
-    profiles: [ "core" ]
 
   home-open5gs-webui:
     extends:
-      service: home-base
+      file: ${DOCKER}/open5gs/services.yaml
+      service: open5gs-webui
     container_name: home-open5gs-webui
-    command: webui
     environment:
       - DB_URI=mongodb://home-mongo/open5gs
       - MONGO_IP_ADDR=home-mongo
-    networks:
-      - o5gc
-    ports:
+    networks: !override
+      home-corenet:
+      o5gc:
+        gw_priority: 1
+    ports: !override
       - ${O5GC_WEBUI_HOST_ADDR}:${HOME_OPEN5GS_WEBUI_HOST_PORT}:3000
     labels:
       o5gc.link.title: "Home Open5GS WebUI"
       o5gc.link.url: "http://{{host}}:${HOME_OPEN5GS_WEBUI_HOST_PORT}/"
-      o5gc.webui.priority: 0
-    depends_on: [ home-mongo ]
-    profiles: [ "core" ]
-    healthcheck:
-      test: bash -c "exec 6<> /dev/tcp/localhost/3000"
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    depends_on: !override [ home-mongo ]
 
   home-open5gs-init:
     extends:
-      service: home-base
+      file: ${DOCKER}/open5gs/services.yaml
+      service: open5gs-init
     container_name: home-open5gs-init
-    entrypoint: /mnt/open5gs/init-subscribers.sh
     environment:
       - OPEN5GS_WEBUI_IP_ADDR=home-open5gs-webui
-    labels:
-      o5gc.initialisation: true
-      o5gc.webui.priority: ${WEBUI_PRIO_INIT}
-    depends_on: [ home-open5gs-webui ]
-    profiles: [ "core" ]
+      - MONGO_IP_ADDR=home-mongo
+      - MCC=${HOME_MCC}
+      - MNC=${HOME_MNC}
+    networks: !override
+      - home-corenet
+    depends_on: !override [ home-open5gs-webui ]
 
   home-nrf:
-    extends:
-      service: home-base
+    <<: [ *home-nf, *sbi-healthcheck ]
     container_name: home-nrf
     command: nrf
-    volumes:
-      - ./nrf.yaml/:/mnt/open5gs/nrf.yaml:ro
-    networks:
-      home-corenet:
-        aliases:
-          - nrf.5gc.mnc${HOME_MNC03}.mcc${HOME_MCC}.3gppnetwork.org
-    profiles: [ "core" ]
+    networks: { home-corenet: { aliases: [ "nrf.5gc.${HOME_PLMN_DOMAIN}" ] } }
+
+  home-scp:
+    <<: [ *home-nf, *sbi-healthcheck ]
+    container_name: home-scp
+    command: scp
+    networks: { home-corenet: { aliases: [ "scp.5gc.${HOME_PLMN_DOMAIN}" ] } }
 
   home-ausf:
-    extends:
-      service: home-base
+    <<: *home-nf
     container_name: home-ausf
     command: ausf
-    volumes:
-      - ./ausf.yaml/:/mnt/open5gs/ausf.yaml:ro
-    networks:
-      home-corenet:
-        aliases:
-          - ausf.5gc.mnc${HOME_MNC03}.mcc${HOME_MCC}.3gppnetwork.org
-    depends_on: [ home-nrf ]
-    profiles: [ "core" ]
-
-  home-udr:
-    extends:
-      service: home-base
-    container_name: home-udr
-    command: udr
-    environment:
-      - DB_URI=mongodb://home-mongo/open5gs
-    volumes:
-      - ./udr.yaml/:/mnt/open5gs/udr.yaml:ro
-    networks:
-      home-corenet:
-        aliases:
-          - udr.5gc.mnc${HOME_MNC03}.mcc${HOME_MCC}.3gppnetwork.org
-    depends_on: [ home-mongo, home-nrf ]
-    profiles: [ "core" ]
+    networks: { home-corenet: { aliases: [ "ausf.5gc.${HOME_PLMN_DOMAIN}" ] } }
 
   home-udm:
-    extends:
-      service: home-base
+    <<: *home-nf
     container_name: home-udm
     command: udm
-    volumes:
-      - ./udm.yaml/:/mnt/open5gs/udm.yaml:ro
-    networks:
-      home-corenet:
-        aliases:
-          - udm.5gc.mnc${HOME_MNC03}.mcc${HOME_MCC}.3gppnetwork.org
-    depends_on: [ home-nrf ]
-    profiles: [ "core" ]
+    networks: { home-corenet: { aliases: [ "udm.5gc.${HOME_PLMN_DOMAIN}" ] } }
+
+  home-udr:
+    <<: *home-nf
+    container_name: home-udr
+    command: udr
+    networks: { home-corenet: { aliases: [ "udr.5gc.${HOME_PLMN_DOMAIN}" ] } }
 
   home-pcf:
-    extends:
-      service: home-base
+    <<: *home-nf
     container_name: home-pcf
     command: pcf
-    environment:
-      - DB_URI=mongodb://home-mongo/open5gs
-    volumes:
-      - ./pcf-home.yaml/:/mnt/open5gs/pcf.yaml:ro
-    networks:
-      home-corenet:
-        aliases:
-          - pcf.5gc.mnc${HOME_MNC03}.mcc${HOME_MCC}.3gppnetwork.org
-    depends_on: [ home-mongo, home-nrf ]
-    profiles: [ "core" ]
+    networks: { home-corenet: { aliases: [ "pcf.5gc.${HOME_PLMN_DOMAIN}" ] } }
 
   home-bsf:
-    extends:
-      service: home-base
+    <<: *home-nf
     container_name: home-bsf
     command: bsf
-    environment:
-      - DB_URI=mongodb://home-mongo/open5gs
-    volumes:
-      - ./bsf.yaml/:/mnt/open5gs/bsf.yaml:ro
-    networks:
-      home-corenet:
-        aliases:
-          - bsf.5gc.mnc${HOME_MNC03}.mcc${HOME_MCC}.3gppnetwork.org
-    depends_on: [ home-mongo, home-nrf ]
-    profiles: [ "core" ]
+    networks: { home-corenet: { aliases: [ "bsf.5gc.${HOME_PLMN_DOMAIN}" ] } }
 
   home-nssf:
-    extends:
-      service: home-base
+    <<: *home-nf
     container_name: home-nssf
     command: nssf
-    volumes:
-      - ./nssf.yaml/:/mnt/open5gs/nssf.yaml:ro
-    networks:
-      home-corenet:
-        aliases:
-          - nssf.5gc.mnc${HOME_MNC03}.mcc${HOME_MCC}.3gppnetwork.org
-    depends_on: [ home-nrf ]
-    profiles: [ "core" ]
+    networks: { home-corenet: { aliases: [ "nssf.5gc.${HOME_PLMN_DOMAIN}" ] } }
 
-  home-smf:
-    extends:
-      service: home-base
-    container_name: home-smf
-    command: smf
-    environment:
-      - EPC_DOMAIN=epc.mnc${HOME_MNC03}.mcc${HOME_MCC}.3gppnetwork.org
-    volumes:
-      - ./smf.yaml/:/mnt/open5gs/smf.yaml:ro
-    networks:
-      home-corenet:
-        aliases:
-          - smf.5gc.mnc${HOME_MNC03}.mcc${HOME_MCC}.3gppnetwork.org
+  home-amf:
+    <<: *home-nf
+    container_name: home-amf
+    command: amf
+    networks: { home-corenet: { aliases: [ "amf.5gc.${HOME_PLMN_DOMAIN}" ] } }
     labels:
       o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
-    depends_on: [ home-nrf ]
-    profiles: [ "core" ]
+
+  home-smf:
+    <<: *home-nf
+    container_name: home-smf
+    command: smf
+    networks: { home-corenet: { ipv4_address: "${HOME_SMF_IP_ADDR}" } }
+    labels:
+      o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
 
   home-upf:
-    extends:
-      service: home-base
+    <<: *home-nf
     container_name: home-upf
     command: upf
+    privileged: true
     environment:
-      - UPF_ADVERTISE_IP=${UPF_IP_ADDR}
       - CAPTURE_INTERFACE=ogstun
-    volumes:
-      - ./upf.yaml/:/mnt/open5gs/upf.yaml:ro
     networks:
       home-corenet:
-        aliases:
-          - upf.5gc.mnc${HOME_MNC03}.mcc${HOME_MCC}.3gppnetwork.org
+        ipv4_address: ${HOME_UPF_IP_ADDR}
       home-extnet:
         gw_priority: 1
-    labels:
-      o5gc.webui.priority: ${WEBUI_PRIO_CORE_DEFAULT}
-    depends_on: [ home-nrf, home-smf ]
-    profiles: [ "core" ]
     cap_add:
       - NET_ADMIN
     sysctls:
       - net.ipv4.ip_forward=1
 
-  home-amf:
-    extends:
-      service: home-base
-    container_name: home-amf
-    command: amf
-    volumes:
-      - ./amf-home.yaml/:/mnt/open5gs/amf.yaml:ro
-    networks:
-      home-corenet:
-        aliases:
-          - amf.5gc.mnc${HOME_MNC03}.mcc${HOME_MCC}.3gppnetwork.org
-    labels:
-      o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
-    depends_on: [ home-ausf, home-bsf, home-nrf, home-pcf, home-smf, home-udm, home-udr, home-upf ]
-    profiles: [ "core" ]
-
   home-pcrf:
-    extends:
-      service: home-base
+    <<: *home-nf
     container_name: home-pcrf
     command: pcrf
-    environment:
-      - EPC_DOMAIN=epc.mnc${HOME_MNC03}.mcc${HOME_MCC}.3gppnetwork.org
-      - IMS_DOMAIN=ims.mnc${HOME_MNC03}.mcc${HOME_MCC}.3gppnetwork.org
-      - DB_URI=mongodb://home-mongo/open5gs
-    volumes:
-      - ./pcrf.yaml/:/mnt/open5gs/pcrf.yaml:ro
-    networks:
-      home-corenet:
-        aliases:
-          - pcrf.5gc.mnc${HOME_MNC03}.mcc${HOME_MCC}.3gppnetwork.org
-    depends_on: [ home-mongo ]
-    profiles: [ "core" ]
-
-  home-scp:
-    extends:
-      service: home-base
-    container_name: home-scp
-    command: scp
-    volumes:
-      - ./scp.yaml/:/mnt/open5gs/scp.yaml:ro
-    networks:
-      home-corenet:
-        aliases:
-          - scp.5gc.mnc${HOME_MNC03}.mcc${HOME_MCC}.3gppnetwork.org
-    profiles: [ "core" ]
+    networks: { home-corenet: { ipv4_address: "${HOME_PCRF_IP_ADDR}" } }
 
   home-sepp:
-    extends:
-      service: home-base
+    <<: *home-nf
     container_name: home-sepp
     command: sepp
-    volumes:
-      - ./sepp-home.yaml/:/mnt/open5gs/sepp.yaml:ro
+    environment:
+      - SEPP_PEER_MCC=${VISITED_MCC}
+      - SEPP_PEER_MNC03=${VISITED_MNC03}
     networks:
       home-corenet:
-        aliases:
-          - sepp.5gc.mnc${HOME_MNC03}.mcc${HOME_MCC}.3gppnetwork.org
+        aliases: [ "sepp.5gc.${HOME_PLMN_DOMAIN}" ]
       visited-corenet:
+    # The SEPP starts the handshake with its peer only after it registered at
+    # the NRF, and aborts when the peer's handshake comes first (Open5GS
+    # v2.8.0): start it once it can register right away
+    depends_on:
+      home-nrf:
+        condition: service_healthy
+      home-scp:
+        condition: service_healthy
 
-        # -----------------------------------------------------------------
+  # -----------------------------------------------------------------
 
-    profiles: [ "core" ]
   visited-base:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
       service: base
     environment:
-      - OPEN5GS_ROAMING_NETWORK=VISITED
+      - OPEN5GS_INIT_HOST=visited-open5gs-init
+      - DB_URI=mongodb://visited-mongo/open5gs
+      - MONGO_IP_ADDR=visited-mongo
       - MCC=${VISITED_MCC}
       - MNC=${VISITED_MNC}
       - MNC03=${VISITED_MNC03}
-    domainname: 5gc.mnc${VISITED_MNC03}.mcc${VISITED_MCC}.3gppnetwork.org
+      - NRF_IP_ADDR=nrf.5gc.${VISITED_PLMN_DOMAIN}
+      - SCP_IP_ADDR=scp.5gc.${VISITED_PLMN_DOMAIN}
+      - AUSF_IP_ADDR=ausf.5gc.${VISITED_PLMN_DOMAIN}
+      - UDM_IP_ADDR=udm.5gc.${VISITED_PLMN_DOMAIN}
+      - UDR_IP_ADDR=udr.5gc.${VISITED_PLMN_DOMAIN}
+      - PCF_IP_ADDR=pcf.5gc.${VISITED_PLMN_DOMAIN}
+      - BSF_IP_ADDR=bsf.5gc.${VISITED_PLMN_DOMAIN}
+      - NSSF_IP_ADDR=nssf.5gc.${VISITED_PLMN_DOMAIN}
+      - AMF_IP_ADDR=amf.5gc.${VISITED_PLMN_DOMAIN}
+      - SEPP_IP_ADDR=sepp.5gc.${VISITED_PLMN_DOMAIN}
+      - SMF_IP_ADDR=${VISITED_SMF_IP_ADDR}
+      - UPF_IP_ADDR=${VISITED_UPF_IP_ADDR}
+      - UPF_ADVERTISE_IP=${VISITED_UPF_IP_ADDR}
+      - PCRF_IP_ADDR=${VISITED_PCRF_IP_ADDR}
+      - EPC_DOMAIN=epc.${VISITED_PLMN_DOMAIN}
+      - IMS_DOMAIN=ims.${VISITED_PLMN_DOMAIN}
+    domainname: 5gc.${VISITED_PLMN_DOMAIN}
     networks:
       - visited-corenet
 
   visited-mongo:
-    image: mongo:6.0
+    extends:
+      file: ${DOCKER}/open5gs/services.yaml
+      service: mongo
     container_name: visited-mongo
-    command: --bind_ip 0.0.0.0
-    networks:
+    networks: !override
       - visited-corenet
-    profiles: [ "core" ]
 
   visited-open5gs-webui:
     extends:
-      service: visited-base
+      file: ${DOCKER}/open5gs/services.yaml
+      service: open5gs-webui
     container_name: visited-open5gs-webui
-    command: webui
     environment:
       - DB_URI=mongodb://visited-mongo/open5gs
       - MONGO_IP_ADDR=visited-mongo
-    networks:
-      - o5gc
-    ports:
+    networks: !override
+      visited-corenet:
+      o5gc:
+        gw_priority: 1
+    ports: !override
       - ${O5GC_WEBUI_HOST_ADDR}:${VISITED_OPEN5GS_WEBUI_HOST_PORT}:3000
     labels:
-      o5gc.link.title: "Home Open5GS WebUI"
+      o5gc.link.title: "Visited Open5GS WebUI"
       o5gc.link.url: "http://{{host}}:${VISITED_OPEN5GS_WEBUI_HOST_PORT}/"
-      o5gc.webui.priority: 0
-    depends_on: [ visited-mongo ]
-    profiles: [ "core" ]
-    healthcheck:
-      test: bash -c "exec 6<> /dev/tcp/localhost/3000"
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    depends_on: !override [ visited-mongo ]
 
   visited-open5gs-init:
     extends:
-      service: visited-base
+      file: ${DOCKER}/open5gs/services.yaml
+      service: open5gs-init
     container_name: visited-open5gs-init
-    entrypoint: /mnt/open5gs/init-subscribers.sh
     environment:
       - OPEN5GS_WEBUI_IP_ADDR=visited-open5gs-webui
-    labels:
-      o5gc.initialisation: true
-      o5gc.webui.priority: ${WEBUI_PRIO_INIT}
-    depends_on: [ visited-open5gs-webui ]
-    profiles: [ "core" ]
+      - MONGO_IP_ADDR=visited-mongo
+      - MCC=${VISITED_MCC}
+      - MNC=${VISITED_MNC}
+    networks: !override
+      - visited-corenet
+    depends_on: !override [ visited-open5gs-webui ]
 
   visited-nrf:
-    extends:
-      service: visited-base
+    <<: [ *visited-nf, *sbi-healthcheck ]
     container_name: visited-nrf
     command: nrf
-    volumes:
-      - ./nrf.yaml/:/mnt/open5gs/nrf.yaml:ro
-    networks:
-      visited-corenet:
-        aliases:
-          - nrf.5gc.mnc${VISITED_MNC03}.mcc${VISITED_MCC}.3gppnetwork.org
-    profiles: [ "core" ]
+    networks: { visited-corenet: { aliases: [ "nrf.5gc.${VISITED_PLMN_DOMAIN}" ] } }
+
+  visited-scp:
+    <<: [ *visited-nf, *sbi-healthcheck ]
+    container_name: visited-scp
+    command: scp
+    networks: { visited-corenet: { aliases: [ "scp.5gc.${VISITED_PLMN_DOMAIN}" ] } }
 
   visited-ausf:
-    extends:
-      service: visited-base
+    <<: *visited-nf
     container_name: visited-ausf
     command: ausf
-    volumes:
-      - ./ausf.yaml/:/mnt/open5gs/ausf.yaml:ro
-    networks:
-      visited-corenet:
-        aliases:
-          - ausf.5gc.mnc${VISITED_MNC03}.mcc${VISITED_MCC}.3gppnetwork.org
-    depends_on: [ visited-nrf ]
-    profiles: [ "core" ]
-
-  visited-udr:
-    extends:
-      service: visited-base
-    container_name: visited-udr
-    command: udr
-    environment:
-      - DB_URI=mongodb://visited-mongo/open5gs
-    volumes:
-      - ./udr.yaml/:/mnt/open5gs/udr.yaml:ro
-    networks:
-      visited-corenet:
-        aliases:
-          - udr.5gc.mnc${VISITED_MNC03}.mcc${VISITED_MCC}.3gppnetwork.org
-    depends_on: [ visited-mongo, visited-nrf ]
-    profiles: [ "core" ]
+    networks: { visited-corenet: { aliases: [ "ausf.5gc.${VISITED_PLMN_DOMAIN}" ] } }
 
   visited-udm:
-    extends:
-      service: visited-base
+    <<: *visited-nf
     container_name: visited-udm
     command: udm
-    volumes:
-      - ./udm.yaml/:/mnt/open5gs/udm.yaml:ro
-    networks:
-      visited-corenet:
-        aliases:
-          - udm.5gc.mnc${VISITED_MNC03}.mcc${VISITED_MCC}.3gppnetwork.org
-    depends_on: [ visited-nrf ]
-    profiles: [ "core" ]
+    networks: { visited-corenet: { aliases: [ "udm.5gc.${VISITED_PLMN_DOMAIN}" ] } }
+
+  visited-udr:
+    <<: *visited-nf
+    container_name: visited-udr
+    command: udr
+    networks: { visited-corenet: { aliases: [ "udr.5gc.${VISITED_PLMN_DOMAIN}" ] } }
 
   visited-pcf:
-    extends:
-      service: visited-base
+    <<: *visited-nf
     container_name: visited-pcf
     command: pcf
-    environment:
-      - DB_URI=mongodb://visited-mongo/open5gs
     volumes:
-      - ./pcf-visited.yaml/:/mnt/open5gs/pcf.yaml:ro
-    networks:
-      visited-corenet:
-        aliases:
-          - pcf.5gc.mnc${VISITED_MNC03}.mcc${VISITED_MCC}.3gppnetwork.org
-    depends_on: [ visited-mongo, visited-nrf ]
-    profiles: [ "core" ]
+      - ./pcf-visited.yaml:/mnt/open5gs/pcf.yaml:ro
+    networks: { visited-corenet: { aliases: [ "pcf.5gc.${VISITED_PLMN_DOMAIN}" ] } }
 
   visited-bsf:
-    extends:
-      service: visited-base
+    <<: *visited-nf
     container_name: visited-bsf
     command: bsf
-    environment:
-      - DB_URI=mongodb://visited-mongo/open5gs
-    volumes:
-      - ./bsf.yaml/:/mnt/open5gs/bsf.yaml:ro
-    networks:
-      visited-corenet:
-        aliases:
-          - bsf.5gc.mnc${VISITED_MNC03}.mcc${VISITED_MCC}.3gppnetwork.org
-    depends_on: [ visited-mongo, visited-nrf ]
-    profiles: [ "core" ]
+    networks: { visited-corenet: { aliases: [ "bsf.5gc.${VISITED_PLMN_DOMAIN}" ] } }
 
   visited-nssf:
-    extends:
-      service: visited-base
+    <<: *visited-nf
     container_name: visited-nssf
     command: nssf
-    volumes:
-      - ./nssf.yaml/:/mnt/open5gs/nssf.yaml:ro
-    networks:
-      visited-corenet:
-        aliases:
-          - nssf.5gc.mnc${VISITED_MNC03}.mcc${VISITED_MCC}.3gppnetwork.org
-    depends_on: [ visited-nrf ]
-    profiles: [ "core" ]
+    networks: { visited-corenet: { aliases: [ "nssf.5gc.${VISITED_PLMN_DOMAIN}" ] } }
 
-  visited-smf:
-    extends:
-      service: visited-base
-    container_name: visited-smf
-    command: smf
-    environment:
-      - EPC_DOMAIN=epc.mnc${VISITED_MNC03}.mcc${VISITED_MCC}.3gppnetwork.org
-    volumes:
-      - ./smf.yaml/:/mnt/open5gs/smf.yaml:ro
-    networks:
-      visited-corenet:
-        aliases:
-          - smf.5gc.mnc${VISITED_MNC03}.mcc${VISITED_MCC}.3gppnetwork.org
+  visited-amf:
+    <<: *visited-nf
+    container_name: visited-amf
+    command: amf
+    networks: { visited-corenet: { aliases: [ "amf.5gc.${VISITED_PLMN_DOMAIN}" ] } }
     labels:
       o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
-    depends_on: [ visited-nrf ]
-    profiles: [ "core" ]
+
+  visited-smf:
+    <<: *visited-nf
+    container_name: visited-smf
+    command: smf
+    networks: { visited-corenet: { ipv4_address: "${VISITED_SMF_IP_ADDR}" } }
+    labels:
+      o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
 
   visited-upf:
-    extends:
-      service: visited-base
+    <<: *visited-nf
     container_name: visited-upf
     command: upf
+    privileged: true
     environment:
-      - UPF_ADVERTISE_IP=${UPF_IP_ADDR}
       - CAPTURE_INTERFACE=ogstun
-    volumes:
-      - ./upf.yaml/:/mnt/open5gs/upf.yaml:ro
     networks:
       visited-corenet:
-        aliases:
-          - upf.5gc.mnc${VISITED_MNC03}.mcc${VISITED_MCC}.3gppnetwork.org
+        ipv4_address: ${VISITED_UPF_IP_ADDR}
       visited-extnet:
         gw_priority: 1
-    labels:
-      o5gc.webui.priority: ${WEBUI_PRIO_CORE_DEFAULT}
-    depends_on: [ visited-nrf, visited-smf ]
-    profiles: [ "core" ]
     cap_add:
       - NET_ADMIN
     sysctls:
       - net.ipv4.ip_forward=1
 
-  visited-amf:
-    extends:
-      service: visited-base
-    container_name: visited-amf
-    command: amf
-    volumes:
-      - ./amf-visited.yaml/:/mnt/open5gs/amf.yaml:ro
-    networks:
-      visited-corenet:
-        aliases:
-          - amf.5gc.mnc${VISITED_MNC03}.mcc${VISITED_MCC}.3gppnetwork.org
-    labels:
-      o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
-    depends_on:
-      - visited-ausf
-      - visited-bsf
-      - visited-nrf
-      - visited-pcf
-      - visited-smf
-      - visited-udm
-      - visited-udr
-      - visited-upf
-    profiles: [ "core" ]
-
   visited-pcrf:
-    extends:
-      service: visited-base
+    <<: *visited-nf
     container_name: visited-pcrf
     command: pcrf
-    environment:
-      - EPC_DOMAIN=epc.mnc${VISITED_MNC03}.mcc${VISITED_MCC}.3gppnetwork.org
-      - IMS_DOMAIN=ims.mnc${VISITED_MNC03}.mcc${VISITED_MCC}.3gppnetwork.org
-      - DB_URI=mongodb://visited-mongo/open5gs
-    volumes:
-      - ./pcrf.yaml/:/mnt/open5gs/pcrf.yaml:ro
-    networks:
-      visited-corenet:
-        aliases:
-          - pcrf.5gc.mnc${VISITED_MNC03}.mcc${VISITED_MCC}.3gppnetwork.org
-    depends_on: [ visited-mongo ]
-    profiles: [ "core" ]
-
-  visited-scp:
-    extends:
-      service: visited-base
-    container_name: visited-scp
-    command: scp
-    volumes:
-      - ./scp.yaml/:/mnt/open5gs/scp.yaml:ro
-    networks:
-      visited-corenet:
-        aliases:
-          - scp.5gc.mnc${VISITED_MNC03}.mcc${VISITED_MCC}.3gppnetwork.org
-    profiles: [ "core" ]
+    networks: { visited-corenet: { ipv4_address: "${VISITED_PCRF_IP_ADDR}" } }
 
   visited-sepp:
-    extends:
-      service: visited-base
+    <<: *visited-nf
     container_name: visited-sepp
     command: sepp
-    volumes:
-      - ./sepp-visited.yaml/:/mnt/open5gs/sepp.yaml:ro
+    environment:
+      - SEPP_PEER_MCC=${HOME_MCC}
+      - SEPP_PEER_MNC03=${HOME_MNC03}
     networks:
       visited-corenet:
-        aliases:
-          - sepp.5gc.mnc${VISITED_MNC03}.mcc${VISITED_MCC}.3gppnetwork.org
+        aliases: [ "sepp.5gc.${VISITED_PLMN_DOMAIN}" ]
       home-corenet:
-    profiles: [ "core" ]
+    # The SEPP starts the handshake with its peer only after it registered at
+    # the NRF, and aborts when the peer's handshake comes first (Open5GS
+    # v2.8.0): start it once it can register right away
+    depends_on:
+      visited-nrf:
+        condition: service_healthy
+      visited-scp:
+        condition: service_healthy
