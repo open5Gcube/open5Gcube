@@ -247,8 +247,6 @@ services:
       o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
     depends_on: [ mongo ]
     profiles: [ "core" ]
-  healthcheck:
-    test: bash -c "ss -ltn | grep -q ':39607'"
 
   sgwc:
     extends:

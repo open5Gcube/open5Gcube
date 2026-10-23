@@ -36,9 +36,6 @@ services:
     container_name: ellacore-ims
     entrypoint: [ "/mnt/ellacore/entrypoint.sh" ]
     command: ims
-    # P-CSCF installs IPsec security associations towards the UEs
-    cap_add:
-      - NET_ADMIN
     env_file: [ "${ENV_FILE}" ]
     volumes:
       - .:/mnt/ellacore/:ro
@@ -65,6 +62,9 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    # P-CSCF installs IPsec security associations towards the UEs
+    cap_add:
+      - NET_ADMIN
 
   ellacore-smsc:
     image: o5gc/ellacore-smsc

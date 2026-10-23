@@ -88,7 +88,7 @@ services:
   # which their network aliases resolve: the SEPPs route the requests of the
   # other network by the FQDN in the NF profiles. Diameter, PFCP and GTP-U
   # need IP addresses, so SMF, UPF and PCRF have static ones.
-  
+
   home-base:
     extends:
       file: ${DOCKER}/open5gs/services.yaml
