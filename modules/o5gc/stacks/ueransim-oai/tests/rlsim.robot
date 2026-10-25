@@ -1,6 +1,6 @@
 *** Settings ***
 Documentation   UERANSIM 5G SA with OAI core, radio link simulation
-Test Tags       Emulated  ueransim  oai-cn
+Test Tags       Emulated  ueransim  oaicn
 Resource        ../../../../../tests/common.resource
 Suite Setup     Setup Stack
 Suite Teardown  Teardown Stack

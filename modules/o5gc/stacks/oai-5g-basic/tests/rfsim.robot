@@ -1,6 +1,6 @@
 *** Settings ***
 Documentation   OAI 5G SA basic rfsim
-Test Tags       Emulated  oai-ran  oai-cn
+Test Tags       Emulated  oairan  oaicn
 Resource        ../../../../../tests/common.resource
 Suite Setup     Setup Stack
 Suite Teardown  Teardown Stack

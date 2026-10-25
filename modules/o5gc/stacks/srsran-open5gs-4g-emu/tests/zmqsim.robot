@@ -1,6 +1,6 @@
 *** Settings ***
 Documentation   srsRAN 4G LTE with Open5GS EPC, ZMQ RF simulation
-Test Tags       Emulated  srsran  open5gs-epc
+Test Tags       Emulated  srsran  open5gsepc
 Resource        ../../../../../tests/common.resource
 Suite Setup     Setup Stack
 Suite Teardown  Teardown Stack

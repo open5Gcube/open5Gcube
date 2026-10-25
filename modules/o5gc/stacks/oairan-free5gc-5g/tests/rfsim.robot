@@ -1,6 +1,6 @@
 *** Settings ***
 Documentation   OAI-RAN 5G SA with free5GC core, RF simulation
-Test Tags       Emulated  oai-ran  free5gc
+Test Tags       Emulated  oairan  free5gc
 Resource        ../../../../../tests/common.resource
 Suite Setup     Setup Stack
 Suite Teardown  Teardown Stack

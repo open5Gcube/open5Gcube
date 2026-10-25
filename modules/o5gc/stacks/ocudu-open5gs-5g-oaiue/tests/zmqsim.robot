@@ -1,6 +1,6 @@
 *** Settings ***
 Documentation   OCUDU 5G SA gNB with OAI nrUE and Open5GS core, ZMQ RF simulation
-Test Tags       Emulated  ocudu  oai-ue  open5gs
+Test Tags       Emulated  ocudu  oaiue  open5gs
 Resource        ../../../../../tests/common.resource
 Suite Setup     Setup Stack
 Suite Teardown  Teardown Stack

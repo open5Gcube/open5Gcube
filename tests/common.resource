@@ -42,13 +42,13 @@ ${SMF_CONTAINER}  smf
 
 *** Keywords ***
 Wait Until Startup Complete
-    [Documentation]  Poll until the stack is ready. The last startup milestone is the SMF
-    ...    establishing a PDU session, asserted by the keyword CORE_TYPE selects.
-    ...    ${timeout} is the ceiling; the keyword returns as soon as the core network,
-    ...    gNB and UE have completed startup.
-    [Arguments]  ${timeout}=120s  ${interval}=3s
-    Log To Console  Waiting up to ${timeout} for core network, gNB and UE startup
-    Wait Until Keyword Succeeds  ${timeout}  ${interval}  Startup Should Be Complete
+    [Documentation]  Poll ${ready_kw} until the stack is ready. By default the last startup
+    ...    milestone is the SMF establishing a PDU session, asserted by the keyword
+    ...    CORE_TYPE selects. Stacks without a UE of their own pass another keyword.
+    ...    ${timeout} is the ceiling; the keyword returns as soon as ${ready_kw} passes.
+    [Arguments]  ${ready_kw}=Startup Should Be Complete  ${timeout}=120s  ${interval}=3s
+    Log To Console  Waiting up to ${timeout} for stack startup
+    Wait Until Keyword Succeeds  ${timeout}  ${interval}  ${ready_kw}
 
 Startup Should Be Complete
     No Running Container Should Be  starting
@@ -57,14 +57,16 @@ Startup Should Be Complete
 
 Setup Stack
     [Documentation]  Start the stack and wait until it is ready.
-    ...    Used as Suite Setup; the suite only supplies ${STACK}.
+    ...    Used as Suite Setup; the suite only supplies ${STACK}, and optionally
+    ...    the readiness keyword passed on to Wait Until Startup Complete.
+    [Arguments]  ${ready_kw}=Startup Should Be Complete
     Log To Console  Setup Stack: run 'make run-${STACK}'
     Start Process  make  run-${STACK}
     # Give 'make' a moment to fork the compose stack before we assert the process
     # is alive; actual readiness is polled by Wait Until Startup Complete below.
     Sleep  5s
     Process Should Be Running
-    Wait Until Startup Complete
+    Wait Until Startup Complete  ${ready_kw}
 
 Teardown Stack
     [Documentation]  Collect artifacts then stop the stack. Runs on every exit,
