@@ -9,12 +9,9 @@ Library  get_env.py
 *** Variables ***
 # Tunnel interface each UE implementation brings up. These names are fixed by the
 # UE software rather than configurable: see docker/oai/ran-entrypoint.sh and
-# docker/srsran/4g/entrypoint.sh; UERANSIM creates uesimtun0 itself. PacketRusher is
-# absent here because it derives the name from the MSIN: see Get UE Tunnel Interface.
-&{UE_TUN_IFACE}  oai=oaitun_ue1  ueransim=uesimtun0  srsran=tun_srsue
-# Tunnel interface of the UE's second PDU session, on the ims data network. Only
-# UERANSIM requests it (docker/ueransim/ue.yaml).
-&{UE_IMS_TUN_IFACE}  ueransim=uesimtun1
+# docker/srsran/4g/entrypoint.sh. UERANSIM and PacketRusher are absent here because
+# their names are not fixed: see Get UE Tunnel Interface.
+&{UE_TUN_IFACE}  oai=oaitun_ue1  srsran=tun_srsue
 
 # Container running the UE. Stacks that combine the gNB and UE in a single container
 # (PacketRusher) override this in their suite.
@@ -60,13 +57,24 @@ Setup Stack
     ...    Used as Suite Setup; the suite only supplies ${STACK}, and optionally
     ...    the readiness keyword passed on to Wait Until Startup Complete.
     [Arguments]  ${ready_kw}=Startup Should Be Complete
-    Log To Console  Setup Stack: run 'make run-${STACK}'
-    Start Process  make  run-${STACK}
+    Start Stack
+    Wait Until Startup Complete  ${ready_kw}
+
+Start Stack
+    [Documentation]  Start the stack ${stack} with 'make run-${stack}' in the background
+    ...    and assert it is running. Its output, the container logs compose writes, goes
+    ...    to run-${stack}.log in the suite's output directory.
+    [Arguments]  ${stack}=${STACK}
+    Log To Console  Start Stack: run 'make run-${stack}'
+    # Into a file, not the default pipe: nothing reads the pipe while the stack runs, so
+    # with the container logs compose writes it would fill up and block compose before
+    # it started all containers.
+    ${suite_output_dir} =  Get Suite Output Dir
+    Start Process  make  run-${stack}  stdout=${suite_output_dir}/run-${stack}.log  stderr=STDOUT
     # Give 'make' a moment to fork the compose stack before we assert the process
-    # is alive; actual readiness is polled by Wait Until Startup Complete below.
+    # is alive; actual readiness is polled by Wait Until Startup Complete.
     Sleep  5s
     Process Should Be Running
-    Wait Until Startup Complete  ${ready_kw}
 
 Teardown Stack
     [Documentation]  Collect artifacts then stop the stack. Runs on every exit,
@@ -163,37 +171,55 @@ UE Should Reach The Internet
     ...    ${ue} names the UE implementation (oai, ueransim, srsran, packetrusher) and
     ...    defaults to the suite's UE_TYPE; ${container} defaults to the suite's UE_CONTAINER.
     [Arguments]  ${ue}=${UE_TYPE}  ${container}=${UE_CONTAINER}
-    ${iface} =  Get UE Tunnel Interface  ${ue}
+    ${iface} =  Get UE Tunnel Interface  ${ue}  ${container}
     ${result} =  Run Process  docker  exec  ${container}  ping  -I  ${iface}  -c  1  8.8.8.8
     Should Be Empty  ${result.stderr}
     Should Be Equal  ${result.rc}  ${0}
     Log  ${result.stdout}
 
 UE Should Have IMS Session
-    [Documentation]  Assert the UE brought up its PDU session on the ims data network: its
-    ...    IMS tunnel interface (UE_IMS_TUN_IFACE) has an IPv4 address of the IMS pool
-    ...    UE_IMS_IP_SUBNET. ${ue} and ${container} default to the suite's UE_TYPE and UE_CONTAINER.
-    [Arguments]  ${ue}=${UE_TYPE}  ${container}=${UE_CONTAINER}
-    ${iface} =  Set Variable  ${UE_IMS_TUN_IFACE}[${ue}]
-    ${subnet} =  Get Env  UE_IMS_IP_SUBNET
-    ${result} =  Run Process  docker  exec  ${container}  ip  -4  -o  addr  show  dev  ${iface}
-    Should Be Equal  ${result.rc}  ${0}  no ${iface} in ${container}: ${result.stderr}
-    ${addr} =  Get Regexp Matches  ${result.stdout}  inet ([0-9.]+)/  1
-    Should Not Be Empty  ${addr}  no IPv4 address on ${iface} in ${container}
-    ${in_pool} =  Evaluate  ipaddress.ip_address($addr[0]) in ipaddress.ip_network($subnet)
-    ...    modules=ipaddress
-    Should Be True  ${in_pool}  ${addr}[0] of ${iface} in ${container} is not in ${subnet}
+    [Documentation]  Assert the UERANSIM UE in ${container} brought up its PDU session on the
+    ...    ims data network: one of its tunnel interfaces has an IPv4 address of the IMS pool
+    ...    UE_IMS_IP_SUBNET. ${container} defaults to the suite's UE_CONTAINER.
+    [Arguments]  ${container}=${UE_CONTAINER}
+    Get UERANSIM Tunnel Interface  ${container}  ims=${True}
 
 Get UE Tunnel Interface
-    [Documentation]  Name of the tunnel interface the UE brings up. Most implementations use a
-    ...    fixed name (UE_TUN_IFACE), but PacketRusher names one interface per subscriber,
-    ...    derived from the MSIN, e.g. MSIN 0010000001 gives gtp00010000001.
-    [Arguments]  ${ue}=${UE_TYPE}
+    [Documentation]  Name of the tunnel interface the UE in ${container} brings up for its
+    ...    internet PDU session. Most implementations use a fixed name (UE_TUN_IFACE), but
+    ...    PacketRusher names one interface per subscriber, derived from the MSIN, e.g.
+    ...    MSIN 0010000001 gives gtp00010000001, and UERANSIM numbers its interfaces in the
+    ...    order the PDU sessions come up: see Get UERANSIM Tunnel Interface.
+    [Arguments]  ${ue}=${UE_TYPE}  ${container}=${UE_CONTAINER}
     IF  '${ue}' == 'packetrusher'
         ${msin} =  Get Env  UE_SOFT_MSIN
         RETURN  gtp0${msin}
     END
+    IF  '${ue}' == 'ueransim'
+        ${iface} =  Get UERANSIM Tunnel Interface  ${container}
+        RETURN  ${iface}
+    END
     RETURN  ${UE_TUN_IFACE}[${ue}]
+
+Get UERANSIM Tunnel Interface
+    [Documentation]  Name of the tunnel interface of the UERANSIM UE in ${container} for its
+    ...    ims PDU session if ${ims} is true, else for its internet PDU session. UERANSIM names
+    ...    the interfaces uesimtun0, uesimtun1, ... in the order the PDU sessions come up, so
+    ...    the session is told by the interface's IPv4 address: the ims session has one of
+    ...    the IMS pool UE_IMS_IP_SUBNET, the internet session one outside of it.
+    [Arguments]  ${container}=${UE_CONTAINER}  ${ims}=${False}
+    ${subnet} =  Get Env  UE_IMS_IP_SUBNET
+    ${result} =  Run Process  docker  exec  ${container}  ip  -4  -o  addr  show
+    Should Be Equal  ${result.rc}  ${0}  ${result.stderr}
+    @{ifaces} =  Get Regexp Matches  ${result.stdout}  ^\\d+: (uesimtun\\d+)\\s+inet ([0-9.]+)/
+    ...    1  2  flags=MULTILINE
+    FOR  ${iface}  IN  @{ifaces}
+        ${in_pool} =  Evaluate  ipaddress.ip_address($iface[1]) in ipaddress.ip_network($subnet)
+        ...    modules=ipaddress
+        IF  ${in_pool} == ${ims}  RETURN  ${iface}[0]
+    END
+    ${session} =  Set Variable If  ${ims}  ims  internet
+    Fail  no ${session} PDU session interface in ${container}, IMS pool ${subnet}:\n${result.stdout}
 
 UE Should Be Registered At AMF
     [Documentation]  Assert the AMF registered the UE whose IMSI is built from the

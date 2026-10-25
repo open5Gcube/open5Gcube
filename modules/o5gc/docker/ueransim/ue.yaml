@@ -50,7 +50,8 @@ sessions:
     slice:
       sst: ${NSSAI_SST}
       sd: ${NSSAI_SD}
-  # IMS signalling and media (uesimtun1), for the cores that offer it
+  # IMS signalling and media, for the cores that offer it. UERANSIM numbers the
+  # TUN interfaces (uesimtun0, uesimtun1) in the order the sessions come up.
   - type: 'IPv4'
     apn: 'ims'
     slice:

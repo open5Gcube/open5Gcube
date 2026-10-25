@@ -67,9 +67,10 @@ IMS Test Should Pass
 IMS Test Environment
     [Documentation]  docker run options with the O5GC_* environment of ims_test.go
     ${pcscf} =  Get Env  PCSCF_EXT_IP_ADDR
+    ${ims_pool} =  Get Env  UE_IMS_IP_SUBNET
     ${mnc} =  Get Env  MNC
     ${mnc_length} =  Get Length  ${mnc}
-    @{env} =  Create List  -e  O5GC_PCSCF\=${pcscf}:5060  -e  O5GC_TUN\=${UE_IMS_TUN_IFACE}[${UE_TYPE}]
+    @{env} =  Create List  -e  O5GC_PCSCF\=${pcscf}:5060  -e  O5GC_IMS_POOL\=${ims_pool}
     ...    -e  O5GC_MNC_LENGTH\=${mnc_length}
     FOR  ${ue}  ${container}  ${suffix}  IN  1  ue  ${EMPTY}  2  ue2  _0
         @{ue_env} =  UE Test Environment  ${ue}  ${container}  ${suffix}

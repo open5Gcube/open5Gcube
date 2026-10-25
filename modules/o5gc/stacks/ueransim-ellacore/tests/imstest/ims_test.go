@@ -134,25 +134,22 @@ func (n *netns) Do(f func()) {
 	<-done
 }
 
-// tunAddr is the IPv4 address of the UE's ims PDU session.
-func tunAddr(tun string) (netip.Addr, error) {
-	ifc, err := net.InterfaceByName(tun)
-	if err != nil {
-		return netip.Addr{}, err
-	}
-
-	addrs, err := ifc.Addrs()
+// imsAddr is the IPv4 address of the UE's ims PDU session, the one of the IMS
+// pool: UERANSIM numbers its TUN interfaces in the order the PDU sessions come
+// up, so the interface name does not tell the session.
+func imsAddr(pool netip.Prefix) (netip.Addr, error) {
+	addrs, err := net.InterfaceAddrs()
 	if err != nil {
 		return netip.Addr{}, err
 	}
 
 	for _, a := range addrs {
-		if p, err := netip.ParsePrefix(a.String()); err == nil && p.Addr().Is4() {
+		if p, err := netip.ParsePrefix(a.String()); err == nil && pool.Contains(p.Addr()) {
 			return p.Addr(), nil
 		}
 	}
 
-	return netip.Addr{}, errors.New("no IPv4 address on " + tun)
+	return netip.Addr{}, errors.New("no IPv4 address of the IMS pool " + pool.String())
 }
 
 // newUE makes the test UE of subscriber i in its UE container.
@@ -171,7 +168,11 @@ func newUE(t *testing.T, i int) *testue.UE {
 		t.Fatalf("O5GC_MNC_LENGTH: %v", err)
 	}
 
-	tun := env(t, "O5GC_TUN")
+	pool, err := netip.ParsePrefix(env(t, "O5GC_IMS_POOL"))
+	if err != nil {
+		t.Fatalf("O5GC_IMS_POOL: %v", err)
+	}
+
 	ns := enter(t, sub.pid)
 
 	var (
@@ -180,7 +181,7 @@ func newUE(t *testing.T, i int) *testue.UE {
 	)
 
 	ns.Do(func() {
-		if local, err = tunAddr(tun); err == nil {
+		if local, err = imsAddr(pool); err == nil {
 			xfrm, err = ipsec.Open()
 		}
 	})
