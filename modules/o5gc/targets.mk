@@ -146,29 +146,29 @@ stop-osmocom-2g:  ##
 
 run-srsran-4g-emu: .create-running-env
 	$(call run_stack,o5gc,srsran-4g-emu,enb core ue)
-stop-srsran-4g-emu: .create-running-env
+stop-srsran-4g-emu:
 	$(call stop_stack,o5gc,srsran-4g-emu,enb core ue)
 
 run-srsran-open5gs-4g: .create-running-env  ##
 	$(call run_stack,o5gc,srsran-open5gs-4g,enb core)
-stop-srsran-open5gs-4g: .create-running-env  ##
+stop-srsran-open5gs-4g:  ##
 	$(call stop_stack,o5gc,srsran-open5gs-4g,enb core)
 run-srsran-open5gs-4g-enb run-srsran-open5gs-4g-core: .create-running-env
 	$(call run_stack,o5gc,srsran-open5gs-4g,$(subst run-srsran-open5gs-4g-,,$@))
 
 run-srsran-open5gs-4g-emu: .create-running-env  ##
 	$(call run_stack,o5gc,srsran-open5gs-4g-emu,enb core ue)
-stop-srsran-open5gs-4g-emu: .create-running-env  ##
+stop-srsran-open5gs-4g-emu:  ##
 	$(call stop_stack,o5gc,srsran-open5gs-4g-emu,enb core ue)
 run-srsran-open5gs-4g-emu-enb run-srsran-open5gs-4g-emu-core run-srsran-open5gs-4g-emu-ue: .create-running-env
 	$(call run_stack,o5gc,srsran-open5gs-4g-emu,$(subst run-srsran-open5gs-4g-emu-,,$@))
 
-run-srsran-open5gs-4g-volte: ${ENV_DIR}/srsran-open5gs-4g-volte.env .create-running-env  ##
+run-srsran-open5gs-4g-volte: ${ENV_DIR}/o5gc/srsran-open5gs-4g-volte.env .create-running-env  ##
 	$(call run_stack,o5gc,srsran-open5gs-4g-volte,enb core volte                   \
 	    $(if $(subst SMS-over-SGs,,$(call get_env,SMS_DOMAIN,$<)),smsc,osmocom))
-stop-srsran-open5gs-4g-volte: .create-running-env  ##
-	$(call stop_stack,o5gc,srsran-open5gs-4g-volte,enb core volte)
-run-srsran-open5gs-4g-volte-core: ${ENV_DIR}/srsran-open5gs-4g-volte.env .create-running-env
+stop-srsran-open5gs-4g-volte:  ##
+	$(call stop_stack,o5gc,srsran-open5gs-4g-volte,enb core volte smsc osmocom)
+run-srsran-open5gs-4g-volte-core: ${ENV_DIR}/o5gc/srsran-open5gs-4g-volte.env .create-running-env
 	$(call run_stack,o5gc,srsran-open5gs-4g-volte,core volte                       \
 	    $(if $(subst SMS-over-SGs,,$(call get_env,SMS_DOMAIN,$<)),smsc,osmocom))
 run-srsran-open5gs-4g-volte-enb: .create-running-env
@@ -176,35 +176,49 @@ run-srsran-open5gs-4g-volte-enb: .create-running-env
 
 run-srsran-open5gs-5g: .create-running-env  ##
 	$(call run_stack,o5gc,srsran-open5gs-5g,gnb core)
-stop-srsran-open5gs-5g: .create-running-env  ##
+stop-srsran-open5gs-5g:  ##
 	$(call stop_stack,o5gc,srsran-open5gs-5g,gnb core)
 run-srsran-open5gs-5g-gnb run-srsran-open5gs-5g-core: .create-running-env
 	$(call run_stack,o5gc,srsran-open5gs-5g,$(subst run-srsran-open5gs-5g-,,$@))
 
+run-srsran-free5gc-5g: .create-running-env  ##
+	$(call run_stack,o5gc,srsran-free5gc-5g,gnb core)
+stop-srsran-free5gc-5g:  ##
+	$(call stop_stack,o5gc,srsran-free5gc-5g,gnb core)
+run-srsran-free5gc-5g-gnb run-srsran-free5gc-5g-core: .create-running-env
+	$(call run_stack,o5gc,srsran-free5gc-5g,$(subst run-srsran-free5gc-5g-,,$@))
+
+run-srsran-oaicn5g-5g: .create-running-env  ##
+	$(call run_stack,o5gc,srsran-oaicn5g-5g,gnb core)
+stop-srsran-oaicn5g-5g:  ##
+	$(call stop_stack,o5gc,srsran-oaicn5g-5g,gnb core)
+run-srsran-oaicn5g-5g-gnb run-srsran-oaicn5g-5g-core: .create-running-env
+	$(call run_stack,o5gc,srsran-oaicn5g-5g,$(subst run-srsran-oaicn5g-5g-,,$@))
+
 run-srsran-open5gs-5g-emu: .create-running-env  ##
 	$(call run_stack,o5gc,srsran-open5gs-5g-emu,gnb core ue)
-stop-srsran-open5gs-5g-emu: .create-running-env  ##
+stop-srsran-open5gs-5g-emu:  ##
 	$(call stop_stack,o5gc,srsran-open5gs-5g-emu,gnb core ue)
 run-srsran-open5gs-5g-emu-gnb run-srsran-open5gs-5g-emu-core run-srsran-open5gs-5g-emu-ue: .create-running-env
 	$(call run_stack,o5gc,srsran-open5gs-5g-emu,$(subst run-srsran-open5gs-5g-emu-,,$@))
 
 run-ocudu-open5gs-5g: .create-running-env  ##
 	$(call run_stack,o5gc,ocudu-open5gs-5g,gnb core)
-stop-ocudu-open5gs-5g: .create-running-env  ##
+stop-ocudu-open5gs-5g:  ##
 	$(call stop_stack,o5gc,ocudu-open5gs-5g,gnb core)
 run-ocudu-open5gs-5g-gnb run-ocudu-open5gs-5g-core: .create-running-env
 	$(call run_stack,o5gc,ocudu-open5gs-5g,$(subst run-ocudu-open5gs-5g-,,$@))
 
 run-ocudu-open5gs-5g-oaiue: .create-running-env  ##
 	$(call run_stack,o5gc,ocudu-open5gs-5g-oaiue,gnb core ue)
-stop-ocudu-open5gs-5g-oaiue: .create-running-env  ##
+stop-ocudu-open5gs-5g-oaiue:  ##
 	$(call stop_stack,o5gc,ocudu-open5gs-5g-oaiue,gnb core ue)
 run-ocudu-open5gs-5g-oaiue-gnb run-ocudu-open5gs-5g-oaiue-core run-ocudu-open5gs-5g-oaiue-ue: .create-running-env
 	$(call run_stack,o5gc,ocudu-open5gs-5g-oaiue,$(subst run-ocudu-open5gs-5g-oaiue-,,$@))
 
 run-ocudu-split-open5gs-5g: .create-running-env  ##
 	$(call run_stack,o5gc,ocudu-split-open5gs-5g,du cu-cp cu-up core)
-stop-ocudu-split-open5gs-5g: .create-running-env  ##
+stop-ocudu-split-open5gs-5g:  ##
 	$(call stop_stack,o5gc,ocudu-split-open5gs-5g,du cu-cp cu-up core)
 run-ocudu-split-open5gs-5g-cu-cp run-ocudu-split-open5gs-5g-cu-up \
 run-ocudu-split-open5gs-5g-core run-ocudu-split-open5gs-5g-du: .create-running-env
