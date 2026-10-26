@@ -4,6 +4,16 @@ x-home-nf: &home-nf
     service: home-base
   profiles: [ "core" ]
 
+# the SBI network functions register at the NRF through the SCP on startup and
+# retry only after a while: start them once both are up
+x-home-sbi-nf: &home-sbi-nf
+  <<: *home-nf
+  depends_on:
+    home-nrf:
+      condition: service_healthy
+    home-scp:
+      condition: service_healthy
+
 x-sbi-healthcheck: &sbi-healthcheck
   healthcheck:
     test: bash -c "ss -ltn | grep -q ':7777'"
@@ -18,6 +28,16 @@ x-visited-nf: &visited-nf
   extends:
     service: visited-base
   profiles: [ "core" ]
+
+# the SBI network functions register at the NRF through the SCP on startup and
+# retry only after a while: start them once both are up
+x-visited-sbi-nf: &visited-sbi-nf
+  <<: *visited-nf
+  depends_on:
+    visited-nrf:
+      condition: service_healthy
+    visited-scp:
+      condition: service_healthy
 
 # ---------------------------------------------------------------------
 networks:
@@ -172,45 +192,48 @@ services:
     container_name: home-scp
     command: scp
     networks: { home-corenet: { aliases: [ "scp.5gc.${HOME_PLMN_DOMAIN}" ] } }
+    depends_on:
+      home-nrf:
+        condition: service_healthy
 
   home-ausf:
-    <<: *home-nf
+    <<: *home-sbi-nf
     container_name: home-ausf
     command: ausf
     networks: { home-corenet: { aliases: [ "ausf.5gc.${HOME_PLMN_DOMAIN}" ] } }
 
   home-udm:
-    <<: *home-nf
+    <<: *home-sbi-nf
     container_name: home-udm
     command: udm
     networks: { home-corenet: { aliases: [ "udm.5gc.${HOME_PLMN_DOMAIN}" ] } }
 
   home-udr:
-    <<: *home-nf
+    <<: *home-sbi-nf
     container_name: home-udr
     command: udr
     networks: { home-corenet: { aliases: [ "udr.5gc.${HOME_PLMN_DOMAIN}" ] } }
 
   home-pcf:
-    <<: *home-nf
+    <<: *home-sbi-nf
     container_name: home-pcf
     command: pcf
     networks: { home-corenet: { aliases: [ "pcf.5gc.${HOME_PLMN_DOMAIN}" ] } }
 
   home-bsf:
-    <<: *home-nf
+    <<: *home-sbi-nf
     container_name: home-bsf
     command: bsf
     networks: { home-corenet: { aliases: [ "bsf.5gc.${HOME_PLMN_DOMAIN}" ] } }
 
   home-nssf:
-    <<: *home-nf
+    <<: *home-sbi-nf
     container_name: home-nssf
     command: nssf
     networks: { home-corenet: { aliases: [ "nssf.5gc.${HOME_PLMN_DOMAIN}" ] } }
 
   home-amf:
-    <<: *home-nf
+    <<: *home-sbi-nf
     container_name: home-amf
     command: amf
     networks: { home-corenet: { aliases: [ "amf.5gc.${HOME_PLMN_DOMAIN}" ] } }
@@ -218,7 +241,7 @@ services:
       o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
 
   home-smf:
-    <<: *home-nf
+    <<: *home-sbi-nf
     container_name: home-smf
     command: smf
     networks: { home-corenet: { ipv4_address: "${HOME_SMF_IP_ADDR}" } }
@@ -353,27 +376,30 @@ services:
     container_name: visited-scp
     command: scp
     networks: { visited-corenet: { aliases: [ "scp.5gc.${VISITED_PLMN_DOMAIN}" ] } }
+    depends_on:
+      visited-nrf:
+        condition: service_healthy
 
   visited-ausf:
-    <<: *visited-nf
+    <<: *visited-sbi-nf
     container_name: visited-ausf
     command: ausf
     networks: { visited-corenet: { aliases: [ "ausf.5gc.${VISITED_PLMN_DOMAIN}" ] } }
 
   visited-udm:
-    <<: *visited-nf
+    <<: *visited-sbi-nf
     container_name: visited-udm
     command: udm
     networks: { visited-corenet: { aliases: [ "udm.5gc.${VISITED_PLMN_DOMAIN}" ] } }
 
   visited-udr:
-    <<: *visited-nf
+    <<: *visited-sbi-nf
     container_name: visited-udr
     command: udr
     networks: { visited-corenet: { aliases: [ "udr.5gc.${VISITED_PLMN_DOMAIN}" ] } }
 
   visited-pcf:
-    <<: *visited-nf
+    <<: *visited-sbi-nf
     container_name: visited-pcf
     command: pcf
     volumes:
@@ -381,19 +407,19 @@ services:
     networks: { visited-corenet: { aliases: [ "pcf.5gc.${VISITED_PLMN_DOMAIN}" ] } }
 
   visited-bsf:
-    <<: *visited-nf
+    <<: *visited-sbi-nf
     container_name: visited-bsf
     command: bsf
     networks: { visited-corenet: { aliases: [ "bsf.5gc.${VISITED_PLMN_DOMAIN}" ] } }
 
   visited-nssf:
-    <<: *visited-nf
+    <<: *visited-sbi-nf
     container_name: visited-nssf
     command: nssf
     networks: { visited-corenet: { aliases: [ "nssf.5gc.${VISITED_PLMN_DOMAIN}" ] } }
 
   visited-amf:
-    <<: *visited-nf
+    <<: *visited-sbi-nf
     container_name: visited-amf
     command: amf
     networks: { visited-corenet: { aliases: [ "amf.5gc.${VISITED_PLMN_DOMAIN}" ] } }
@@ -401,7 +427,7 @@ services:
       o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
 
   visited-smf:
-    <<: *visited-nf
+    <<: *visited-sbi-nf
     container_name: visited-smf
     command: smf
     networks: { visited-corenet: { ipv4_address: "${VISITED_SMF_IP_ADDR}" } }
