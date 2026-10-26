@@ -30,9 +30,9 @@ while sleep 1; do
 done
 set -x
 
-[ "${NSSAI_SD}" != "ffffff" ] && NSSAI_SD=$(printf "%06d" ${NSSAI_SD})
-NSSAI_SST=$(printf "%02d" ${NSSAI_SST})
-TAC=$(printf "%06d" ${TAC})
+# the gNB takes SST and TAC as hex strings, the UE the SST as a number
+export GNB_NSSAI_SST=$(printf "%02x" ${NSSAI_SST})
+TAC=$(printf "%06x" ${TAC})
 envsubst.sh /mnt/packetrusher/config.yaml config/config.yml
 
 exec ./packetrusher multi-ue --number-of-ues 1 --tunnel --dedicatedGnb --tunnel-vrf=false

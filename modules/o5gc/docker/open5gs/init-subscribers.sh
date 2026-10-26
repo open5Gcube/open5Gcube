@@ -13,7 +13,6 @@ add_subscriber () {
         echo "skip imsi:  ${imsi}"
         return
     fi
-    [ "${NSSAI_SD}" != "ffffff" ] && NSSAI_SD=$(printf "%06d" ${NSSAI_SD})
     # lbo_roaming_allowed: a visited network breaks the internet session out
     # locally instead of routing it to the home network
     data='{

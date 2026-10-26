@@ -10,7 +10,7 @@ if [[ -z "${service}" ]]; then
     exit 1
 fi
 
-export NSSAI_SD=$(printf "%06x" "${NSSAI_SD/#0x}")
+export TAC=$(printf "%06x" "${TAC}")
 envsubst.sh ${mnt}/${service}cfg.yaml /o5gc/free5gc/config/${service}cfg.yaml
 
 if [[ "${service}" == "upf" ]]; then

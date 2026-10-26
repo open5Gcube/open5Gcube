@@ -11,7 +11,7 @@ gnodeb:
     tac: "${TAC}"
     gnbid: "000008"
   slicesupportlist:
-    sst: "${NSSAI_SST}"
+    sst: "${GNB_NSSAI_SST}"
     sd: "${NSSAI_SD}" # optional, can be removed if not used
 
 ue:

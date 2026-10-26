@@ -6,7 +6,8 @@ wait-for-it -t 60 ${FREE5GC_WEBUI_IP_ADDR}:5000
 sleep 1
 
 WEBUI_URL=http://${FREE5GC_WEBUI_IP_ADDR}:5000
-NSSAI_SD=$(printf "%06x" "${NSSAI_SD/#0x}")
+# per-slice subscription data is keyed by SST and SD as hex string
+SNSSAI=$(printf "%02x" ${NSSAI_SST})${NSSAI_SD}
 
 add_subscriber () {
     imsi=$1; key=$2; opc=$3
@@ -76,7 +77,7 @@ add_subscriber () {
         } ],
         "SmfSelectionSubscriptionData": {
             "subscribedSnssaiInfos": {
-                "01'${NSSAI_SD}'": {
+                "'${SNSSAI}'": {
                     "dnnInfos": [ {"dnn": "'${APN}'"}, {"dnn": "ims"} ]
                 }
             }
@@ -84,7 +85,7 @@ add_subscriber () {
         "AmPolicyData": { "subscCats": ["free5gc"] },
         "SmPolicyData": {
             "smPolicySnssaiData": {
-                "01'${NSSAI_SD}'": {
+                "'${SNSSAI}'": {
                     "snssai": {
                         "sst": '${NSSAI_SST}',
                         "sd": "'${NSSAI_SD}'"

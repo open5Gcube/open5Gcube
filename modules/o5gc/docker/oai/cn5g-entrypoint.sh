@@ -10,7 +10,6 @@ if [[ -z "${service}" ]]; then
     exit 1;
 fi
 
-export NSSAI_SD=$(printf "%06x" "${NSSAI_SD/#0x}")
 config=/o5gc/oai-cn5g-${service}/etc/config.yaml
 envsubst.sh ${mnt}/cn5g.yaml ${config}
 

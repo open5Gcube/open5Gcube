@@ -49,24 +49,24 @@ sessions:
     apn: '${APN}'
     slice:
       sst: ${NSSAI_SST}
-      sd: ${NSSAI_SD}
+      sd: 0x${NSSAI_SD}
   # IMS signalling and media, for the cores that offer it. UERANSIM numbers the
   # TUN interfaces (uesimtun0, uesimtun1) in the order the sessions come up.
   - type: 'IPv4'
     apn: 'ims'
     slice:
       sst: ${NSSAI_SST}
-      sd: ${NSSAI_SD}
+      sd: 0x${NSSAI_SD}
 
 # Configured NSSAI for this UE by HPLMN
 configured-nssai:
   - sst: ${NSSAI_SST}
-    sd: ${NSSAI_SD}
+    sd: 0x${NSSAI_SD}
 
 # Default Configured NSSAI for this UE
 default-nssai:
   - sst: ${NSSAI_SST}
-    sd: ${NSSAI_SD}
+    sd: 0x${NSSAI_SD}
 
 # Supported integrity algorithms by this UE
 integrity:

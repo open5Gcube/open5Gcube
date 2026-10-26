@@ -31,7 +31,7 @@ configuration:
     - plmnId: # Public Land Mobile Network ID, <PLMN ID> = <MCC><MNC>
         mcc: ${MCC} # Mobile Country Code (3 digits string, digit: 0~9)
         mnc: ${MNC} # Mobile Network Code (2 or 3 digits string, digit: 0~9)
-      tac: 000001 # Tracking Area Code (3 bytes hex string, range: 000000~FFFFFF)
+      tac: ${TAC} # Tracking Area Code (3 bytes hex string, range: 000000~FFFFFF)
   plmnSupportList: # the PLMNs (Public land mobile network) list supported by this AMF
     - plmnId: # Public Land Mobile Network ID, <PLMN ID> = <MCC><MNC>
         mcc: ${MCC} # Mobile Country Code (3 digits string, digit: 0~9)

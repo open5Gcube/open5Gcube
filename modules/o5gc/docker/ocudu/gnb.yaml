@@ -9,7 +9,7 @@ cu_cp:
           - plmn: "${MCC}${MNC}"
             tai_slice_support_list:
               - sst: ${NSSAI_SST}
-                sd: ${NSSAI_SD}
+                sd: 0x${NSSAI_SD}
   security:
     integrity: not_needed
     confidentiality: required
