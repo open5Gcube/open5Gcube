@@ -51,8 +51,8 @@ configuration:
       - NEA0
       # - NEA2
   networkName:  # the name of this core network
-    full: free5GC
-    short: free
+    full: ${NETWORK_NAME}
+    short: ${NETWORK_NAME}
   ngapIE: # Optional NGAP IEs
     mobilityRestrictionList: # Mobility Restriction List IE, refer to TS 38.413
       enable: true # append this IE in related message or not

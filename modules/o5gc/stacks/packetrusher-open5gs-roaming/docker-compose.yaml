@@ -120,6 +120,7 @@ services:
       - MCC=${HOME_MCC}
       - MNC=${HOME_MNC}
       - MNC03=${HOME_MNC03}
+      - NETWORK_NAME=${HOME_NETWORK_NAME}
       - NRF_IP_ADDR=nrf.5gc.${HOME_PLMN_DOMAIN}
       - SCP_IP_ADDR=scp.5gc.${HOME_PLMN_DOMAIN}
       - AUSF_IP_ADDR=ausf.5gc.${HOME_PLMN_DOMAIN}
@@ -304,6 +305,7 @@ services:
       - MCC=${VISITED_MCC}
       - MNC=${VISITED_MNC}
       - MNC03=${VISITED_MNC03}
+      - NETWORK_NAME=${VISITED_NETWORK_NAME}
       - NRF_IP_ADDR=nrf.5gc.${VISITED_PLMN_DOMAIN}
       - SCP_IP_ADDR=scp.5gc.${VISITED_PLMN_DOMAIN}
       - AUSF_IP_ADDR=ausf.5gc.${VISITED_PLMN_DOMAIN}

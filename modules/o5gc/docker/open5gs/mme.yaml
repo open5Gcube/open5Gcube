@@ -35,7 +35,7 @@ mme:
         integrity_order: [ ${FOURG_INTEGRITY_ORDER} ]
         ciphering_order: [ ${FOURG_CIPHERING_ORDER} ]
     network_name:
-        full: Open5GS
+        full: ${NETWORK_NAME}
     mme_name: open5gs-mme0
     metrics:
       server:

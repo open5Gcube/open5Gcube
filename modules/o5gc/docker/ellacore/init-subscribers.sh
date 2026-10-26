@@ -108,6 +108,8 @@ init() {
 setup () {
     data='{"supportedTacs": ["'$(printf "%06x" "${TAC}")'"]}'
     ella_api PUT operator/tracking "${data}"
+    data='{"fullName": "'${NETWORK_NAME}'", "shortName": "'${NETWORK_NAME}'"}'
+    ella_api PUT operator/spn "${data}"
     data='{"sd": "'$(printf "%06x" "${NSSAI_SD/#0x}")'", "sst": '${NSSAI_SST}'}'
     ella_api PUT slices/default "${data}"
     data='{"keyIdentifier":1, "scheme": "A", "privateKey": "c53c22208b61860b06c62e5406a7b330c2b577aa5558981510d128247d38bd1d"}'

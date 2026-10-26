@@ -49,7 +49,7 @@ amf:
         integrity_order : [ ${FIVEG_INTEGRITY_ORDER} ]
         ciphering_order : [ ${FIVEG_CIPHERING_ORDER} ]
     network_name:
-        full: Open5GS
+        full: ${NETWORK_NAME}
     amf_name: open5gs-amf
     metrics:
       server:
