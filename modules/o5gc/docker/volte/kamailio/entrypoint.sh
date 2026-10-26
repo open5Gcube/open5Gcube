@@ -24,7 +24,7 @@ case "${cf}" in
         mysql pcscf < ims_usrloc_pcscf-create.sql
         mysql pcscf < ims_dialog-create.sql
         # Add static route to route traffic back to UE as there is not NATing
-        ip r add 192.168.101.0/24 via ${UPF_IP_ADDR}
+        ip r add ${UE_IMS_IP_SUBNET} via ${UPF_IP_ADDR}
         sh -c "echo 1 > /proc/sys/net/ipv4/ip_nonlocal_bind"
         ;;
     scscf)

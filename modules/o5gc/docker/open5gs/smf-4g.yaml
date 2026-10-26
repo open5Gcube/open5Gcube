@@ -25,13 +25,13 @@ smf:
           - address: ${UPF_IP_ADDR}
     session:
       - subnet: ${UE_IP_SUBNET}
-        gateway: 192.168.100.1
-        dnn: internet
+        gateway: ${UE_IP_GATEWAY}
+        dnn: ${APN}
       - subnet: 2001:230:cafe::/48
         gateway: 2001:230:cafe::1
-        dnn: internet
-      - subnet: 192.168.101.0/24
-        gateway: 192.168.101.1
+        dnn: ${APN}
+      - subnet: ${UE_IMS_IP_SUBNET}
+        gateway: ${UE_IMS_IP_GATEWAY}
         dnn: ims
       - subnet: 2001:230:babe::/48
         gateway: 2001:230:babe::1

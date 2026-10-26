@@ -3,7 +3,7 @@
 set -ux
 
 # Add static route to route traffic back to UE as there is not NATing
-ip r add 192.168.101.0/24 via ${UPF_IP_ADDR}
+ip r add ${UE_IMS_IP_SUBNET} via ${UPF_IP_ADDR}
 
 exec rtpengine                                                                \
     --interface=${RTPENGINE_IP_ADDR}                                          \

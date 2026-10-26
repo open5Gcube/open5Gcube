@@ -53,12 +53,12 @@ configuration:
             dnnUpfInfoList: # DNN information list for this S-NSSAI
               - dnn: ${APN}
                 pools:
-                  - cidr: 192.168.100.1/24
+                  - cidr: ${UE_IP_SUBNET}
                 staticPools:
                   - cidr: 10.60.1.0/24
               - dnn: ims
                 pools:
-                  - cidr: 192.168.101.1/24
+                  - cidr: ${UE_IMS_IP_SUBNET}
         interfaces: # Interface list for this UPF
           - interfaceType: N3 # the type of the interface (N3 or N9)
             endpoints: # the IP address of this N3/N9 interface on this UPF

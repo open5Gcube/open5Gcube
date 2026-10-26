@@ -22,10 +22,10 @@ gtpu:
 # The DNN list supported by UPF
 dnnList:
   - dnn: ${APN} # Data Network Name
-    cidr: 192.168.100.1/24 # Classless Inter-Domain Routing for assigned IPv4 pool of UE
+    cidr: ${UE_IP_SUBNET} # Classless Inter-Domain Routing for assigned IPv4 pool of UE
     # natifname: eth0
   - dnn: ims
-    cidr: 192.168.101.1/24
+    cidr: ${UE_IMS_IP_SUBNET}
 
 logger: # log output setting
   enable: true # true or false

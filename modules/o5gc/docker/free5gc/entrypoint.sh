@@ -24,7 +24,7 @@ if [[ "${service}" == "upf" ]]; then
         insmod ./gtp5g.ko
         popd
     fi
-    iptables -t nat -A POSTROUTING -s 192.168.100.0/24 ! -o upfgtp -j MASQUERADE
+    iptables -t nat -A POSTROUTING -s ${UE_IP_SUBNET} ! -o upfgtp -j MASQUERADE
     service ssh start
 fi
 

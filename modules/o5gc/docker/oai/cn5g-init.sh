@@ -6,7 +6,7 @@ export MYSQL_PWD=${MYSQL_PASSWORD}
 
 function edq () { printf "%s" ${1//'"'/'\"'}; }  # escape double-quotes
 
-ue_ip () { prips ${UE_IP_ADDR_POOL_BEGIN} ${UE_IP_ADDR_POOL_END} | sed "$((${1}+1))q;d"; }
+ue_ip () { prips ${UE_IP_SUBNET} | sed "$((${1}+2))q;d"; }  # first UE gets .2
 
 exec_sql () {
     echo "$1"

@@ -13,6 +13,11 @@ if [[ -z "${service}" ]]; then
     exit 1;
 fi
 
+# the gateway of a UE subnet is its first host address
+first_host () { prips ${1} | sed "2q;d"; }
+export UE_IP_GATEWAY=$(first_host ${UE_IP_SUBNET})
+export UE_IMS_IP_GATEWAY=$(first_host ${UE_IMS_IP_SUBNET})
+
 if [[ -f ${mnt}/${service}.yaml ]]; then
     envsubst.sh ${mnt}/${service}.yaml install/etc/open5gs/${service}.yaml
     cat install/etc/open5gs/${service}.yaml
@@ -24,8 +29,8 @@ fi
 
 case "${service}" in
     upf)
-        python3 ${mnt}/tun_if.py --tun_ifname ogstun  --ipv4_range 192.168.100.0/24 --ipv6_range 2001:230:cafe::/48
-        python3 ${mnt}/tun_if.py --tun_ifname ogstun2 --ipv4_range 192.168.101.0/24 --ipv6_range 2001:230:babe::/48 --nat_rule 'no'
+        python3 ${mnt}/tun_if.py --tun_ifname ogstun  --ipv4_range ${UE_IP_SUBNET} --ipv6_range 2001:230:cafe::/48
+        python3 ${mnt}/tun_if.py --tun_ifname ogstun2 --ipv4_range ${UE_IMS_IP_SUBNET} --ipv6_range 2001:230:babe::/48 --nat_rule 'no'
         service ssh start
         ;;
     mme)
