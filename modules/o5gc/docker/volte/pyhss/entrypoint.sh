@@ -5,7 +5,7 @@ set -ex
 add_subscriber () {
     imsi=$1; key=$2; opc=$3; id=$4
     msisdn=${imsi: -5}
-    /mnt/volte/pyhss/pyhss-tool.py subscriber-create                          \
+    /mnt/volte/pyhss/pyhss-tool.py --apn ${APN} subscriber-create             \
         --imsi ${imsi} --msisdn ${msisdn} --k ${key} --opc ${opc}
 }
 add_subscriptions () {

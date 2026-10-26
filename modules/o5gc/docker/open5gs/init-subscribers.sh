@@ -35,7 +35,7 @@ add_subscriber () {
             "sd": "'$NSSAI_SD'",
             "default_indicator": true,
             "session": [ {
-                "name": "internet",
+                "name": "'${APN}'",
                 "type": 1,
                 "lbo_roaming_allowed": true,
                 "pcc_rule": [],

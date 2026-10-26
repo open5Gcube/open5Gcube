@@ -10,7 +10,8 @@ Author: Harald Welte <laforge@osmocom.org>.  Licensed under CC0-1.0.
 
 This only covers the most basic use case
 where every subscriber is both an EPS and IMS subscriber, has access to both
-the "internet" and "ims" APN (no others) and has a single MSISDN.
+the default APN (option --apn, "internet" if not given) and the "ims" APN
+(no others) and has a single MSISDN.
 
 Example usage:
     pyhss-tool.py subscriber-create --imsi 001011111111111 --msisdn 1111 --k 000102030405060708090a0b0c0d0e0f --opc 00000000000000000000000000000000
@@ -42,8 +43,9 @@ def build_realm(mcc: Union[int,str], mnc: Union[int,str]) -> str:
 class PyHssApi:
     headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}
 
-    def __init__(self, base_url:str):
+    def __init__(self, base_url:str, apn:str = 'internet'):
         self.base_url = base_url
+        self.apn = apn
         self.apn_internet_id = None
         self.apn_ims_id = None
         self.get_default_apn_ids()
@@ -74,7 +76,7 @@ class PyHssApi:
 
     def get_default_apn_ids(self):
         if not self.apn_internet_id:
-            self.apn_internet_id = self.get_apn_id('internet')
+            self.apn_internet_id = self.get_apn_id(self.apn)
         if not self.apn_ims_id:
             self.apn_ims_id = self.get_apn_id('ims')
 
@@ -116,7 +118,7 @@ class PyHssApi:
             'scscf_peer': 'scscf.%s' % realm,
             'msisdn_list': [msisdn],
             'ifc_path': 'default_ifc.xml',
-            'scscf': 'sip:' + 'sip:scscf.%s:6060' % realm,
+            'scscf': 'sip:scscf.%s:6060' % realm,
             'scscf_realm': realm,
         }
         self.perform_api_put('/ims_subscriber/', ims_subscr_data)
@@ -149,11 +151,14 @@ arg_parser = argparse.ArgumentParser(description="""
 Small command-line utility program to talk to the PyHSS REST interface in order
 to create and delete subscribers.  It only covers the most basic use case
 where every subscriber is both an EPS and IMS subscriber, has access to both
-the "internet" and "ims" APN (no others) and has a single MSISDN.""")
+the default APN (option --apn, "internet" if not given) and the "ims" APN
+(no others) and has a single MSISDN.""")
 
 global_group = arg_parser.add_argument_group('General Options')
 global_group.add_argument('-B', '--base-url', help='Base URL of the pyHSS API',
                           default='http://localhost:8080')
+global_group.add_argument('-A', '--apn', help='Default APN of the subscribers',
+                          default='internet')
 
 subparsers = arg_parser.add_subparsers(dest='operation', required=True)
 
@@ -170,9 +175,9 @@ parser_delete.add_argument('--imsi', help="15-digit IMSI", required=True)
 if __name__ == '__main__':
     opts = arg_parser.parse_args()
 
-    api = PyHssApi(opts.base_url)
+    api = PyHssApi(opts.base_url, opts.apn)
 
-    if opts.operation == 'create':
+    if opts.operation == 'subscriber-create':
         api.create_subscriber(opts.imsi, opts.k, opts.opc, opts.msisdn)
-    elif opts.operation == 'delete':
+    elif opts.operation == 'subscriber-delete':
         api.delete_subscriber(opts.imsi)

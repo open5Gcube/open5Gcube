@@ -44,12 +44,8 @@ configuration:
     - ims
   nrfUri: http://${NRF_IP_ADDR}:7777 # a valid URI of NRF
   security:  # NAS security parameters
-    integrityOrder: # the priority of integrity algorithms
-      - NIA2
-      # - NIA0
-    cipheringOrder: # the priority of ciphering algorithms
-      - NEA0
-      # - NEA2
+    integrityOrder: [ ${FIVEG_INTEGRITY_ORDER} ] # the priority of integrity algorithms
+    cipheringOrder: [ ${FIVEG_CIPHERING_ORDER} ] # the priority of ciphering algorithms
   networkName:  # the name of this core network
     full: ${NETWORK_NAME}
     short: ${NETWORK_NAME}

@@ -32,7 +32,7 @@ upf:
         dnn: ims
         dev: ogstun2
       - subnet: 2001:230:babe::/48
-        gateway: 2001:230:bafe::1
+        gateway: 2001:230:babe::1
         dnn: ims
         dev: ogstun2
     metrics:

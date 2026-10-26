@@ -13,6 +13,8 @@ case "${srv}" in
 esac
 
 cd /o5gc/ocudu
+# the gNB takes the security settings, but rejects NIA0 for integrity
+export GNB_NIA_PREF_LIST=$(echo "${FIVEG_INTEGRITY_ORDER}" | sed -E 's/ //g; s/(^|,)NIA0(,|$)/\1/I; s/,$//')
 envsubst.sh /mnt/ocudu/${srv}.yaml ./${srv}.yaml
 # Optional stack specific config overlay, merged on top of ${srv}.yaml
 touch ./${srv}.overlay.yaml

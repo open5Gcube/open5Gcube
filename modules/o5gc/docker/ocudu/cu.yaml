@@ -12,8 +12,8 @@ cu_cp:
   security:
     integrity: not_needed
     confidentiality: required
-    nea_pref_list: nea2,nea1,nea0
-    nia_pref_list: nia2,nia1
+    nea_pref_list: ${FIVEG_CIPHERING_ORDER}
+    nia_pref_list: ${GNB_NIA_PREF_LIST}
   f1ap:
     bind_addrs: ${CU_CP_RAN_IP_ADDR}
 

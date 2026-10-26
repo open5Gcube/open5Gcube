@@ -112,6 +112,23 @@ setup () {
     ella_api PUT operator/spn "${data}"
     data='{"sd": "'${NSSAI_SD}'", "sst": '${NSSAI_SST}'}'
     ella_api PUT slices/default "${data}"
+    # replace the initial internet data network and its default policy by
+    # one for the APN in the UE subnet, with Ella Core's initial values
+    ella_api DELETE policies/default
+    ella_api DELETE networking/data-networks/internet
+    data='{"name": "'${APN}'", "ipv4_pool": "'${UE_IP_SUBNET}'", "dns": "8.8.8.8", "mtu": 1400}'
+    ella_api POST networking/data-networks "${data}"
+    data='{
+        "name": "default",
+        "profile_name": "default",
+        "slice_name": "default",
+        "data_network_name": "'${APN}'",
+        "session_ambr_uplink": "200 Mbps",
+        "session_ambr_downlink": "200 Mbps",
+        "var5qi": 9,
+        "arp": 1
+    }'
+    ella_api POST policies "${data}"
     data='{"keyIdentifier":1, "scheme": "A", "privateKey": "c53c22208b61860b06c62e5406a7b330c2b577aa5558981510d128247d38bd1d"}'
     ella_api POST operator/home-network-keys "${data}"
     data='{"keyIdentifier":2, "scheme": "B", "privateKey": "F1AB1074477EBCC7F554EA1C5FC368B1616730155E0041AC447D6301975FECDA"}'

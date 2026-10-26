@@ -20,7 +20,7 @@ ue:
   opc: "${UE_SOFT_OPC}"
   amf: "8000"
   sqn: "00000000"
-  dnn: "internet"
+  dnn: "${APN}"
   routingindicator: "0000"
   hplmn:
     mcc: "${UE_MCC}"

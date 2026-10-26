@@ -23,6 +23,9 @@ case "${srv}" in
     fi
 esac
 
+# srsEPC takes only the preferred algorithm, the first of each list
+export FOURG_INTEGRITY_ALGO=${FOURG_INTEGRITY_ORDER%%,*}
+export FOURG_CIPHERING_ALGO=${FOURG_CIPHERING_ORDER%%,*}
 [ -f /mnt/srsran/${srv}.conf ] && envsubst.sh /mnt/srsran/${srv}.conf ${srv}.conf
 
 add_user () {

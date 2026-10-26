@@ -54,8 +54,6 @@ configuration:
               - dnn: ${APN}
                 pools:
                   - cidr: ${UE_IP_SUBNET}
-                staticPools:
-                  - cidr: 10.60.1.0/24
               - dnn: ims
                 pools:
                   - cidr: ${UE_IMS_IP_SUBNET}
