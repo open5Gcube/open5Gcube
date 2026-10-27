@@ -116,7 +116,7 @@ setup () {
     # one for the APN in the UE subnet, with Ella Core's initial values
     ella_api DELETE policies/default
     ella_api DELETE networking/data-networks/internet
-    data='{"name": "'${APN}'", "ipv4_pool": "'${UE_IP_SUBNET}'", "dns": "8.8.8.8", "mtu": 1400}'
+    data='{"name": "'${APN}'", "ipv4_pool": "'${UE_IP_SUBNET}'", "dns": "'${UE_DNS_SERVER1}'", "mtu": 1400}'
     ella_api POST networking/data-networks "${data}"
     data='{
         "name": "default",
@@ -140,7 +140,7 @@ setup_ims () {
 
     # Ella Core: ims data network for SIP signalling and media, its policy in
     # the default profile, and the P-CSCF given to UEs on it
-    data='{"name": "ims", "ipv4_pool": "'${UE_IMS_IP_SUBNET}'", "dns": "8.8.8.8", "mtu": 1400}'
+    data='{"name": "ims", "ipv4_pool": "'${UE_IMS_IP_SUBNET}'", "dns": "'${UE_DNS_SERVER1}'", "mtu": 1400}'
     ella_api POST networking/data-networks "${data}"
     data='{
         "name": "ims",

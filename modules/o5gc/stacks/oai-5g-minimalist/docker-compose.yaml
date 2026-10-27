@@ -41,19 +41,3 @@ services:
     extends:
       file: ${DOCKER}/oai/services.yaml
       service: ue
-
-  o5gc-dns:
-    image: cytopia/bind:stable-0.28
-    container_name: o5gc-dns
-    privileged: true
-    environment:
-      # Custom DNS entries:
-      # - bild.de -> tagesschau.de
-      - DNS_A=bild.de=88.215.213.26
-      - DNS_FORWARDER=8.8.8.8,8.8.4.4
-      - DEBUG_ENTRYPOINT=2
-      - DOCKER_LOGS=1
-    networks:
-      extnet:
-        ipv4_address: ${DNS_EXT_IP_ADDR}
-    profiles: [ "core" ]

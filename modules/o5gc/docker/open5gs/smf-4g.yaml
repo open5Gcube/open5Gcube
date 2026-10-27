@@ -37,8 +37,8 @@ smf:
         gateway: 2001:230:babe::1
         dnn: ims
     dns:
-      - 8.8.8.8
-      - 8.8.4.4
+      - ${UE_DNS_SERVER1}
+      - ${UE_DNS_SERVER2}
       - 2001:4860:4860::8888
       - 2001:4860:4860::8844
     p-cscf:

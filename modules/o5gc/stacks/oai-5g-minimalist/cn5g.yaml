@@ -136,9 +136,9 @@ smf:
       config:
         enable_usage_reporting: no
   ue_dns:
-    primary_ipv4: "172.21.3.100"
+    primary_ipv4: "${UE_DNS_SERVER1}"
     primary_ipv6: "2001:4860:4860::8888"
-    secondary_ipv4: "8.8.8.8"
+    secondary_ipv4: "${UE_DNS_SERVER2}"
     secondary_ipv6: "2001:4860:4860::8888"
   ims:
     pcscf_ipv4: "127.0.0.1"
