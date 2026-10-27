@@ -20,7 +20,7 @@ WORKDIR /o5gc/ella-ims
 ARG ELLA_IMS_VERSION=7f1d88c
 RUN git clone https://github.com/ellanetworks/ims.git .                       \
     && git checkout ${ELLA_IMS_VERSION}                                       \
-    && REVISION=`git rev-parse HEAD`                                          \
+    && REVISION=$(git rev-parse HEAD)                                         \
     && sync-cache.sh download ellacore-ims                                    \
         go-cache-dl go-cache-build npm-cache                                  \
     && npm ci --prefix ui                                                     \

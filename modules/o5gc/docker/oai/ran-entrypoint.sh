@@ -90,6 +90,7 @@ case "${srv}" in
             SOFTMODEM_ARGS+=" -E"
         fi
         [ -n "${B210_DETECTED}" ] && SOFTMODEM_ARGS+=" -E"
+        # shellcheck disable=SC2068,SC2294
         args=$(eval echo ${@:2})
         build/nr-uesoftmodem                                                  \
             --usrp-args ${USRP_ARGS} --clock-source 1 ${SOFTMODEM_ARGS}       \

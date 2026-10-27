@@ -77,9 +77,12 @@ UE_DB+="
 ...
 "
 ```
-An optional 4th field, the **ADM key**, may be appended per line. It is used only by the SIM Writer to authenticate when programming physical cards and is ignored by core-network provisioning.
+An optional 4th field, the **ADM key**, may be appended per line. It is used only by the SIM
+Writer to authenticate when programming physical cards and is ignored by core-network
+provisioning.
 
-In addition, each .env file in the optional directory ``etc/uedb.d/`` is included to extend the UE_DB. This can be used to organize the subscriber information in a separate repository.
+In addition, each .env file in the optional directory ``etc/uedb.d/`` is included to extend the
+UE_DB. This can be used to organize the subscriber information in a separate repository.
 
 ### ``networks.env``
 The Docker network configuration does not usually need to be changed. The subnet masks and the

@@ -20,7 +20,7 @@ WORKDIR /o5gc/ella-smsc
 ARG ELLA_SMSC_VERSION=5c094bc
 RUN git clone https://github.com/ellanetworks/smsc.git .                      \
     && git checkout ${ELLA_SMSC_VERSION}                                      \
-    && REVISION=`git rev-parse HEAD`                                          \
+    && REVISION=$(git rev-parse HEAD)                                         \
     && sync-cache.sh download ellacore-smsc                                   \
         go-cache-dl go-cache-build npm-cache                                  \
     && npm ci --prefix ui                                                     \

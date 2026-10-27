@@ -44,6 +44,7 @@ core projects below can be freely combined. Variants with the suffix ``-emu`` (o
 fully emulated and need no SDR hardware.
 
 ### RAN
+
 | Project | Description |
 | :------ | :---------- |
 | OpenAirInterface | 4G eNB / 5G gNB, see [below](#openairinterface). |
@@ -54,6 +55,7 @@ fully emulated and need no SDR hardware.
 | Osmocom | 2G network (``osmocom-2g``) based on the [Osmocom](https://osmocom.org) stack. |
 
 ### Core
+
 | Project | Description |
 | :------ | :---------- |
 | Open5GS | 4G / 5G core, see [below](#open5gs). |

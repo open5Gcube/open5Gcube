@@ -34,7 +34,7 @@ WORKDIR /o5gc/falcon
 
 # Clone and build FALCON
 RUN git clone https://github.com/falkenber9/falcon.git .                       \
-    && wget https://patch-diff.githubusercontent.com/raw/falkenber9/falcon/pull/12.patch \
+    && wget -nv https://patch-diff.githubusercontent.com/raw/falkenber9/falcon/pull/12.patch \
     && git apply 12.patch                                                     \
     && mkdir build                                                            \
     && cd build                                                               \

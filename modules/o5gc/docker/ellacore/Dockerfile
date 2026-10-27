@@ -20,9 +20,9 @@ WORKDIR /o5gc/ellacore
 ARG ELLACORE_VERSION=1.20.0
 RUN git clone --branch v${ELLACORE_VERSION} --depth 1                         \
         https://github.com/ellanetworks/core.git .                            \
-    && REVISION=`git rev-parse HEAD`                                          \
+    && REVISION=$(git rev-parse HEAD)                                         \
     && sync-cache.sh download ellacore go-cache-dl go-cache-build npm-cache   \
-    && npm install --prefix ui                                                \
+    && npm ci --prefix ui                                                     \
     && npm run build --prefix ui                                              \
     && go build -ldflags                                                      \
           "-X github.com/ellanetworks/core/version.GitCommit=${REVISION}"     \

@@ -31,7 +31,7 @@ export FOURG_CIPHERING_ALGO=${FOURG_CIPHERING_ORDER%%,*}
 add_user () {
     imsi=$1; key=$2; opc=$3; id=$4
     # Format: Name,Auth,IMSI,Key,OP_Type,OP/OPc,AMF,SQN,QCI,IP_alloc
-    echo ue${i},mil,${imsi},${key},opc,${opc},8000,000000001234,7,dynamic >> user_db.csv
+    echo ue${id},mil,${imsi},${key},opc,${opc},8000,000000001234,7,dynamic >> user_db.csv
 }
 
 case "${srv}" in

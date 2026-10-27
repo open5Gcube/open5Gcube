@@ -2,7 +2,7 @@
 
 set -e
 
-for i in $(seq 1 60); do
+for _ in $(seq 1 60); do
     if curl -sSf http://${AMF_IP_ADDR}:5002/api/v1/status | grep -q '"ready":true'; then
         break
     fi
@@ -19,7 +19,7 @@ CORE_SMS_NUMBER=+${MSISDN_COUNTRY_CODE}1001
 # API of Ella IMS and SMSC, which need no authentication
 nf_api () {
     url=$1; shift
-    echo "curl -d "$3" -X $1 ${url}/api/v1/$2)"
+    echo "curl -d '$3' -X $1 ${url}/api/v1/$2"
     http_code=$(curl -sS --output /tmp/curl_output --write-out "%{http_code}" \
         -X $1                                                                 \
         -H "Content-Type: application/json"                                   \
@@ -41,7 +41,7 @@ smsc_api () {
 
 # wait until the API of Ella IMS or SMSC ($1) is up
 wait_for_api () {
-    for i in $(seq 1 60); do
+    for _ in $(seq 1 60); do
         if curl -sSf $1/api/v1/status > /dev/null; then
             return
         fi
@@ -54,7 +54,7 @@ wait_for_api () {
 # wait until the Diameter peer of Ella IMS or SMSC (API $1, path $2) is open
 # (Ella Core starts its Diameter node only once the operator is set up)
 wait_for_diameter () {
-    for i in $(seq 1 120); do
+    for _ in $(seq 1 120); do
         if curl -sSf $1/api/v1/$2 | grep -q '"state":"open"'; then
             echo "Diameter connection to Ella Core is open"
             return
@@ -66,8 +66,7 @@ wait_for_diameter () {
 }
 
 ella_api () {
-    echo "curl -d "$3" -X $1 /api/v1/$2)"
-    # shellcheck disable=SC2068
+    echo "curl -d '$3' -X $1 ${WEBUI_URL}/api/v1/$2"
     http_code=$(curl -sS --output /tmp/curl_output --write-out "%{http_code}" \
         -X $1                                                                 \
         -H "Authorization: Bearer $(cat /tmp/access_token)"                   \
@@ -89,7 +88,7 @@ add_subscriber () {
         "imsi": "'${imsi}'",
         "key": "'${key}'",
         "opc": "'${opc}'",
-        "msisdn": "+'${MSISDN_COUNTRY_CODE}${imsi#${MCC}${MNC}}'",
+        "msisdn": "+'${MSISDN_COUNTRY_CODE}${imsi#"${MCC}${MNC}"}'",
         "sequenceNumber": "000000000022",
         "profile_name": "default"
     }'

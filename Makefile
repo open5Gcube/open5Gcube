@@ -295,7 +295,7 @@ lint:
 SHELLCHECK_FILES = $(filter-out ${SHELLCHECK_FILES_IGNORE}, $(shell find modules/ etc/ scripts/ -name '*.sh'))
 SHELLCHECK_FILES_IGNORE += $(foreach m,${GIT_SUBMODULES},${m}/%) %-healthcheck.sh %/wait-for-it.sh
 SHELLCHECK_IGNORE = SC1091 SC2016 SC2046 SC3037 SC2086 SC2059 SC2155 SC2153   \
-                    SC2291 SC3040 SC1090 SC2317
+                    SC2291 SC3040 SC1090 SC2317 SC2329
 shellcheck:
 	@echo Running shellcheck
 	@docker run --rm --volume="${PWD}:/mnt"                                   \
@@ -312,7 +312,7 @@ yamllint:
 	    -s -c scripts/yamllint.yaml ${YAMLLINT_FILES}
 
 HADOLINT_IGNORE = DL3003 DL3007 DL3008 DL3009 DL3013 DL3018 DL3059 DL4006     \
-                  SC3010 SC3044 SC3060 ${SHELLCHECK_IGNORE}
+                  SC3010 SC3044 SC3045 SC3060 ${SHELLCHECK_IGNORE}
 hadolint:
 	@echo Running hadolint
 	@docker run --rm --volume ${BASE_DIR}:${BASE_DIR}:ro                      \
