@@ -17,5 +17,5 @@ RUN sync-cache.sh download oai-smf ccache                                     \
     && sync-cache.sh upload oai-smf ccache
 
 HEALTHCHECK --interval=10s --timeout=15s --retries=6                          \
-    CMD /o5gc/oai-cn5g-smf/scripts/healthcheck.sh
+    CMD ["/o5gc/oai-cn5g-smf/scripts/healthcheck.sh"]
 

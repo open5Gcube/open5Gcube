@@ -130,8 +130,8 @@ programs the database via the Open5GS-WebUI with all configured UEs in ``etc/ued
 
 ## VoLTE
 The setup follows the
-[VoLTE Setup with Kamailio IMS and Open5GS tutorial](https://open5gs.org/open5gs/docs/tutorial/02-VoLTE-setup/)
-quite closely.
+[VoLTE Setup with Kamailio IMS and Open5GS
+tutorial](https://open5gs.org/open5gs/docs/tutorial/02-VoLTE-setup/) quite closely.
 The network topology is comparable to the
 [System Architecture Evolution (SAE)](https://en.wikipedia.org/wiki/System_Architecture_Evolution)
 of LTE: ![VoLTE_Topology](img/volte_topology.png)
@@ -150,4 +150,5 @@ To test VoLTE make sure the APN settings of the UE are correct:
     * First create internet APN, APN name: internet, APN type: default –> Save APN
     * Then, create ims APN, APN name: ims, APN type: ims –> Save APN
 
-Contrary to the tutorial, it does not seem necessary to disable the SQN check for Sysmocom SIM cards.
+Contrary to the tutorial, it does not seem necessary to disable the SQN check for Sysmocom SIM
+cards.

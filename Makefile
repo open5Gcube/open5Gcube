@@ -289,8 +289,18 @@ lazydocker:
 	  lazyteam/lazydocker
 
 lint:
-	$(MAKE) --ignore-errors shellcheck yamllint codespell hadolint            \
-	    dclint markdownlint space-end-check
+	$(MAKE) --keep-going shellcheck yamllint codespell hadolint               \
+	    dclint markdownlint space-end-check tests-lint
+
+SHELLCHECK_IMAGE = koalaman/shellcheck:stable
+YAMLLINT_IMAGE = cytopia/yamllint:latest
+HADOLINT_IMAGE = hadolint/hadolint
+DCLINT_IMAGE = zavoloklom/dclint
+MARKDOWNLINT_IMAGE = markdownlint/markdownlint
+LINT_IMAGES = ${SHELLCHECK_IMAGE} ${YAMLLINT_IMAGE} ${HADOLINT_IMAGE}         \
+              ${DCLINT_IMAGE} ${MARKDOWNLINT_IMAGE}
+lint-update-images:
+	$(foreach img,${LINT_IMAGES},docker pull ${img};)
 
 SHELLCHECK_FILES = $(filter-out ${SHELLCHECK_FILES_IGNORE}, $(shell find modules/ etc/ scripts/ -name '*.sh'))
 SHELLCHECK_FILES_IGNORE += $(foreach m,${GIT_SUBMODULES},${m}/%) %-healthcheck.sh %/wait-for-it.sh
@@ -300,7 +310,7 @@ shellcheck:
 	@echo Running shellcheck
 	@docker run --rm --volume="${PWD}:/mnt"                                   \
 	    -e SHELLCHECK_OPTS="$(foreach rule,${SHELLCHECK_IGNORE},-e ${rule})"  \
-	  koalaman/shellcheck:stable ${SHELLCHECK_FILES}
+	  ${SHELLCHECK_IMAGE} ${SHELLCHECK_FILES}
 
 DC_FILES = $(wildcard modules/*/stacks/*/docker-compose.yaml)                 \
            $(shell find modules/*/docker/ -name services.yaml)
@@ -308,7 +318,7 @@ YAMLLINT_FILES = ${DC_FILES} etc/networks.yaml Doc/mkdocs.yml
 yamllint:
 	@echo Running yamllint
 	@docker run --rm --volume="${PWD}:/data"                                  \
-	  cytopia/yamllint:latest                                                 \
+	  ${YAMLLINT_IMAGE}                                                       \
 	    -s -c scripts/yamllint.yaml ${YAMLLINT_FILES}
 
 HADOLINT_IGNORE = DL3003 DL3007 DL3008 DL3009 DL3013 DL3018 DL3059 DL4006     \
@@ -316,20 +326,20 @@ HADOLINT_IGNORE = DL3003 DL3007 DL3008 DL3009 DL3013 DL3018 DL3059 DL4006     \
 hadolint:
 	@echo Running hadolint
 	@docker run --rm --volume ${BASE_DIR}:${BASE_DIR}:ro                      \
-	  hadolint/hadolint hadolint                                              \
+	  ${HADOLINT_IMAGE} hadolint                                              \
 	    $(foreach rule,${HADOLINT_IGNORE},--ignore ${rule}) $(addprefix ${BASE_DIR}/,${DOCKER_FILES})
 
 dclint:
 	@echo Running dclint
 	@docker run --rm --volume ${BASE_DIR}:/app                                \
-	  zavoloklom/dclint -c scripts/dclintrc ${DC_FILES}
+	  ${DCLINT_IMAGE} -c scripts/dclintrc ${DC_FILES}
 
 MD_FILES += $(filter-out ${BASE_DIR}/Doc/README.md,$(wildcard ${BASE_DIR}/Doc/*.md))
 MD_IGNORE = ~MD001,~MD002,~MD022,~MD031,~MD032,~MD041
 markdownlint:
 	@echo Running markdownlint
 	@docker run --rm -v ${BASE_DIR}:${BASE_DIR}                               \
-	  markdownlint/markdownlint                                               \
+	  ${MARKDOWNLINT_IMAGE}                                                   \
 	    --rules ${MD_IGNORE} --style=$(BASE_DIR)/Doc/.mdl.style ${MD_FILES}
 
 CODESPELL_FILES += $(shell find etc/ -name *.env) ${DOCKER_FILES} ${MD_FILES} \

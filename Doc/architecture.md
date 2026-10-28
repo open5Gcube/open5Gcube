@@ -1,7 +1,8 @@
 ## Networking
 The network architecture incorporates three virtual Docker networks:
 
-* ``corenet`` (192.168.70.0/24): Configured as a *[macvlan](https://docs.docker.com/network/drivers/macvlan/)*
+* ``corenet`` (192.168.70.0/24): Configured as a
+  *[macvlan](https://docs.docker.com/network/drivers/macvlan/)*
   this network is designated for all Core Network and RAN components. The use of 802.1q trunk
   bridge mode allows a flexible distribution of containers across multiple servers.
   The host system is configured with additional virtual interfaces, facilitating direct
@@ -41,7 +42,8 @@ Their entrypoint scripts call the ``docker-remote.sh`` script, which uses
 * connects it to the default Docker bridge
 * configures the ssh usage
 * copy the files to run the container to the remote host
-* execute the docker-compose client [connecting to the remote daemon via SSH](https://docs.docker.com/engine/reference/commandline/cli/#a-namehosta-specify-daemon-host--h---host)
+* execute the docker-compose client
+  [connecting to the remote daemon via SSH](https://docs.docker.com/reference/cli/docker/#host)
   to run the eNB / gNB
 
 With this approach, all containers are managed on the Controller host using standard Docker
@@ -63,8 +65,8 @@ the building of the actual images by incorporating the following features:
 * ``Downloads``: Large downloaded files are cached to accelerate subsequent builds.
 
 The cacher runs on the Controller host only. To make it available for the builds on the RAN
-hosts, the cacher ports have to be forwarded over ssh, see
-[Forward the build-cacher Ports to the RAN Hosts](installation.md#forward-the-build-cacher-ports-to-the-ran-hosts).
+hosts, the cacher ports have to be forwarded over ssh, see [Forward the build-cacher Ports to the
+RAN Hosts](installation.md#forward-the-build-cacher-ports-to-the-ran-hosts).
 
 The usage of the cacher can be disabled in the installation specific settings file
   [``etc/local.env``](user_guide.md#localenv) by setting

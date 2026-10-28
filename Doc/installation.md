@@ -43,7 +43,7 @@ ExecStart = cpupower idle-set -d 1
 WantedBy = multi-user.target
 ```
 and enable it with
-```
+```console
 sudo systemctl enable cpupower
 ```
 
@@ -54,7 +54,8 @@ cd open5Gcube
 ```
 
 ### Install Docker Engine
-See [official Docker documentation](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
+See [official Docker
+documentation](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
 for details. Specific fixed versions of the Docker packages are installed with the script
 ``modules/base/docker/o5gc/install-docker.sh``. Execute it with
 ```console
@@ -68,7 +69,7 @@ sudo usermod -aG docker $USER
 To configure a static IP address and enable DHCP for the network interface, create a file
 ``/etc/netplan/00-ethernet.yaml`` with the following content on all hosts (adjust interface
 name and ip address as required):
-```
+```yaml
 network:
   version: 2
   renderer: networkd
@@ -80,13 +81,13 @@ network:
         addresses: [8.8.8.8,8.8.4.4]
 ```
 In addition, on the RAN hosts, add the following entries into ``/etc/sysctl.conf``:
-```
+```ini
 net.core.rmem_max=33554432
 net.core.wmem_max=33554432
 ```
 and assign to the 10G Ethernet interface connected to the X310 the IP address ``192.168.40.1/24``
 and set the MTU to 9000: in ``/etc/netplan/00-ethernet.yaml``:
-```
+```yaml
 network:
   version: 2
   renderer: networkd
@@ -124,7 +125,7 @@ the RAN hosts. This is achieved by remote-forwarding the three cacher ports (rsy
 apt-cacher-ng ``40861`` and git-cache-http-server ``40862``) over the existing ssh connections.
 
 1. On the Controller host, add the following to ``~/.ssh/config``:
-```
+```text
 Host o5gc2 o5gc3
     RemoteForward 172.17.0.1:40860 172.17.0.1:40860
     RemoteForward 172.17.0.1:40861 172.17.0.1:40861
@@ -132,7 +133,7 @@ Host o5gc2 o5gc3
 ```
 2. On each RAN host, the sshd must be allowed to bind forwarded ports to an address other than
 ``localhost``. Set in ``/etc/ssh/sshd_config``:
-```
+```text
 GatewayPorts clientspecified
 ```
 and reload the ssh daemon:
@@ -183,7 +184,7 @@ make systemd-install-unit
 ### Build all Docker Images
 To build all docker images for all sub-projects on the Controller host as well as the ran projects
 on the configured ran hosts, run
-```
+```console
 make build-cacher-start docker-build-all
 ```
 and get yourself a big cup of coffee as this will take a few hours.

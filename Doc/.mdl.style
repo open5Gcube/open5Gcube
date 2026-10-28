@@ -1,5 +1,6 @@
 all
 rule 'MD007', :indent => 4
-rule 'MD013', :line_length => 100, :ignore_code_blocks => true, :tables => false
+rule 'MD013', :line_length => 100, :ignore_code_blocks => true, :tables => false,
+  :treat_links_as_single_words => true
 rule 'MD009', :br_spaces => 2
 rule 'MD029', :style => :ordered

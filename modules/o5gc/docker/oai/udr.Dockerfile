@@ -17,5 +17,5 @@ RUN sync-cache.sh download oai-udr ccache                                     \
     && sync-cache.sh upload oai-udr ccache
 
 HEALTHCHECK --interval=10s --timeout=15s --retries=6                          \
-    CMD /o5gc/oai-cn5g-udr/scripts/healthcheck.sh
+    CMD ["/o5gc/oai-cn5g-udr/scripts/healthcheck.sh"]
 

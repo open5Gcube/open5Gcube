@@ -42,7 +42,8 @@ $(addprefix tests-run-,${TEST_STACKS}): tests-run-%: tests-install-venv
 	    $(wildcard modules/*/stacks/$*/tests)
 
 tests-lint: tests-install-venv
-	$(ACTIVATE_TEST_VENV); robocop check --config tests/robocop.toml          \
+	@echo Running robocop
+	@$(ACTIVATE_TEST_VENV); robocop check --config tests/robocop.toml         \
 	    modules/*/stacks tests
 
 tests-clean:

@@ -139,7 +139,8 @@ make run-oairan-open5gs-5g
 This starts all containers of the Stack and attaches to their console output. To stop the Stack
 just press ++ctrl+c++.
 
-In general, for Mobile-Network Stacks the naming follows the convention ``<ran-project>-<core-project>-<technology>``.
+In general, for Mobile-Network Stacks the naming follows the convention
+``<ran-project>-<core-project>-<technology>``.
 
 The startup-scripts of the RAN containers automatically take over the execution of the
 containers on the remote RAN hosts, if so configured in ``etc/local.env``.
