@@ -352,7 +352,7 @@ codespell: scripts-install-venv
 
 space-end-check:
 	@echo "check for files that do not end with a newline"
-	@! rg -g '!*.svg' -Ul '[^\n]\z' || false
+	@! rg -g '!*.svg' -Ul '[^\n]\z' . || false
 	@echo "check for files with trailing whitespaces"
 	@! grep -n '[[:blank:]]$$' ${CODESPELL_FILES}
 
