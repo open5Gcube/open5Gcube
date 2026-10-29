@@ -6,6 +6,24 @@
 
 *open5Gcube* is a **Modular Framework for Mobile Network Laboratories**. It builds and manages **open-source mobile network stacks**, including 2G, 4G, and 5G systems. It is designed for research, testing, and educational purposes, providing users with a customizable and extensible environment for deploying radio access networks (RAN), core networks (CN), and supporting components.
 
+<p align="center">
+  <b>Integrated projects</b><br>
+  <a href="https://openairinterface.org/"><img src="https://img.shields.io/badge/OpenAirInterface-8e44ad?style=flat-square" alt="OpenAirInterface"></a>
+  <a href="https://osmocom.org/"><img src="https://img.shields.io/badge/Osmocom-8e44ad?style=flat-square" alt="Osmocom"></a>
+  <a href="https://www.srsran.com/"><img src="https://img.shields.io/badge/srsRAN-e67e22?style=flat-square" alt="srsRAN"></a>
+  <a href="https://gitlab.com/ocudu/ocudu"><img src="https://img.shields.io/badge/OCUDU-e67e22?style=flat-square" alt="OCUDU"></a>
+  <a href="https://github.com/aligungr/UERANSIM"><img src="https://img.shields.io/badge/UERANSIM-27ae60?style=flat-square" alt="UERANSIM"></a>
+  <a href="https://github.com/HewlettPackard/PacketRusher"><img src="https://img.shields.io/badge/PacketRusher-27ae60?style=flat-square" alt="PacketRusher"></a>
+  <br>
+  <a href="https://open5gs.org/"><img src="https://img.shields.io/badge/Open5GS-2e86c1?style=flat-square" alt="Open5GS"></a>
+  <a href="https://free5gc.org/"><img src="https://img.shields.io/badge/free5GC-2e86c1?style=flat-square" alt="free5GC"></a>
+  <a href="https://github.com/ellanetworks/core"><img src="https://img.shields.io/badge/EllaCore-2e86c1?style=flat-square" alt="EllaCore"></a>
+  <a href="https://www.kamailio.org/"><img src="https://img.shields.io/badge/Kamailio-c0392b?style=flat-square" alt="Kamailio"></a>
+  <a href="https://github.com/nickvsnetworking/pyhss"><img src="https://img.shields.io/badge/PyHSS-c0392b?style=flat-square" alt="PyHSS"></a>
+  <a href="https://gitea.osmocom.org/sim-card/pysim"><img src="https://img.shields.io/badge/pySim-7f8c8d?style=flat-square" alt="pySim"></a>
+  <a href="https://github.com/SysSec-KAIST/LTESniffer"><img src="https://img.shields.io/badge/LTESniffer-7f8c8d?style=flat-square" alt="LTESniffer"></a>
+</p>
+
 ---
 
 I. [Overview](#-Overview) II. [Getting Started](#-Getting-Started) III. [Configuration](#%EF%B8%8F-configuration) IV. [Usage](#-Usage) V. [Documentation](#documentation) VI. [License](#-License)
