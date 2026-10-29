@@ -5,3 +5,11 @@
 table thead tr th:empty {
     display: none;
 }
+
+.md-content a[href^="http"]::after {
+    content: "\00a0⧉";
+}
+
+.nt-card a {
+    text-decoration: none;
+}

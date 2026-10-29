@@ -49,21 +49,21 @@ services:
       start_interval: 1s
 
   documentation:
-    image: o5gc/o5gc-mkdocs
+    image: o5gc/o5gc-zensical
     container_name: o5gc-docu
-    entrypoint: mkdocs
     command: serve -a 0.0.0.0:8000
     working_dir: /Doc
     volumes:
       - ${BASE}/Doc:/Doc/docs
       - ${BASE}/Doc/mkdocs.yml:/Doc/mkdocs.yml
       - ${BASE}/Doc/html:/Doc/html
-      - ${BASE}/Doc/pdf:/Doc/pdf
     network_mode: bridge
     ports:
       - ${O5GC_WEBUI_HOST_ADDR}:${DOCUMENTATION_SERVE_HOST_PORT}:8000
     user: ${HOST_USER_GROUP_ID}
     profiles: [ "docu" ]
+    tmpfs:
+      - /Doc/.cache:mode=1777
 
   coredns:
     image: coredns/coredns:1.11.3

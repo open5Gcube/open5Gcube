@@ -2,6 +2,10 @@ site_name: open5Gcube
 copyright: "&copy; Fraunhofer FKIE"
 
 site_dir: html
+exclude_docs: |
+  README.md
+  html/
+  mkdocs.yml
 
 nav:
   - Overview: index.md
@@ -21,22 +25,16 @@ extra_css:
   - css/neoteroi.css
   - css/extra.css
 
+extra_javascript:
+  - js/external_links.js
+
 extra:
   generator: false
 
 plugins:
   - search
   - offline
-  - link-marker
-  - open-in-new-tab
-  - glightbox:
-      zoomable: false
-  - to-pdf:
-      cover_subtitle: Technical Reference Documentation
-      author: !ENV DATE
-      exclude_pages:
-        - ^index.html$
-      output_path: ../pdf/Documentation.pdf
+  - glightbox
 
 markdown_extensions:
   - admonition
@@ -48,5 +46,5 @@ markdown_extensions:
   - pymdownx.keys
   - pymdownx.superfences
   - pymdownx.emoji:
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
+      emoji_index: !!python/name:zensical.extensions.emoji.twemoji
+      emoji_generator: !!python/name:zensical.extensions.emoji.to_svg

@@ -32,8 +32,8 @@ docker-build-o5gc-base-%: .docker-build-prerequisites
 	$(call parse-stem,$*)
 	$(call docker-build,base,o5gc,base,USE_BUILD_CACHER=${USE_BUILD_CACHER} BUILD_HOST=${$@_H} BASE_IMG=${$@_V} TZ=$(TIMEZONE),,${$@_V},${$@_H})
 
-docker-build-o5gc-mkdocs:
-	$(call docker-build,base,o5gc,mkdocs)
+docker-build-o5gc-zensical:
+	$(call docker-build,base,o5gc,zensical)
 docker-build-o5gc-webui: docker-build-o5gc-base Documentation-build
 	rm -rf modules/base/docker/o5gc/webui/frontend/theme/*
 	[ -z "$(call get_env,WEBUI_THEME)" ] ||                                   \
@@ -43,12 +43,10 @@ docker-build-o5gc-webui: docker-build-o5gc-base Documentation-build
 docker-build-simcard: docker-build-o5gc-base
 	$(call docker-build,base,simcard)
 
-Documentation-build: docker-build-o5gc-mkdocs
+Documentation-build: docker-build-o5gc-zensical
 	cd ${BASE_O5GC_DIR};                                                      \
-	$(DOCKER_COMPOSE) --profile=docu run --no-TTY --rm                        \
-	    --env DATE="Date: $(shell date +%Y-%m-%d)" documentation build #--strict
-	rm Doc/html/mkdocs.yml
-Documentation-serve-start: docker-build-core-mkdocs
+	$(DOCKER_COMPOSE) --profile=docu run --no-TTY --rm documentation build #--strict
+Documentation-serve-start: docker-build-o5gc-zensical
 	cd ${BASE_O5GC_DIR};                                                      \
 	$(DOCKER_COMPOSE) --profile=docu up --detach
 	@echo Live-reloading docs server available at                             \
