@@ -14,8 +14,9 @@ The main structure is as follows:
 
 ## Configuration
 The configuration of the installation and the global settings across the Stacks is done via
-different [environment files](https://docs.docker.com/compose/environment-variables/env-file/)
-in the ``etc`` directory.
+different [environment files][env-file] in the ``etc`` directory.
+
+[env-file]: https://docs.docker.com/compose/how-tos/environment-variables/variable-interpolation/#env-file
 
 ### ``local.env``
 Sets system / installation specific settings, especially the network interface names as well as

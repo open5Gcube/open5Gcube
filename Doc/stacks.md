@@ -134,14 +134,10 @@ Only the configuration of the SMF differs between 4G and 5G. The initialization 
 programs the database via the Open5GS-WebUI with all configured UEs in ``etc/uedb.env``.
 
 ## VoLTE
-The setup follows the
-[VoLTE Setup with Kamailio IMS and Open5GS
-tutorial](https://open5gs.org/open5gs/docs/tutorial/02-VoLTE-setup/) quite closely.
-The network topology is comparable to the
-[System Architecture Evolution (SAE)](https://en.wikipedia.org/wiki/System_Architecture_Evolution)
+The setup follows the [VoLTE Setup with Kamailio IMS and Open5GS tutorial][volte-tutorial] quite
+closely. The network topology is comparable to the [System Architecture Evolution (SAE)][sae]
 of LTE: ![VoLTE_Topology](img/volte_topology.png)
-The dockerized setup is inspired by the
-[docker_open5gs github repository](https://github.com/herlesupreeth/docker_open5gs)
+The dockerized setup is inspired by the [docker_open5gs github repository][docker_open5gs]
 by Supreeth Herle.
 srsRAN as well as OAI-RAN has been tested successfully to build a full Stack (both support for QoS
 and dedicated radio bearer creation).
@@ -157,3 +153,7 @@ To test VoLTE make sure the APN settings of the UE are correct:
 
 Contrary to the tutorial, it does not seem necessary to disable the SQN check for Sysmocom SIM
 cards.
+
+[volte-tutorial]: https://open5gs.org/open5gs/docs/tutorial/02-VoLTE-setup/
+[sae]: https://en.wikipedia.org/wiki/System_Architecture_Evolution
+[docker_open5gs]: https://github.com/herlesupreeth/docker_open5gs

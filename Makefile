@@ -290,15 +290,17 @@ lazydocker:
 
 lint:
 	$(MAKE) --keep-going shellcheck yamllint codespell hadolint               \
-	    dclint markdownlint space-end-check tests-lint
+	    dclint markdownlint actionlint space-end-check tests-lint
 
 SHELLCHECK_IMAGE = koalaman/shellcheck:stable
 YAMLLINT_IMAGE = cytopia/yamllint:latest
 HADOLINT_IMAGE = hadolint/hadolint
 DCLINT_IMAGE = zavoloklom/dclint
 MARKDOWNLINT_IMAGE = markdownlint/markdownlint
+ACTIONLINT_IMAGE = rhysd/actionlint
 LINT_IMAGES = ${SHELLCHECK_IMAGE} ${YAMLLINT_IMAGE} ${HADOLINT_IMAGE}         \
-              ${DCLINT_IMAGE} ${MARKDOWNLINT_IMAGE}
+              ${DCLINT_IMAGE} ${MARKDOWNLINT_IMAGE} ${ACTIONLINT_IMAGE}       \
+              ${LYCHEE_IMAGE}
 lint-update-images:
 	$(foreach img,${LINT_IMAGES},docker pull ${img};)
 
@@ -334,13 +336,18 @@ dclint:
 	@docker run --rm --volume ${BASE_DIR}:/app                                \
 	  ${DCLINT_IMAGE} -c scripts/dclintrc ${DC_FILES}
 
-MD_FILES += $(filter-out ${BASE_DIR}/Doc/README.md,$(wildcard ${BASE_DIR}/Doc/*.md))
+MD_FILES += ${BASE_DIR}/README.md $(filter-out ${BASE_DIR}/Doc/README.md,$(wildcard ${BASE_DIR}/Doc/*.md))
 MD_IGNORE = ~MD001,~MD002,~MD022,~MD031,~MD032,~MD041
 markdownlint:
 	@echo Running markdownlint
 	@docker run --rm -v ${BASE_DIR}:${BASE_DIR}                               \
 	  ${MARKDOWNLINT_IMAGE}                                                   \
 	    --rules ${MD_IGNORE} --style=$(BASE_DIR)/Doc/.mdl.style ${MD_FILES}
+
+actionlint:
+	@echo Running actionlint
+	@docker run --rm --volume ${BASE_DIR}:${BASE_DIR}:ro                      \
+	    --workdir ${BASE_DIR} ${ACTIONLINT_IMAGE}
 
 CODESPELL_FILES += $(shell find etc/ -name *.env) ${DOCKER_FILES} ${MD_FILES} \
                    ${SHELLCHECK_FILES} ${YAMLLINT_FILES} ${DC_FILES} Makefile
@@ -349,6 +356,15 @@ codespell: scripts-install-venv
 	@echo Running codespell
 	@source scripts/venv/bin/activate;                                        \
 	codespell -L ${CODESPELL_IGNORE_WORDS} ${CODESPELL_FILES}
+
+LYCHEE_IMAGE = lycheeverse/lychee
+linkcheck-noredirects: LINKCHECK_OPTS = --max-redirects 0
+linkcheck linkcheck-noredirects: Documentation-stacks-svg
+	@echo Running lychee
+	@docker run --rm --volume ${BASE_DIR}:${BASE_DIR}:ro                      \
+	    --workdir ${BASE_DIR} $(if ${GITHUB_TOKEN},--env GITHUB_TOKEN)        \
+	  ${LYCHEE_IMAGE} --no-progress --verbose --root-dir ${BASE_DIR}          \
+	    ${LINKCHECK_OPTS} ${MD_FILES}
 
 space-end-check:
 	@echo "check for files that do not end with a newline"

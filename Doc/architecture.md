@@ -2,7 +2,7 @@
 The network architecture incorporates three virtual Docker networks:
 
 * ``corenet`` (192.168.70.0/24): Configured as a
-  *[macvlan](https://docs.docker.com/network/drivers/macvlan/)*
+  *[macvlan](https://docs.docker.com/engine/network/drivers/macvlan/)*
   this network is designated for all Core Network and RAN components. The use of 802.1q trunk
   bridge mode allows a flexible distribution of containers across multiple servers.
   The host system is configured with additional virtual interfaces, facilitating direct

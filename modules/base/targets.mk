@@ -44,8 +44,8 @@ docker-build-simcard: docker-build-o5gc-base
 	$(call docker-build,base,simcard)
 
 Documentation-stacks-svg:
-	scripts/stacks_svg.py ${MODULES_DIR}/o5gc/stacks Doc/img/stacks.svg animated
-	scripts/stacks_svg.py ${MODULES_DIR}/o5gc/stacks Doc/img/stacks-hover.svg hover
+	@scripts/stacks_svg.py ${MODULES_DIR}/o5gc/stacks Doc/img/stacks.svg animated
+	@scripts/stacks_svg.py ${MODULES_DIR}/o5gc/stacks Doc/img/stacks-hover.svg hover
 
 Documentation-build: docker-build-o5gc-zensical Documentation-stacks-svg
 	cd ${BASE_O5GC_DIR};                                                      \

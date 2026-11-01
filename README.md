@@ -1,42 +1,50 @@
-<div id="top">
-  <p align="center">
-    <img src="Doc/img/o5gc_logo.svg" width="70%">
-  </p>
+<div align="center">
+  <img src="Doc/img/o5gc_logo.svg" width="70%">
 </div>
 
-*open5Gcube* is a **Modular Framework for Mobile Network Laboratories**. It builds and manages **open-source mobile network stacks**, including 2G, 4G, and 5G systems. It is designed for research, testing, and educational purposes, providing users with a customizable and extensible environment for deploying radio access networks (RAN), core networks (CN), and supporting components.
+*open5Gcube* is a **Modular Framework for Mobile Network Laboratories**. It builds and manages
+**open-source mobile network stacks**, including 2G, 4G, and 5G systems. It is designed for
+research, testing, and educational purposes, providing users with a customizable and extensible
+environment for deploying radio access networks (RAN), core networks (CN), and supporting
+components.
 
-<p align="center">
-  <b>Integrated projects</b><br>
-  <a href="https://openairinterface.org/"><img src="https://img.shields.io/badge/OpenAirInterface-8e44ad?style=flat-square" alt="OpenAirInterface"></a>
-  <a href="https://osmocom.org/"><img src="https://img.shields.io/badge/Osmocom-8e44ad?style=flat-square" alt="Osmocom"></a>
-  <a href="https://www.srsran.com/"><img src="https://img.shields.io/badge/srsRAN-e67e22?style=flat-square" alt="srsRAN"></a>
-  <a href="https://gitlab.com/ocudu/ocudu"><img src="https://img.shields.io/badge/OCUDU-e67e22?style=flat-square" alt="OCUDU"></a>
-  <a href="https://github.com/aligungr/UERANSIM"><img src="https://img.shields.io/badge/UERANSIM-27ae60?style=flat-square" alt="UERANSIM"></a>
-  <a href="https://github.com/HewlettPackard/PacketRusher"><img src="https://img.shields.io/badge/PacketRusher-27ae60?style=flat-square" alt="PacketRusher"></a>
-  <br>
-  <a href="https://open5gs.org/"><img src="https://img.shields.io/badge/Open5GS-2e86c1?style=flat-square" alt="Open5GS"></a>
-  <a href="https://free5gc.org/"><img src="https://img.shields.io/badge/free5GC-2e86c1?style=flat-square" alt="free5GC"></a>
-  <a href="https://github.com/ellanetworks/core"><img src="https://img.shields.io/badge/EllaCore-2e86c1?style=flat-square" alt="EllaCore"></a>
-  <a href="https://www.kamailio.org/"><img src="https://img.shields.io/badge/Kamailio-c0392b?style=flat-square" alt="Kamailio"></a>
-  <a href="https://github.com/nickvsnetworking/pyhss"><img src="https://img.shields.io/badge/PyHSS-c0392b?style=flat-square" alt="PyHSS"></a>
-  <a href="https://gitea.osmocom.org/sim-card/pysim"><img src="https://img.shields.io/badge/pySim-7f8c8d?style=flat-square" alt="pySim"></a>
-  <a href="https://github.com/SysSec-KAIST/LTESniffer"><img src="https://img.shields.io/badge/LTESniffer-7f8c8d?style=flat-square" alt="LTESniffer"></a>
-</p>
+<div align="center">
+
+**Integrated projects**\
+[![OpenAirInterface](https://img.shields.io/badge/OpenAirInterface-8e44ad?style=flat-square)](https://openairinterface.org/)
+[![Osmocom](https://img.shields.io/badge/Osmocom-8e44ad?style=flat-square)](https://osmocom.org/)
+[![srsRAN](https://img.shields.io/badge/srsRAN-e67e22?style=flat-square)](https://www.srsran.com/)
+[![OCUDU](https://img.shields.io/badge/OCUDU-e67e22?style=flat-square)](https://gitlab.com/ocudu/ocudu)
+[![UERANSIM](https://img.shields.io/badge/UERANSIM-27ae60?style=flat-square)](https://github.com/aligungr/UERANSIM)
+[![PacketRusher](https://img.shields.io/badge/PacketRusher-27ae60?style=flat-square)](https://github.com/HewlettPackard/PacketRusher)\
+[![Open5GS](https://img.shields.io/badge/Open5GS-2e86c1?style=flat-square)](https://open5gs.org/)
+[![free5GC](https://img.shields.io/badge/free5GC-2e86c1?style=flat-square)](https://free5gc.org/)
+[![EllaCore](https://img.shields.io/badge/EllaCore-2e86c1?style=flat-square)](https://github.com/ellanetworks/core)
+[![Kamailio](https://img.shields.io/badge/Kamailio-c0392b?style=flat-square)](https://www.kamailio.org/)
+[![PyHSS](https://img.shields.io/badge/PyHSS-c0392b?style=flat-square)](https://github.com/nickvsnetworking/pyhss)
+[![pySim](https://img.shields.io/badge/pySim-7f8c8d?style=flat-square)](https://gitea.osmocom.org/sim-card/pysim)
+[![LTESniffer](https://img.shields.io/badge/LTESniffer-7f8c8d?style=flat-square)](https://github.com/SysSec-KAIST/LTESniffer)
+
+</div>
 
 ---
 
-I. [Overview](#-Overview) II. [Getting Started](#-Getting-Started) III. [Configuration](#%EF%B8%8F-configuration) IV. [Usage](#-Usage) V. [Documentation](#documentation) VI. [License](#-License)
+I. [Overview](#-Overview) II. [Getting Started](#-Getting-Started)
+III. [Configuration](#%EF%B8%8F-configuration) IV. [Usage](#-Usage)
+V. [Documentation](#-documentation) VI. [License](#-License)
 
 ---
 
 ## 📍 Overview
 
-open5Gcube facilitates reproducible experiments across a variety of mobile network configurations by using:
+open5Gcube facilitates reproducible experiments across a variety of mobile network configurations by
+using:
 
 - **Docker containers and Docker Compose** for isolated service deployments.
-- **Pre-built network Stacks** representing different technology combinations (e.g., OAI-RAN + Open5GS core).
-- **Remote container orchestration** across multiple physical hosts using SSH and Docker-outside-of-Docker (DooD).
+- **Pre-built network Stacks** representing different technology combinations (e.g., OAI-RAN +
+  Open5GS core).
+- **Remote container orchestration** across multiple physical hosts using SSH and
+  Docker-outside-of-Docker (DooD).
 - **A WebUI** for visual control and monitoring of the Stack deployments.
 - **Support for physical SDR hardware** (USRP X310/B210), as well as emulated setups.
 
@@ -44,10 +52,10 @@ open5Gcube facilitates reproducible experiments across a variety of mobile netwo
 
 - Full-stack mobile network simulation (2G/4G/5G SA)
 - Integration with:
-  - **Open5GS**, **OpenAirInterface**, **UERANSIM**, **srsRAN**, **osmocom**, and more
+    - **Open5GS**, **OpenAirInterface**, **UERANSIM**, **srsRAN**, **osmocom**, and more
 - Easy-to-use **WebUI**
-  - View and control container health and logs
-  - Start/stop Stacks
+    - View and control container health and logs
+    - Start/stop Stacks
 - **VoLTE** configuration based on Open5GS + Kamailio IMS
 - SIM card provisioning tools via `pySim`
 
@@ -55,7 +63,8 @@ open5Gcube facilitates reproducible experiments across a variety of mobile netwo
 
 ### Prerequisites
 #### BIOS
-For performance tuning, it is recommended to disable hyper-threading, CPU frequency control, C-States, P-States and any other power management settings.
+For performance tuning, it is recommended to disable hyper-threading, CPU frequency control,
+C-States, P-States and any other power management settings.
 
 #### Operating System
 Ubuntu 22.04 is recommended as base host distribution.
@@ -72,12 +81,14 @@ cd open5Gcube
 ```
 
 #### Docker Engine
-See [official Docker documentation](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
-for details. Specific fixed versions of the Docker packages are installed with the script
-``modules/base/docker/o5gc/install-docker.sh``. Execute it with
+See [official Docker documentation][docker-install] for details. Specific fixed versions of the
+Docker packages are installed with the script ``modules/base/docker/o5gc/install-docker.sh``.
+Execute it with
 ```console
 make system-install-docker
 ```
+
+[docker-install]: https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository
 
 ### Install open5Gcube systemd Startup Service
 ```console
@@ -85,7 +96,8 @@ make systemd-install-unit
 ```
 
 ### Build all Docker Images
-To build all docker images for all sub-projects on the Controller host as well as the ran projects on the configured ran hosts, run
+To build all docker images for all sub-projects on the Controller host as well as the ran projects
+on the configured ran hosts, run
 ```console
 make build-cacher-start docker-build-all
 ```
@@ -97,13 +109,19 @@ make webui-start
 ```
 
 ## ⚙️ Configuration
-The configuration of the installation and the global settings across the Stacks is done via different [environment files](https://docs.docker.com/compose/environment-variables/env-file/) in the ``etc`` directory.
+The configuration of the installation and the global settings across the Stacks is done via
+different [environment files][env-file] in the ``etc`` directory.
+
+[env-file]: https://docs.docker.com/compose/how-tos/environment-variables/variable-interpolation/#env-file
 
 ### System Specific Settings
 The system installation specific configuration can be adjusted in the file ``etc/local.env``:
 
-1. Set the ``CLOCK_SRC``either to ``external`` or ``internal``, depending on whether an external clock supply is connected to the USRP or not.
-2. If components of the network (especially the RANs like the gNB) are distributed across different hosts, set the Docker network driver for the ``corenet`` to ``macvlan``. If all services are running on the same host, a ``bridge`` can be used instead.
+1. Set the ``CLOCK_SRC``either to ``external`` or ``internal``, depending on whether an external
+   clock supply is connected to the USRP or not.
+2. If components of the network (especially the RANs like the gNB) are distributed across different
+   hosts, set the Docker network driver for the ``corenet`` to ``macvlan``. If all services are
+   running on the same host, a ``bridge`` can be used instead.
 ```shell
 # CORENET_DRIVER should be
 #   - 'macvlan' if components (such as the gNB) are distributed across
@@ -115,7 +133,8 @@ CORENET_DRIVER=bridge
 # If macvlan is used, set the parent interface here
 CORENET_MACVLAN_IFACE=eno1
 ```
-3. Set the ``USRP_IFACE`` to the interface name of the 10G adapter connected to the USRP X310 on the RAN hosts. Leave it unchanged if USRPs B210 via USB are used.
+3. Set the ``USRP_IFACE`` to the interface name of the 10G adapter connected to the USRP X310 on the
+   RAN hosts. Leave it unchanged if USRPs B210 via USB are used.
 4. Configure the hostname of the eNB and gNB RAN hosts:
 ```shell
 # eNB / gNB RAN hostnames
@@ -124,7 +143,9 @@ GNB_HOSTNAME=localhost
 ```
 
 ### ``settings.env``
-Sets especially the 4G / 5G mobile network settings like the PLMN, TAC, APN and the used frequencies. These configurations are utilized by all Stacks if not [configured explicitly](#stack-specific-settings) to different values in the Stack directory.
+Sets especially the 4G / 5G mobile network settings like the PLMN, TAC, APN and the used
+frequencies. These configurations are utilized by all Stacks if not
+[configured explicitly](#stack-specific-settings) to different values in the Stack directory.
 
 ```shell
 # Mobile Network
@@ -143,7 +164,9 @@ NR_ARFCN=641280
 ```
 
 ### ``uedb.env``
-This file contains the *database* for all SIM Cards, including the IMSI, Key and the OPc. On startup of the Core Networks short-living initialization containers and helper scripts uses this settings to program the corresponding databases of the particular Core Network.
+This file contains the *database* for all SIM Cards, including the IMSI, Key and the OPc. On startup
+of the Core Networks short-living initialization containers and helper scripts uses this settings to
+program the corresponding databases of the particular Core Network.
 
 ```shell
 UE_DB+="
@@ -155,16 +178,22 @@ UE_DB+="
 ...
 "
 ```
-An optional 4th field, the **ADM key**, may be appended per line. It is used only by the SIM Writer to authenticate when programming physical cards and is ignored by core-network provisioning.
+An optional 4th field, the **ADM key**, may be appended per line. It is used only by the SIM Writer
+to authenticate when programming physical cards and is ignored by core-network provisioning.
 
-In addition, each .env file in the optional directory ``etc/uedb.d/`` is included to extend the UE_DB. This can be used to organize the subscriber information in a separate repository.
+In addition, each .env file in the optional directory ``etc/uedb.d/`` is included to extend the
+UE_DB. This can be used to organize the subscriber information in a separate repository.
 
 ### Stack specific settings
-Each Stack can override all of the above settings by providing a separate ``settings.env`` file in its directory. This is useful if a Stack requires fix certain configurations to function correctly, for example if slicing is not supported.
+Each Stack can override all of the above settings by providing a separate ``settings.env`` file in
+its directory. This is useful if a Stack requires fix certain configurations to function correctly,
+for example if slicing is not supported.
 
 ## 🖵 Usage
 ### Command Line
-A ``Makefile`` is the central entry point for all commands on the console, so they start all with ``make`` followed by the target which should be executed. ``make help`` will list the most important targets. Most consoles supports Tab-completion which helps exploring the available commands as well.
+A ``Makefile`` is the central entry point for all commands on the console, so they start all with
+``make`` followed by the target which should be executed. ``make help`` will list the most important
+targets. Most consoles supports Tab-completion which helps exploring the available commands as well.
 
 ### Build Docker Images
 The build process is managed by the ``Makefile``, which takes care of handling the dependencies.
@@ -186,17 +215,22 @@ make docker-purge-all-images
 ```
 
 ### Running Stacks
-For each Stack defined in the modules, there is a ``make run-<stackname>`` command. So for example, to run the 5G-SA Stack composed of OAI-RAN and Open5GS, run
+For each Stack defined in the modules, there is a ``make run-<stackname>`` command. So for example,
+to run the 5G-SA Stack composed of OAI-RAN and Open5GS, run
 ```console
 make run-oairan-open5gs-5g
 ```
-This starts all containers of the Stack and attaches to their console output. To stop the Stack just press <kbd>Ctrl</kbd> + <kbd>c</kbd>.
+This starts all containers of the Stack and attaches to their console output. To stop the Stack just
+press `Ctrl` + `c`.
 
-In general, for Mobile-Network Stacks the naming follows the convention ``<ran-project>-<core-project>-<technology>``.
+In general, for Mobile-Network Stacks the naming follows the convention
+``<ran-project>-<core-project>-<technology>``.
 
-The startup-scripts of the RAN containers automatically take over the execution of the containers on the remote RAN hosts, if so configured in ``etc/local.env``.
+The startup-scripts of the RAN containers automatically take over the execution of the containers on
+the remote RAN hosts, if so configured in ``etc/local.env``.
 
-As an alternative, it is possible to start each component separately. This is especially useful if the RAN should run on the same host. Run
+As an alternative, it is possible to start each component separately. This is especially useful if
+the RAN should run on the same host. Run
 ```console
 make run-oairan-open5gs-5g-core
 ```
@@ -208,7 +242,9 @@ to start the gNB.
 
 <img src="Doc/img/ctop.png" width="40%" align="right">
 
-To get a better overview of the running containers on the Controller host, [ctop](https://github.com/bcicen/ctop) provides a concise and condensed overview of real-time metrics. It can be started with
+To get a better overview of the running containers on the Controller host,
+[ctop](https://github.com/bcicen/ctop) provides a concise and condensed overview of real-time
+metrics. It can be started with
 
 ```console
 make ctop
@@ -217,7 +253,8 @@ make ctop
 ### WebUI
 <img src="Doc/img/webui_overview.png" width="40%" align="right">
 
-When booting the Controller host, the open5Gcube WebUI is started automatically, listening on the standard HTTP port. The WebUI provides a user-friendly interface to
+When booting the Controller host, the open5Gcube WebUI is started automatically, listening on the
+standard HTTP port. The WebUI provides a user-friendly interface to
 * Get an overview of the currently running containers, including
     * the log output,
     * the health status
@@ -226,11 +263,11 @@ When booting the Controller host, the open5Gcube WebUI is started automatically,
 * Read and write SIM Cards
 * Get links to web services by the Stack
 
-
-## 📄	Documentation
+## 📄 Documentation
 
 Comprehensive documentation can be found in the [Doc](/Doc) directory as well as in the WebUI.
 
 ## 📜 License
 
-This project is licensed under the terms of the Apache-2.0 license. For more details, refer to the [LICENSE](LICENSE) file.
+This project is licensed under the terms of the Apache-2.0 license. For more details, refer to the
+[LICENSE](LICENSE) file.
