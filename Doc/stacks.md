@@ -43,6 +43,11 @@ Following the naming convention ``<ran-project>-<core-project>-<technology>``, t
 core projects below can be freely combined. Variants with the suffix ``-emu`` (or rfsim) run
 fully emulated and need no SDR hardware.
 
+<!-- GitHub drops the object and shows the animated image, the WebUI the hover version -->
+<object data="img/stacks-hover.svg" type="image/svg+xml">
+  <img src="img/stacks.svg" alt="Projects and the Stacks combining them">
+</object>
+
 ### RAN
 
 | Project | Description |

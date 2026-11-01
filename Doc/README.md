@@ -1,14 +1,14 @@
-# <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/network-wired.svg" height="35" valign="middle"> [Architecture](architecture.md)
+# <img src="img/icons/architecture.svg" height="35" valign="middle"> [Architecture](architecture.md)
 What are the concepts?
 
-# <img src="https://github.com/user-attachments/assets/e5e02363-b3c1-4047-83e6-caa17b204dab" height="50" valign="middle"> [Installation](installation.md)
+# <img src="img/icons/installation.svg" height="50" valign="middle"> [Installation](installation.md)
 How is the project installed?
 
-# <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/route.svg" height="35" valign="middle"> [User Guide](user_guide.md)
+# <img src="img/icons/user_guide.svg" height="35" valign="middle"> [User Guide](user_guide.md)
 How to use the system and start a mobile network?
 
-# <img src="https://github.com/user-attachments/assets/0e34f582-56b3-4332-9e03-92a1aab2d275" width="50" height="50" valign="middle"> [Stacks](stacks.md)
+# <img src="img/icons/stacks.svg" width="50" height="50" valign="middle"> [Stacks](stacks.md)
 Which components can be combined?
 
-# <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/code-branch.svg" height="35" valign="middle"> [Development](development.md)
+# <img src="img/icons/development.svg" height="50" valign="middle"> [Development](development.md)
 How to extend the project?

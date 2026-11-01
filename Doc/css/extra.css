@@ -13,3 +13,12 @@ table thead tr th:empty {
 .nt-card a {
     text-decoration: none;
 }
+
+.md-typeset object {
+    max-width: 100%;
+    height: auto;
+}
+
+.md-grid {
+    max-width: 80rem;
+}

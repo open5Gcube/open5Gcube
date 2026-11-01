@@ -6,3 +6,4 @@ tests/results
 tests/__pycache__
 scripts/.venv.build
 .vscode
+Doc/img/stacks-hover.svg

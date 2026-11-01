@@ -17,6 +17,8 @@ nav:
 
 theme:
   name: material
+  logo: img/o5gc_icon.svg
+  favicon: img/o5gc_icon.svg
   features:
     - content.code.copy
     - navigation.footer

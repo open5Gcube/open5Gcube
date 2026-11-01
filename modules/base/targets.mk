@@ -43,10 +43,14 @@ docker-build-o5gc-webui: docker-build-o5gc-base Documentation-build
 docker-build-simcard: docker-build-o5gc-base
 	$(call docker-build,base,simcard)
 
-Documentation-build: docker-build-o5gc-zensical
+Documentation-stacks-svg:
+	scripts/stacks_svg.py ${MODULES_DIR}/o5gc/stacks Doc/img/stacks.svg animated
+	scripts/stacks_svg.py ${MODULES_DIR}/o5gc/stacks Doc/img/stacks-hover.svg hover
+
+Documentation-build: docker-build-o5gc-zensical Documentation-stacks-svg
 	cd ${BASE_O5GC_DIR};                                                      \
 	$(DOCKER_COMPOSE) --profile=docu run --no-TTY --rm documentation build #--strict
-Documentation-serve-start: docker-build-o5gc-zensical
+Documentation-serve-start: docker-build-o5gc-zensical Documentation-stacks-svg
 	cd ${BASE_O5GC_DIR};                                                      \
 	$(DOCKER_COMPOSE) --profile=docu up --detach
 	@echo Live-reloading docs server available at                             \
