@@ -29,6 +29,7 @@ RUN git clone https://github.com/ellanetworks/smsc.git .                      \
           "-X github.com/ellanetworks/smsc/version.GitCommit=${REVISION}"     \
         ./cmd/smsc                                                            \
     && sync-cache.sh upload ellacore-smsc                                     \
-        go-cache-dl go-cache-build npm-cache
+        go-cache-dl go-cache-build npm-cache                                  \
+    && rm -rf ui/node_modules
 
 RUN echo ${ELLA_SMSC_VERSION} > /etc/image_version

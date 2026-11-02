@@ -29,6 +29,7 @@ RUN git clone https://github.com/ellanetworks/ims.git .                       \
           "-X github.com/ellanetworks/ims/version.GitCommit=${REVISION}"      \
         ./cmd/ims                                                             \
     && sync-cache.sh upload ellacore-ims                                      \
-        go-cache-dl go-cache-build npm-cache
+        go-cache-dl go-cache-build npm-cache                                  \
+    && rm -rf ui/node_modules
 
 RUN echo ${ELLA_IMS_VERSION} > /etc/image_version

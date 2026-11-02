@@ -13,8 +13,10 @@ WORKDIR /o5gc/PacketRusher
 ARG PACKETRUSHER_VERSION=v2.0.0
 RUN git clone https://github.com/HewlettPackard/PacketRusher .                \
     && git checkout ${PACKETRUSHER_VERSION}                                   \
+    && sync-cache.sh download packetrusher go-cache-dl go-cache-build         \
     && go mod download                                                        \
     && go build -o packetrusher                                               \
-        -ldflags "-X main.version=${PACKETRUSHER_VERSION}" ./cmd
+        -ldflags "-X main.version=${PACKETRUSHER_VERSION}" ./cmd              \
+    && sync-cache.sh upload packetrusher go-cache-dl go-cache-build
 
 RUN echo ${PACKETRUSHER_VERSION} > /etc/image_version

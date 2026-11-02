@@ -24,6 +24,9 @@ for cache in "${@:3}"; do
         upload)
             rsync -a -O --no-perms ${dir}/ rsync://o5gc-build-cacher:40860/${cache}/${BUILD_HOST}/$2
             rm -rf ${dir}
+            if [ "$cache" == "go-cache-dl" ]; then
+                rm -rf /root/go/pkg/mod
+            fi
             ;;
     esac
 done

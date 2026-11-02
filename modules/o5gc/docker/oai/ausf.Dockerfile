@@ -13,7 +13,7 @@ RUN sync-cache.sh download oai-ausf ccache                                    \
     && ./build_ausf --clean --Verbose --build-type Release --jobs             \
     && ldconfig                                                               \
     && find ../ \( -name "*.a" -o -name "*.o" \) -type f -delete              \
-    && rm -rf /tmp/*                                                          \
+    && rm -rf /tmp/* /var/lib/apt/lists/*                                     \
     && sync-cache.sh upload oai-ausf ccache
 
 HEALTHCHECK --interval=10s --timeout=15s --retries=6                          \

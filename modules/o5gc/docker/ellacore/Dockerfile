@@ -27,6 +27,7 @@ RUN git clone --branch v${ELLACORE_VERSION} --depth 1                         \
     && go build -ldflags                                                      \
           "-X github.com/ellanetworks/core/version.GitCommit=${REVISION}"     \
         ./cmd/core/main.go                                                    \
-    && sync-cache.sh upload ellacore go-cache-dl go-cache-build npm-cache
+    && sync-cache.sh upload ellacore go-cache-dl go-cache-build npm-cache     \
+    && rm -rf ui/node_modules
 
 RUN echo ${ELLACORE_VERSION} > /etc/image_version

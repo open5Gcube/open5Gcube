@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM o5gc/o5gc-base:jammy AS base
+FROM o5gc/o5gc-base:jammy AS frontend
 
 RUN mkdir -p /etc/apt/keyrings                                                \
     && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key   \
@@ -18,6 +18,17 @@ RUN sync-cache.sh download o5gc-webui npm-cache                               \
     && npm install                                                            \
     && sync-cache.sh upload o5gc-webui npm-cache
 
+COPY ./frontend ./frontend
+RUN cd frontend                                                               \
+    && cp -a theme/. src/                                                     \
+    && quasar build
+
+FROM o5gc/o5gc-base:jammy
+
+RUN apt-get.sh install nginx
+
+WORKDIR /o5gc/webui
+
 COPY ./backend/requirements.txt ./backend/
 RUN cd backend                                                                \
     && pip --no-cache-dir install -r requirements.txt                         \
@@ -27,13 +38,6 @@ RUN cd backend                                                                \
     && python3 setup.py install                                               \
     && cd .. && rm -rf kiopcgenerator
 
-FROM base AS frontend
-COPY ./frontend ./frontend
-RUN cd frontend                                                               \
-    && cp -a theme/. src/                                                     \
-    && quasar build
-
-FROM base
 COPY --from=frontend --exclude=node_modules /o5gc/webui/frontend ./frontend
 COPY ./backend ./backend
 
