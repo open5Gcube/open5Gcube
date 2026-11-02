@@ -15,7 +15,9 @@ RUN sed -i 's|http://archive.ubuntu.com|http://de.archive.ubuntu.com|g'       \
         > /etc/apt/apt.conf.d/01proxy                                         \
     && ([ ${USE_BUILD_CACHER} -ne 0 ] || :> /etc/apt/apt.conf.d/01proxy)      \
     && DEBIAN_FRONTEND=noninteractive                                         \
-       xargs -a /tmp/base.packages.txt apt-get install --no-install-recommends -y
+       xargs -a /tmp/base.packages.txt                                        \
+           apt-get install --no-install-recommends -y                         \
+    && rm -rf /var/lib/apt/lists/*
 
 # make /bin/sh symlink to bash instead of dash
 RUN echo "dash dash/sh boolean false" | debconf-set-selections                \
@@ -71,7 +73,7 @@ RUN cd /usr/local/bin/ && cached-download.sh                                  \
 
 # install Docker CLI
 COPY install-docker.sh /usr/local/bin/
-RUN install-docker.sh cli-only
+RUN install-docker.sh --image cli-only
 
 RUN --mount=type=secret,id=id_ed25519 --mount=type=secret,id=id_ed25519.pub   \
     mkdir -m 0700 /root/.ssh && cd /root/.ssh                                 \

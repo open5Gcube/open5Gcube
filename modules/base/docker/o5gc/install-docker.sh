@@ -4,8 +4,15 @@ set -e
 
 [[ $EUID -ne 0 ]] && echo "This script must be run as root." && exit 1
 
+# --image: called from a Dockerfile, install via apt-get.sh (cleans up after)
+IMAGE_BUILD=0
+if [ "$1" == "--image" ]; then
+    IMAGE_BUILD=1
+    shift
+fi
+
 apt_get_install() {
-    if grep -sq 'docker' /proc/1/cgroup; then
+    if [ ${IMAGE_BUILD} -eq 1 ]; then
         apt-get.sh install "$@"
     else (
         set -x
@@ -31,14 +38,17 @@ install_preliminaries() {
 }
 
 install_docker_cli() {
+    # images only run containers, they are built on the host: no buildx there
+    local buildx=docker-buildx-plugin
+    [ ${IMAGE_BUILD} -eq 0 ] || buildx=
     case "${OS_DISTRO} ${OS_RELEASE}" in
         "ubuntu 20.04" | "ubuntu 22.04" | "ubuntu 24.04")
-            apt_get_install docker-ce-cli=5:28.* docker-compose-plugin=2.36.* docker-buildx-plugin=0.23.*
+            apt_get_install docker-ce-cli=5:28.* docker-compose-plugin=2.36.* ${buildx:+${buildx}=0.23.*}
             ;;
         *)
             exit 1
     esac
-    apt-mark hold docker-ce-cli docker-compose-plugin docker-buildx-plugin
+    apt-mark hold docker-ce-cli docker-compose-plugin ${buildx}
     [ -z "${SUDO_USER}" ] || bash -xc "usermod --append --groups docker ${SUDO_USER}"
 }
 
