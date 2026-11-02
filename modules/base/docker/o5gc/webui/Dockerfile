@@ -34,6 +34,7 @@ RUN cd backend                                                                \
     && pip --no-cache-dir install -r requirements.txt                         \
     && git clone https://github.com/PodgroupConnectivity/kiopcgenerator.git   \
     && cd kiopcgenerator                                                      \
+    && git checkout d720a91                                                   \
     && pip --no-cache-dir install -r requirements.txt                         \
     && python3 setup.py install                                               \
     && cd .. && rm -rf kiopcgenerator

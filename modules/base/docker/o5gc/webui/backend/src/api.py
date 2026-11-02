@@ -406,7 +406,7 @@ def kiopcgen():
     op = "00000000000000000000000000000000"
     return {
         "ki": ki,
-        "opc": kiopcgenerator.gen_opc(op, ki).decode()
+        "opc": kiopcgenerator.gen_opc(op, ki)
     }
 
 @bp.get('/pysim/prog_types')
