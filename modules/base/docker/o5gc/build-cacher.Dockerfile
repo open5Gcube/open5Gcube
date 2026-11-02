@@ -1,8 +1,7 @@
 FROM node:16-bookworm-slim
 
-RUN apt-get update                                                            \
-    && DEBIAN_FRONTEND=noninteractive                                         \
-       apt-get install --no-install-recommends -y git ca-certificates apt-cacher-ng rsync
+COPY apt-get.sh /usr/local/bin/
+RUN apt-get.sh install git ca-certificates apt-cacher-ng rsync
 
 RUN git clone https://github.com/jonasmalacofilho/git-cache-http-server       \
     && cd git-cache-http-server                                               \

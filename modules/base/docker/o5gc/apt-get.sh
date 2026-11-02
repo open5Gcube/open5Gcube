@@ -2,7 +2,7 @@
 
 set -e
 
-HOST_DISTRI=$(lsb_release -sc)
+HOST_DISTRI=$(. /etc/os-release && echo ${VERSION_CODENAME})
 RESTRICT_DISTRI=$HOST_DISTRI
 
 while [[ $# -gt 0 ]]; do
