@@ -6,17 +6,17 @@ RUN echo latest > /etc/image_version
 
 FROM proxy AS develop
 
+# Install UHD first, so images with the same UHD version share the layer
+ARG UHD_VERSION=4.4
+RUN sync-cache.sh download uhd ccache                                         \
+    && install-uhd.sh ${UHD_VERSION}                                          \
+    && sync-cache.sh upload uhd ccache
+
 # Install dependencies
 RUN apt-get.sh install                                                        \
         libfftw3-dev libmbedtls-dev libconfig++-dev                           \
         libboost-system-dev libboost-program-options-dev                      \
         libsctp-dev libzmq3-dev
-
-# Install UHD for USRP support
-ARG UHD_VERSION=4.4
-RUN sync-cache.sh download srsran-4g ccache                                   \
-    && install-uhd.sh ${UHD_VERSION}                                          \
-    && sync-cache.sh upload srsran-4g ccache
 
 # Clone and build srsGUI
 RUN apt-get.sh install                                                        \

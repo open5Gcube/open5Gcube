@@ -1,16 +1,19 @@
 FROM o5gc/o5gc-base:jammy
 
+# same first steps as srsran and ocudu, so the UHD layer is shared
+RUN echo latest > /etc/image_version
+
+# Install UHD first, so images with the same UHD version share the layer
+ARG UHD_VERSION=4.4
+RUN sync-cache.sh download uhd ccache                                         \
+    && install-uhd.sh ${UHD_VERSION}                                          \
+    && sync-cache.sh upload uhd ccache
+
 # Install srsRAN dependencies
 RUN apt-get.sh install                                                        \
         libfftw3-dev libmbedtls-dev libconfig++-dev                           \
         libboost-system-dev libboost-program-options-dev                      \
         libsctp-dev libzmq3-dev
-
-# Install UHD for USRP support
-ARG UHD_VERSION=4.4
-RUN sync-cache.sh download misc-falcon ccache                                 \
-    && install-uhd.sh ${UHD_VERSION}                                          \
-    && sync-cache.sh upload misc-falcon ccache
 
 # Clone and build srsGUI
 RUN apt-get.sh install                                                        \
@@ -44,5 +47,3 @@ RUN git clone https://github.com/falkenber9/falcon.git .                       \
     && make install clean                                                     \
     && ldconfig                                                               \
     && sync-cache.sh upload misc-falcon ccache
-
-RUN echo latest > /etc/image_version

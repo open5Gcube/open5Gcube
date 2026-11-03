@@ -1,10 +1,13 @@
 FROM o5gc/o5gc-base:jammy
 
-# Install UHD for USRP support
+# same first steps as srsran and ocudu, so the UHD layer is shared
+RUN echo latest > /etc/image_version
+
+# Install UHD first, so images with the same UHD version share the layer
 ARG UHD_VERSION=4.6
-RUN sync-cache.sh download misc-ltesniffer ccache                             \
+RUN sync-cache.sh download uhd ccache                                         \
     && install-uhd.sh ${UHD_VERSION}                                          \
-    && sync-cache.sh upload misc-ltesniffer ccache
+    && sync-cache.sh upload uhd ccache
 
 ARG LTESNIFFER_VERSION=2.1.0
 

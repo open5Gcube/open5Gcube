@@ -6,16 +6,16 @@ RUN echo latest > /etc/image_version
 
 FROM proxy AS develop
 
+# Install UHD first, so images with the same UHD version share the layer
+ARG UHD_VERSION=4.4
+RUN sync-cache.sh download uhd ccache                                         \
+    && install-uhd.sh ${UHD_VERSION}                                          \
+    && sync-cache.sh upload uhd ccache
+
 # Install dependencies
 RUN apt-get.sh install                                                        \
         cmake make gcc g++ pkg-config libfftw3-dev libmbedtls-dev libsctp-dev \
         libyaml-cpp-dev libgtest-dev libboost-dev libzmq3-dev
-
-# Install UHD for USRP support
-ARG UHD_VERSION=4.4
-RUN sync-cache.sh download srsran-project ccache                              \
-    && install-uhd.sh ${UHD_VERSION}                                          \
-    && sync-cache.sh upload srsran-project ccache
 
 RUN pip3 install --no-cache-dir nrarfcn
 
