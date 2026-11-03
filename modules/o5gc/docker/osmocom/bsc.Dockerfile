@@ -18,9 +18,11 @@ WORKDIR /o5gc/osmo-bsc
 RUN git clone https://gitea.osmocom.org/cellular-infrastructure/osmo-bsc .    \
     && git checkout ${OSMO_BSC_VERSION}                                       \
     && autoreconf -fi                                                         \
+    && sync-cache.sh download osmocom-bsc ccache                              \
     && ./configure --disable-dependency-tracking --enable-trx                 \
     && make -j $(nproc)                                                       \
     && make install                                                           \
+    && sync-cache.sh upload osmocom-bsc ccache                                \
     && ldconfig
 
 RUN echo ${OSMO_BSC_VERSION} > /etc/image_version

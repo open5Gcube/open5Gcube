@@ -23,6 +23,7 @@ RUN git clone https://github.com/ellanetworks/ims.git .                       \
     && REVISION=$(git rev-parse HEAD)                                         \
     && sync-cache.sh download ellacore-ims                                    \
         go-cache-dl go-cache-build npm-cache                                  \
+    && export NODE_DISABLE_COMPILE_CACHE=1                                    \
     && npm ci --prefix ui                                                     \
     && npm run build --prefix ui                                              \
     && go build -o ims -ldflags                                               \

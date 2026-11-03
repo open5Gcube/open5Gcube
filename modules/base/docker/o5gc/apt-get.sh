@@ -24,18 +24,25 @@ done
 [[ "${HOST_DISTRI}" != "${RESTRICT_DISTRI}" ]] && exit 0
 [[ "${HOST_DISTRI}" == "${EXCLUDE_DISTRI}" ]] && exit 0
 
+clean() {
+  apt-get clean
+  rm -rf /var/lib/apt/lists/*
+}
+
 case $1 in
   install)
     (set -x
     apt-get update
     DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y "${@:2}" )
-    apt-get clean
-    rm -rf /var/lib/apt/lists/*
+    clean
     ;;
   purge)
     (set -x
     DEBIAN_FRONTEND=noninteractive SUDO_FORCE_REMOVE=yes apt-get -y purge "${@:2}"
     DEBIAN_FRONTEND=noninteractive apt-get -y autoremove --purge )
+    ;;
+  clean)
+    clean
     ;;
   *)
     exit 1

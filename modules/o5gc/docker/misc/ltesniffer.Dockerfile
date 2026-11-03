@@ -17,8 +17,8 @@ RUN git clone --branch LTESniffer-v${LTESNIFFER_VERSION} --depth 1            \
         https://github.com/SysSec-KAIST/LTESniffer.git .                      \
     && mkdir build                                                            \
     && cd build                                                               \
-    && cmake ..                                                               \
     && sync-cache.sh download misc-ltesniffer ccache                          \
+    && cmake ..                                                               \
     && make -j $(nproc)                                                       \
     && make install clean                                                     \
     && ldconfig                                                               \

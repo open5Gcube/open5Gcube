@@ -22,6 +22,7 @@ RUN git clone --branch v${ELLACORE_VERSION} --depth 1                         \
         https://github.com/ellanetworks/core.git .                            \
     && REVISION=$(git rev-parse HEAD)                                         \
     && sync-cache.sh download ellacore go-cache-dl go-cache-build npm-cache   \
+    && export NODE_DISABLE_COMPILE_CACHE=1                                    \
     && npm ci --prefix ui                                                     \
     && npm run build --prefix ui                                              \
     && go build -ldflags                                                      \

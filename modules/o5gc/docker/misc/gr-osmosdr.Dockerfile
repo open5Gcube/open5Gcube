@@ -17,6 +17,8 @@ ARG GR_OSMOSDR_VERSION=0.2.5
 RUN git clone https://gitea.osmocom.org/sdr/gr-osmosdr .                      \
     && git checkout v${GR_OSMOSDR_VERSION}                                    \
     && mkdir build && cd build                                                \
+    && sync-cache.sh download misc-gr-osmosdr ccache                          \
     && cmake ..                                                               \
     && make -j8 install                                                       \
+    && sync-cache.sh upload misc-gr-osmosdr ccache                            \
     && ldconfig

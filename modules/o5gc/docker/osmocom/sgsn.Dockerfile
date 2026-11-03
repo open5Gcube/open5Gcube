@@ -17,9 +17,11 @@ WORKDIR /o5gc/osmo-sgsn
 RUN git clone https://gitea.osmocom.org/cellular-infrastructure/osmo-sgsn .   \
     && git checkout ${OSMO_SGSN_VERSION}                                      \
     && autoreconf -fi                                                         \
+    && sync-cache.sh download osmocom-sgsn ccache                             \
     && ./configure --disable-dependency-tracking                              \
     && make -j $(nproc)                                                       \
     && make install                                                           \
+    && sync-cache.sh upload osmocom-sgsn ccache                               \
     && ldconfig
 
 RUN echo ${OSMO_SGSN_VERSION} > /etc/image_version

@@ -19,9 +19,11 @@ RUN git clone https://gitea.osmocom.org/cellular-infrastructure/libsmpp34     \
     && cd libsmpp34                                                           \
     && git checkout ${LIBSMPP34_VERSION}                                       \
     && autoreconf -i                                                          \
+    && sync-cache.sh download osmocom-msc ccache                              \
     && ./configure --disable-dependency-tracking                              \
     && make -j $(nproc)                                                       \
     && make install                                                           \
+    && sync-cache.sh upload osmocom-msc ccache                                \
     && ldconfig
 
 ARG OSMO_MSC_VERSION=1.15.0
@@ -31,9 +33,11 @@ WORKDIR /o5gc/osmo-msc
 RUN git clone https://gitea.osmocom.org/cellular-infrastructure/osmo-msc .    \
     && git checkout ${OSMO_MSC_VERSION}                                       \
     && autoreconf -i                                                          \
+    && sync-cache.sh download osmocom-msc ccache                              \
     && ./configure --enable-smpp --disable-dependency-tracking                \
     && make -j $(nproc)                                                       \
     && make install                                                           \
+    && sync-cache.sh upload osmocom-msc ccache                                \
     && ldconfig
 
 RUN echo ${OSMO_MSC_VERSION} > /etc/image_version

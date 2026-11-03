@@ -7,9 +7,11 @@ WORKDIR /o5gc/osmo-hlr
 RUN git clone https://gitea.osmocom.org/cellular-infrastructure/osmo-hlr .    \
     && git checkout ${OSMO_HLR_VERSION}                                       \
     && autoreconf -fi                                                         \
+    && sync-cache.sh download osmocom-hlr ccache                              \
     && ./configure --disable-dependency-tracking                              \
     && make -j $(nproc)                                                       \
     && make install                                                           \
+    && sync-cache.sh upload osmocom-hlr ccache                                \
     && ldconfig
 
 RUN pip --no-cache-dir install sqlite-web

@@ -14,7 +14,8 @@ RUN sync-cache.sh download oai-lmf ccache                                     \
     && ./build_lmf --clean --Verbose --build-type Release --jobs              \
     && ldconfig                                                               \
     && find ../ \( -name "*.a" -o -name "*.o" \) -type f -delete              \
-    && rm -rf /tmp/* /var/lib/apt/lists/*                                     \
+    && rm -rf /tmp/*                                                          \
+    && apt-get.sh clean                                                       \
     && sync-cache.sh upload oai-lmf ccache
 
 HEALTHCHECK --interval=10s --timeout=15s --retries=6                          \

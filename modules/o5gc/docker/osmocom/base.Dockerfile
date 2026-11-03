@@ -10,9 +10,11 @@ RUN git clone https://gitea.osmocom.org/osmocom/libosmocore                   \
     && cd libosmocore                                                         \
     && git checkout ${LIBOSMO_CORE_VERSION}                                   \
     && autoreconf -i                                                          \
+    && sync-cache.sh download osmocom-base ccache                             \
     && ./configure --disable-dependency-tracking --disable-doxygen            \
     && make -j $(nproc)                                                       \
     && make install                                                           \
+    && sync-cache.sh upload osmocom-base ccache                               \
     && ldconfig
 
 ARG LIBOSMO_NETIF_VERSION=1.7.0
@@ -20,9 +22,11 @@ RUN git clone https://gitea.osmocom.org/osmocom/libosmo-netif                 \
     && cd libosmo-netif                                                       \
     && git checkout ${LIBOSMO_NETIF_VERSION}                                  \
     && autoreconf -i                                                          \
+    && sync-cache.sh download osmocom-base ccache                             \
     && ./configure --disable-dependency-tracking --disable-dahdi              \
     && make -j $(nproc)                                                       \
     && make install                                                           \
+    && sync-cache.sh upload osmocom-base ccache                               \
     && ldconfig
 
 ARG LIBOSMO_ABIS_VERSION=2.1.0
@@ -30,9 +34,11 @@ RUN git clone https://gitea.osmocom.org/osmocom/libosmo-abis                  \
     && cd libosmo-abis                                                        \
     && git checkout ${LIBOSMO_ABIS_VERSION}                                   \
     && autoreconf -i                                                          \
+    && sync-cache.sh download osmocom-base ccache                             \
     && ./configure --disable-dependency-tracking --disable-dahdi              \
     && make -j $(nproc)                                                       \
     && make install                                                           \
+    && sync-cache.sh upload osmocom-base ccache                               \
     && ldconfig
 
 RUN echo latest > /etc/image_version

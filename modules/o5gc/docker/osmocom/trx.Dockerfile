@@ -19,10 +19,12 @@ WORKDIR /o5gc/osmo-trx
 RUN git clone https://gitea.osmocom.org/cellular-infrastructure/osmo-trx .    \
     && git checkout ${OSMO_TRX_VERSION}                                       \
     && autoreconf -fi                                                         \
+    && sync-cache.sh download osmocom-trx ccache                              \
     && CFLAGS="-march=native -O3 -flto=auto" CXXFLAGS=${CFLAGS}               \
         ./configure --disable-dependency-tracking --with-uhd                  \
     && make -j $(nproc)                                                       \
     && make install                                                           \
+    && sync-cache.sh upload osmocom-trx ccache                                \
     && ldconfig
 
 RUN echo ${OSMO_TRX_VERSION} > /etc/image_version

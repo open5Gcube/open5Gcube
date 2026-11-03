@@ -14,7 +14,8 @@ RUN sync-cache.sh download oai-udm ccache                                     \
     && ./build_udm --clean --Verbose --build-type Release --jobs              \
     && ldconfig                                                               \
     && find ../ \( -name "*.a" -o -name "*.o" \) -type f -delete              \
-    && rm -rf /tmp/* /var/lib/apt/lists/*                                     \
+    && rm -rf /tmp/*                                                          \
+    && apt-get.sh clean                                                       \
     && sync-cache.sh upload oai-udm ccache
 
 HEALTHCHECK --interval=10s --timeout=15s --retries=6                          \

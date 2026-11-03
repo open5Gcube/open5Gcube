@@ -18,8 +18,8 @@ RUN git clone --branch v${OAI_CN5G_VERSION} --depth 1 --recurse-submodules    \
     && ./build_pcf --install-deps --force                                     \
     && sync-cache.sh upload oai-cn5g-base ccache                              \
     && popd                                                                   \
-    && rm -rf tmp                                                             \
-    && rm -rf /tmp/* /var/lib/apt/lists/*
+    && rm -rf tmp /tmp/*                                                      \
+    && apt-get.sh clean
 
 RUN cached-download.sh                                                        \
         https://github.com/mikefarah/yq/releases/download/v4.45.1/yq_linux_amd64 /usr/local/bin/yq && \

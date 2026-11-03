@@ -33,6 +33,6 @@ RUN git clone --branch v${FREE5GC_VERSION} --depth 1 --recurse-submodules     \
     && apt-get.sh purge sudo                                                  \
     && ln -t webconsole/ -s bin/webconsole                                    \
     && sync-cache.sh upload free5gc go-cache-dl go-cache-build npm-cache      \
-    && rm -rf webconsole/frontend/node_modules /root/go/pkg/mod/*
+    && rm -rf webconsole/frontend/node_modules /root/.yarn
 
 RUN echo ${FREE5GC_VERSION} > /etc/image_version
