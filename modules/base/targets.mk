@@ -1,5 +1,7 @@
 BASE_O5GC_DIR = ${MODULES_DIR}/base/docker/o5gc
 USE_BUILD_CACHER ?= $(or $(call get_env,USE_BUILD_CACHER),1)
+SYNC_CACHES = ccache sccache cargo-registry npm-cache go-cache-dl go-cache-build
+CACHES = apt-cacher-ng git downloads ${SYNC_CACHES}
 
 docker-build-o5gc-build-cacher:
 	if [ ${USE_BUILD_CACHER} -eq 1 ]; then                                    \

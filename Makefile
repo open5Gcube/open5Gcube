@@ -21,9 +21,6 @@ help:  ## This help
 
 OCI_IMG_KEY = org.opencontainers.image
 
-SYNC_CACHES = ccache sccache cargo-registry npm-cache go-cache-dl go-cache-build
-CACHES = apt-cacher-ng git downloads ${SYNC_CACHES}
-
 var/ssh/authorized_keys: var/ssh/id_ed25519
 	cat $<.pub >> $@
 var/ssh/id_ed25519:
@@ -56,7 +53,6 @@ define docker-build
     $(eval $@_TAG = ${$@_IMG}:$(or ${6},latest))
     $(eval $@_BUILD_HOST = $(if $(subst localhost,,${7}),${7}))
     $(eval $@_DOCKER = docker $(if ${$@_BUILD_HOST},-H ssh://${$@_BUILD_HOST}))
-    mkdir -p $(foreach cache,${SYNC_CACHES},var/cache/${cache}/$(if ${7},${7},localhost)/${$@_IMG})
     $(if ${$@_BUILD_HOST},tar -cf var/tmp/${$@_BUILD_HOST}-${$@_IMG}.tar -C modules/${1}/docker/${$@_PRJ} .)
     cd modules/${1}/docker/${$@_PRJ} &&                                       \
     DOCKER_BUILDKIT=1 ${$@_DOCKER} build                                      \

@@ -19,6 +19,7 @@ for cache in "${@:3}"; do
     case "$1" in
         download)
             mkdir -p ${dir}
+            rsync -a -O --no-perms --mkpath ${dir}/ rsync://o5gc-build-cacher:40860/${cache}/${BUILD_HOST}/$2
             rsync -a rsync://o5gc-build-cacher:40860/${cache}/${BUILD_HOST}/$2/ ${dir}
             ;;
         upload)
