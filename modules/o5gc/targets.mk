@@ -86,8 +86,7 @@ docker-build-ellacore-smsc: docker-build-o5gc-base
 	$(call docker-build,o5gc,ellacore,smsc)
 
 docker-build-misc-falcon docker-build-misc-sigdigger                          \
-docker-build-misc-gr-osmosdr docker-build-misc-ltesniffer                     \
-docker-build-misc-swagger: docker-build-o5gc-base
+docker-build-misc-ltesniffer docker-build-misc-swagger: docker-build-o5gc-base
 	$(call docker-build,o5gc,misc,$(subst docker-build-misc-,,$@))
 docker-build-misc-nrscope: docker-build-o5gc-base
 	$(call docker-build,o5gc,srsran/4g,,,develop,develop)
@@ -272,7 +271,7 @@ run-srsran-4g-cell_measurement: ${O5GC_ENV}  ##
 	${DOCKER_RUN_SRSRAN_4G} -xc "build/lib/examples/cell_measurement -d       \
 	    -f $$(scripts/band_helper.py earfcn_to_freq_dl $${EUTRA_BAND} $${EUTRA_ARFCN_DL})"
 
-run-sigdigger run-osmocom_fft run-swagger-ui: .xhost  ##
+run-sigdigger run-swagger-ui: .xhost  ##
 	cd modules/o5gc/docker/misc;                                              \
 	$(DOCKER_COMPOSE) --profile=$(subst run-,,$@) up
 

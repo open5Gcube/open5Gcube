@@ -15,20 +15,6 @@ services:
       - ${HOME}/.Xauthority:/root/.Xauthority:rw
     profiles: [ "sigdigger" ]
 
-  osmocom_fft:
-    image: o5gc/misc-gr-osmosdr
-    container_name: osmocom_fft
-    entrypoint: bash -xc "osmocom_fft -a uhd"
-    privileged: true
-    env_file: [ "${ENV_FILE}" ]
-    environment:
-      - DISPLAY
-    volumes:
-      - /dev/bus/usb:/dev/bus/usb
-      - /tmp/.X11-unix:/tmp/.X11-unix
-      - ${HOME}/.Xauthority:/root/.Xauthority:rw
-    profiles: [ "osmocom_fft" ]
-
   ltesniffer:
     image: o5gc/misc-ltesniffer
     container_name: ltesniffer
