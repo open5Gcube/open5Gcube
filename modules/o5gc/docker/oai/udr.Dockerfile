@@ -12,7 +12,7 @@ RUN sync-cache.sh download oai-udr ccache                                     \
     && ./build_udr --install-deps --force                                     \
     && ./build_udr --clean --Verbose --build-type Release --jobs              \
     && ldconfig                                                               \
-    && find ../ \( -name "*.a" -o -name "*.o" \) -type f -delete              \
+    && find ../ -name "*.[aod]" -type f -delete                               \
     && rm -rf /tmp/*                                                          \
     && apt-get.sh clean                                                       \
     && sync-cache.sh upload oai-udr ccache

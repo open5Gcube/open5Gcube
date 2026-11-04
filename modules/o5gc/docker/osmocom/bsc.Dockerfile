@@ -20,8 +20,8 @@ RUN git clone https://gitea.osmocom.org/cellular-infrastructure/osmo-bsc .    \
     && autoreconf -fi                                                         \
     && sync-cache.sh download osmocom-bsc ccache                              \
     && ./configure --disable-dependency-tracking --enable-trx                 \
-    && make -j $(nproc)                                                       \
-    && make install                                                           \
+    && make -j $(nproc) install                                               \
+    && make clean                                                             \
     && sync-cache.sh upload osmocom-bsc ccache                                \
     && ldconfig
 

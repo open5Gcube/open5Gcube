@@ -22,8 +22,8 @@ RUN git clone https://gitea.osmocom.org/cellular-infrastructure/osmo-trx .    \
     && sync-cache.sh download osmocom-trx ccache                              \
     && CFLAGS="-march=native -O3 -flto=auto" CXXFLAGS=${CFLAGS}               \
         ./configure --disable-dependency-tracking --with-uhd                  \
-    && make -j $(nproc)                                                       \
-    && make install                                                           \
+    && make -j $(nproc) install                                               \
+    && make clean                                                             \
     && sync-cache.sh upload osmocom-trx ccache                                \
     && ldconfig
 

@@ -43,7 +43,7 @@ RUN if [[ "${OCUDU_VERSION}" == *_* ]]; then                                  \
         ${ARCH_FLAG} ..                                                       \
     && make -j $(nproc)                                                       \
     && ldconfig                                                               \
-    && find ./ \( -name "*.a" -o -name "*.o" \) -type f -delete               \
+    && find . -name "*.[aod]" -type f -delete                                 \
     && sync-cache.sh upload ocudu ccache
 
 RUN echo ${OCUDU_VERSION//_/.} > /etc/image_version

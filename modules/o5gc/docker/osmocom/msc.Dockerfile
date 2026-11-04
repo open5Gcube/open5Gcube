@@ -21,8 +21,8 @@ RUN git clone https://gitea.osmocom.org/cellular-infrastructure/libsmpp34     \
     && autoreconf -i                                                          \
     && sync-cache.sh download osmocom-msc ccache                              \
     && ./configure --disable-dependency-tracking                              \
-    && make -j $(nproc)                                                       \
-    && make install                                                           \
+    && make -j $(nproc) install                                               \
+    && make clean                                                             \
     && sync-cache.sh upload osmocom-msc ccache                                \
     && ldconfig
 
@@ -35,8 +35,8 @@ RUN git clone https://gitea.osmocom.org/cellular-infrastructure/osmo-msc .    \
     && autoreconf -i                                                          \
     && sync-cache.sh download osmocom-msc ccache                              \
     && ./configure --enable-smpp --disable-dependency-tracking                \
-    && make -j $(nproc)                                                       \
-    && make install                                                           \
+    && make -j $(nproc) install                                               \
+    && make clean                                                             \
     && sync-cache.sh upload osmocom-msc ccache                                \
     && ldconfig
 

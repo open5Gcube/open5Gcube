@@ -13,7 +13,7 @@ RUN sync-cache.sh download oai-udm ccache                                     \
     && ./build_udm --install-deps --force                                     \
     && ./build_udm --clean --Verbose --build-type Release --jobs              \
     && ldconfig                                                               \
-    && find ../ \( -name "*.a" -o -name "*.o" \) -type f -delete              \
+    && find ../ -name "*.[aod]" -type f -delete                               \
     && rm -rf /tmp/*                                                          \
     && apt-get.sh clean                                                       \
     && sync-cache.sh upload oai-udm ccache

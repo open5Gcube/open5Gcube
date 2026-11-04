@@ -19,8 +19,8 @@ RUN git clone https://gitea.osmocom.org/cellular-infrastructure/osmo-sgsn .   \
     && autoreconf -fi                                                         \
     && sync-cache.sh download osmocom-sgsn ccache                             \
     && ./configure --disable-dependency-tracking                              \
-    && make -j $(nproc)                                                       \
-    && make install                                                           \
+    && make -j $(nproc) install                                               \
+    && make clean                                                             \
     && sync-cache.sh upload osmocom-sgsn ccache                               \
     && ldconfig
 

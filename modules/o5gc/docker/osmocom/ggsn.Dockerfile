@@ -9,8 +9,8 @@ RUN git clone https://gitea.osmocom.org/cellular-infrastructure/osmo-ggsn .   \
     && autoreconf -fi                                                         \
     && sync-cache.sh download osmocom-ggsn ccache                             \
     && ./configure --disable-dependency-tracking                              \
-    && make -j $(nproc)                                                       \
-    && make install                                                           \
+    && make -j $(nproc) install                                               \
+    && make clean                                                             \
     && sync-cache.sh upload osmocom-ggsn ccache                               \
     && ldconfig
 

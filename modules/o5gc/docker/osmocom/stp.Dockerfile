@@ -9,8 +9,8 @@ RUN git clone https://gitea.osmocom.org/osmocom/libosmo-sigtran .               
     && autoreconf -i                                                          \
     && sync-cache.sh download osmocom-stp ccache                              \
     && ./configure --disable-dependency-tracking --disable-doxygen            \
-    && make -j $(nproc)                                                       \
-    && make install                                                           \
+    && make -j $(nproc) install                                               \
+    && make clean                                                             \
     && sync-cache.sh upload osmocom-stp ccache                                \
     && ldconfig
 

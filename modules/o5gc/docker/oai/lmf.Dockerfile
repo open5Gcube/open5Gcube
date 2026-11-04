@@ -13,7 +13,7 @@ RUN sync-cache.sh download oai-lmf ccache                                     \
     && apt-get.sh install liblapacke-dev libopenblas-dev                      \
     && ./build_lmf --clean --Verbose --build-type Release --jobs              \
     && ldconfig                                                               \
-    && find ../ \( -name "*.a" -o -name "*.o" \) -type f -delete              \
+    && find ../ -name "*.[aod]" -type f -delete                               \
     && rm -rf /tmp/*                                                          \
     && apt-get.sh clean                                                       \
     && sync-cache.sh upload oai-lmf ccache

@@ -50,7 +50,7 @@ RUN mkdir build && cd build                                                   \
     && cmake ..                                                               \
     && make -j $(nproc) srsepc srsenb srsue                                   \
     && ldconfig                                                               \
-    && find ./ \( -name "*.a" -o -name "*.o" \) -type f -delete               \
+    && find . -name "*.[aod]" -type f -delete                                 \
     && ./srsran_install_configs.sh                                            \
     && sync-cache.sh upload srsran-4g ccache
 
@@ -65,7 +65,7 @@ RUN echo -e "add_executable(cell_measurement cell_measurement.cc)\n"          \
     && sync-cache.sh download srsran-4g ccache                                \
     && cmake ..                                                               \
     && make cell_measurement cell_search                                      \
-    && find ./ \( -name "*.a" -o -name "*.o" \) -type f -delete               \
+    && find . -name "*.[aod]" -type f -delete                                 \
     && sync-cache.sh upload srsran-4g ccache
 
 RUN echo ${SRSRAN_VERSION//_/.} > /etc/image_version

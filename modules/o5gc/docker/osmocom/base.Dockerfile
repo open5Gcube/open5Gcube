@@ -12,8 +12,8 @@ RUN git clone https://gitea.osmocom.org/osmocom/libosmocore                   \
     && autoreconf -i                                                          \
     && sync-cache.sh download osmocom-base ccache                             \
     && ./configure --disable-dependency-tracking --disable-doxygen            \
-    && make -j $(nproc)                                                       \
-    && make install                                                           \
+    && make -j $(nproc) install                                               \
+    && make clean                                                             \
     && sync-cache.sh upload osmocom-base ccache                               \
     && ldconfig
 
@@ -24,8 +24,8 @@ RUN git clone https://gitea.osmocom.org/osmocom/libosmo-netif                 \
     && autoreconf -i                                                          \
     && sync-cache.sh download osmocom-base ccache                             \
     && ./configure --disable-dependency-tracking --disable-dahdi              \
-    && make -j $(nproc)                                                       \
-    && make install                                                           \
+    && make -j $(nproc) install                                               \
+    && make clean                                                             \
     && sync-cache.sh upload osmocom-base ccache                               \
     && ldconfig
 
@@ -36,8 +36,8 @@ RUN git clone https://gitea.osmocom.org/osmocom/libosmo-abis                  \
     && autoreconf -i                                                          \
     && sync-cache.sh download osmocom-base ccache                             \
     && ./configure --disable-dependency-tracking --disable-dahdi              \
-    && make -j $(nproc)                                                       \
-    && make install                                                           \
+    && make -j $(nproc) install                                               \
+    && make clean                                                             \
     && sync-cache.sh upload osmocom-base ccache                               \
     && ldconfig
 

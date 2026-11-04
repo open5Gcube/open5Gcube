@@ -12,7 +12,7 @@ RUN sync-cache.sh download oai-ausf ccache                                    \
     && ./build_ausf --install-deps --force                                    \
     && ./build_ausf --clean --Verbose --build-type Release --jobs             \
     && ldconfig                                                               \
-    && find ../ \( -name "*.a" -o -name "*.o" \) -type f -delete              \
+    && find ../ -name "*.[aod]" -type f -delete                               \
     && rm -rf /tmp/*                                                          \
     && apt-get.sh clean                                                       \
     && sync-cache.sh upload oai-ausf ccache

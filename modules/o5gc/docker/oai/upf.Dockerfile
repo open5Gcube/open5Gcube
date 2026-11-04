@@ -12,7 +12,7 @@ RUN sync-cache.sh download oai-upf ccache                                     \
     && ./build_upf --install-deps --force                                     \
     && ./build_upf --clean --Verbose --build-type Release --jobs              \
     && ldconfig                                                               \
-    && find ../ \( -name "*.a" -o -name "*.o" \) -type f -delete              \
+    && find ../ -name "*.[aod]" -type f -delete                               \
     && rm -rf /tmp/*                                                          \
     && apt-get.sh clean                                                       \
     && sync-cache.sh upload oai-upf ccache

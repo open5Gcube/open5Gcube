@@ -9,8 +9,8 @@ RUN git clone https://gitea.osmocom.org/cellular-infrastructure/osmo-cbc .    \
     && autoreconf -i                                                          \
     && sync-cache.sh download osmocom-cbc ccache                              \
     && ./configure --disable-dependency-tracking                              \
-    && make -j $(nproc)                                                       \
-    && make install                                                           \
+    && make -j $(nproc) install                                               \
+    && make clean                                                             \
     && sync-cache.sh upload osmocom-cbc ccache                                \
     && ldconfig
 

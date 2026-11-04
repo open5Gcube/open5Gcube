@@ -39,7 +39,7 @@ RUN if [[ "${SRSRAN_VERSION}" == *_* ]]; then                                 \
     && cmake -DENABLE_EXPORT=ON -DENABLE_ZEROMQ=ON -DBUILD_TESTS=OFF ..       \
     && make -j $(nproc)                                                       \
     && ldconfig                                                               \
-    && find ./ \( -name "*.a" -o -name "*.o" \) -type f -delete               \
+    && find . -name "*.[aod]" -type f -delete                                 \
     && sync-cache.sh upload srsran-project ccache
 
 RUN echo ${SRSRAN_VERSION//_/.} > /etc/image_version

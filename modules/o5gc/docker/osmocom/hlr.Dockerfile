@@ -9,8 +9,8 @@ RUN git clone https://gitea.osmocom.org/cellular-infrastructure/osmo-hlr .    \
     && autoreconf -fi                                                         \
     && sync-cache.sh download osmocom-hlr ccache                              \
     && ./configure --disable-dependency-tracking                              \
-    && make -j $(nproc)                                                       \
-    && make install                                                           \
+    && make -j $(nproc) install                                               \
+    && make clean                                                             \
     && sync-cache.sh upload osmocom-hlr ccache                                \
     && ldconfig
 
