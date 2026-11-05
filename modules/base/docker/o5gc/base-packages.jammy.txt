@@ -30,7 +30,6 @@ libffi-dev
 libgmp-dev
 libgnutls28-dev
 libjansson-dev
-libjemalloc-dev
 libmysqlclient-dev
 libsctp-dev libsctp1
 libssl-dev
@@ -38,11 +37,9 @@ libsystemd-dev
 libtasn1-6-dev
 libtool
 libusb-1.0-0-dev
-libuv1-dev
 libxml2 libxml2-dev
 libxslt1-dev
 libyaml-dev
-memcached libmemcached-dev
 mlocate
 moreutils
 mysql-client
@@ -65,11 +62,9 @@ retry
 rsync
 socat
 software-properties-common
-subversion
 tcpdump
 tini
 tzdata
-unzip
 usbutils
 vim
 wait-for-it
