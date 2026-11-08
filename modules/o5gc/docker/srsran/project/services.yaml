@@ -5,6 +5,8 @@ services:
       service: base-ran
     image: o5gc/srsran-project
     entrypoint: [ "/mnt/srsran/entrypoint.sh" ]
+    environment:
+      - UHD_IMAGE_LOADER
     volumes:
       - .:/mnt/srsran/:ro
       - ${DEVELOP_VOLUME_SRSRAN:-${BASE}/var/empty:/var/empty}

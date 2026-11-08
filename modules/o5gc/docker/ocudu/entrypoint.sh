@@ -12,6 +12,15 @@ case "${srv}" in
     fi
 esac
 
+if [ "${srv}" == "uhd_image_loader" ]; then
+    (set +x;
+    for i in $(seq 10 -1 1); do
+        echo "USRP will be flashed now. Press CTRL-C to abort. ($i)"
+        sleep 1s
+    done) 2>/dev/null
+    exec uhd_image_loader --args type=x300,addr=192.168.40.2
+fi
+
 cd /o5gc/ocudu
 # the gNB takes the security settings, but rejects NIA0 for integrity
 export GNB_NIA_PREF_LIST=$(echo "${FIVEG_INTEGRITY_ORDER}" | sed -E 's/ //g; s/(^|,)NIA0(,|$)/\1/I; s/,$//')
@@ -42,13 +51,5 @@ case "${srv}" in
     du)
         retry --until=success --times=10 --delay=5 -- ncat -z --sctp ${CU_CP_RAN_IP_ADDR} 38472
         exec /perf-wrapper.sh ./build/apps/du/odu -c du.yaml -c du.overlay.yaml
-        ;;
-    uhd_image_loader)
-        (set +x;
-        for i in $(seq 10 -1 1); do
-            echo "USRP will be flashed now. Press CTRL-C to abort. ($i)"
-            sleep 1s
-        done) 2>/dev/null
-        uhd_image_loader --args type=x300,addr=192.168.40.2
         ;;
 esac

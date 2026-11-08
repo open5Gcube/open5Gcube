@@ -19,6 +19,15 @@ case "${service}" in
         fi
 esac
 
+if [ "${service}" == "uhd_image_loader" ]; then
+    (set +x;
+    for i in $(seq 10 -1 1); do
+        echo "USRP will be flashed now. Press CTRL-C to abort. ($i)"
+        sleep 1s
+    done) 2>/dev/null
+    exec uhd_image_loader --args type=x300,addr=192.168.40.2
+fi
+
 HLR_DB=/o5gc/osmo-hlr/hlr.db
 
 function add_subscriber () {

@@ -8,6 +8,7 @@ services:
     environment:
       - OCUDU_LOGLEVEL=${OCUDU_LOGLEVEL:-info}
       - DOCKER_TARGET_HOSTNAME=${GNB_HOSTNAME}
+      - UHD_IMAGE_LOADER
     volumes:
       - .:/mnt/ocudu/:ro
     networks: !reset []
