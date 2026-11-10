@@ -24,8 +24,12 @@ RUN cached-download.sh                                                        \
 ENV ANT_HOME="/usr/local/apache-ant-1.9.14"
 
 # Install old MySQL
-RUN echo "deb http://repo.mysql.com/apt/ubuntu bionic mysql-5.7" >> /etc/apt/sources.list.d/mysql.list \
-    && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B7B3B788A8D3785C \
+RUN mkdir -p /etc/apt/keyrings                                                \
+    && curl -fsSL 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xB7B3B788A8D3785C' \
+        | gpg --dearmor -o /etc/apt/keyrings/mysql.gpg                        \
+    && echo "deb [signed-by=/etc/apt/keyrings/mysql.gpg] "                    \
+            "https://repo.mysql.com/apt/ubuntu bionic mysql-5.7"              \
+        > /etc/apt/sources.list.d/mysql.list                                  \
     && apt-get.sh purge mysql-client                                          \
     && apt-get.sh install mysql-client=5.7* mysql-community-server=5.7* mysql-server=5.7*
 
