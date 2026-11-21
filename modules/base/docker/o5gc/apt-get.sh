@@ -27,6 +27,7 @@ done
 clean() {
   apt-get clean
   rm -rf /var/lib/apt/lists/*
+  rm -f /var/cache/debconf/*.dat-old /var/lib/dpkg/*-old
 }
 
 case $1 in
