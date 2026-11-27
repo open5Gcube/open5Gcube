@@ -115,7 +115,6 @@ services:
     env_file: [ "${ENV_FILE}" ]
     volumes:
       - ./develop-entrypoint.sh:/entrypoint.sh:ro
-      - ${VAR}/ssh/:/var/run/ssh/
       - develop:/o5gc/
     networks:
       - corenet

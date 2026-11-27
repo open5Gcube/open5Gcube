@@ -25,7 +25,6 @@ if [[ "${service}" == "upf" ]]; then
         popd
     fi
     iptables -t nat -A POSTROUTING -s ${UE_IP_SUBNET} ! -o upfgtp -j MASQUERADE
-    service ssh start
 fi
 
 wait-for-it -t 60 ${MONGO_IP_ADDR}:27017

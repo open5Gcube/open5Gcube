@@ -92,7 +92,5 @@ interactions. It includes the following features:
 * Preinstalled Packages: The image comes with a lot of preinstalled packages, simplifying the
   installation of the various projects.
 * Current Wireshark Version: Wireshark is included in the image with the latest version.
-* SSH Key for Inter-Container Login: An SSH key is configured, facilitating login between
-  containers.
 * Common Working Directory: The working directory within the container is set to
  ``/o5gc/``, offering a designated space for project-specific installations and operations.

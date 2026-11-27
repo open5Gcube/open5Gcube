@@ -75,11 +75,8 @@ RUN cd /usr/local/bin/ && cached-download.sh                                  \
 COPY install-docker.sh /usr/local/bin/
 RUN install-docker.sh --image cli-only
 
-RUN --mount=type=secret,id=id_ed25519 --mount=type=secret,id=id_ed25519.pub   \
-    mkdir -m 0700 /root/.ssh && cd /root/.ssh                                 \
-    && cp /run/secrets/id_ed25519* .                                          \
-    && chmod +r id_ed25519.pub                                                \
-    && cp id_ed25519.pub authorized_keys
+# the host's ~/.ssh is copied in at runtime for remote hosts (docker-remote.sh)
+RUN mkdir -m 0700 /root/.ssh
 
 COPY install-uhd.sh /usr/local/bin/
 

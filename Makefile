@@ -21,17 +21,6 @@ help:  ## This help
 
 OCI_IMG_KEY = org.opencontainers.image
 
-var/ssh/authorized_keys: var/ssh/id_ed25519
-	cat $<.pub >> $@
-var/ssh/id_ed25519:
-	ssh-keygen -t ed25519 -N "" -C o5gc -f $@
-.PRECIOUS: var/ssh/ssh_host_%_ed25519_key
-var/ssh/ssh_host_%_ed25519_key:
-	$(foreach keytype, rsa ecdsa ed25519,                                     \
-	    ssh-keygen -N "" -t ${keytype} -f var/ssh/ssh_host_$*_${keytype}_key;)
-
-.docker-build-prerequisites: var/ssh/id_ed25519
-
 var/ssl/MOK.der:
 	openssl req -nodes -new -x509 -newkey rsa:2048 -days 36500                \
 	    -keyout var/ssl/MOK.priv -outform DER -out var/ssl/MOK.der -subj "/CN=o5gc"
@@ -62,8 +51,6 @@ define docker-build
 		$(if ${http_proxy},--build-arg http_proxy=${http_proxy},)             \
 		$(if ${https_proxy},--build-arg https_proxy=${https_proxy},)          \
         --label ${OCI_IMG_KEY}.created="$(shell date --rfc-3339=seconds)"     \
-        --secret id=id_ed25519,src=${BASE_DIR}/var/ssh/id_ed25519             \
-        --secret id=id_ed25519.pub,src=${BASE_DIR}/var/ssh/id_ed25519.pub     \
         --add-host o5gc-build-cacher:${DOCKER_HOST_BRIDGE}                    \
         --file $(if ${3},$(subst docker-build-${2}-,,${3}).)Dockerfile        \
         $(if ${$@_BUILD_HOST},- < ${BASE_DIR}/var/tmp/${$@_BUILD_HOST}-${$@_IMG}.tar,.)
@@ -145,7 +132,7 @@ include ${MODULE_TARGET_FILES} tests/targets.mk
 .develop-%-untag-latest:
 	@rm -f docker/$(subst -,/,$*)/.build
 	$(call docker-build,$*)
-.develop-%-start: var/ssh/ssh_host_$$*_ed25519_key var/ssh/authorized_keys
+.develop-%-start:
 	cd docker/$(subst -,/,$*);                                                \
 	$(DOCKER_COMPOSE) --profile=develop up --detach
 .develop-%-stop:

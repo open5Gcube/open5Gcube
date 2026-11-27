@@ -48,7 +48,7 @@ net-tools
 netbase
 netcat
 ninja-build
-openssh-client openssh-server
+openssh-client
 openssl
 prips
 psmisc

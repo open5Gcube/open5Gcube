@@ -31,7 +31,6 @@ case "${service}" in
     upf)
         python3 ${mnt}/tun_if.py --tun_ifname ogstun  --ipv4_range ${UE_IP_SUBNET} --ipv6_range 2001:230:cafe::/48
         python3 ${mnt}/tun_if.py --tun_ifname ogstun2 --ipv4_range ${UE_IMS_IP_SUBNET} --ipv6_range 2001:230:babe::/48 --nat_rule 'no'
-        service ssh start
         ;;
     mme)
         if [[ "${SMS_DOMAIN}" == "SMS-over-SGs" ]]; then
