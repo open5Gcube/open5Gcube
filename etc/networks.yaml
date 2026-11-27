@@ -37,11 +37,3 @@ networks:
     o5gc:
         name: o5gc
         external: true
-
-volumes:
-    develop:
-        driver: local
-        driver_opts:
-            type: nfs
-            o: nfsvers=4,addr=127.0.0.1,rw
-            device: ":${DEVELOP_DIR}"

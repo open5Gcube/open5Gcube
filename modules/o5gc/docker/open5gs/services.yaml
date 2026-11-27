@@ -18,7 +18,6 @@ services:
       - OPEN5GS_LOGLEVEL=${OPEN5GS_LOGLEVEL:-info}
     volumes:
       - .:/mnt/open5gs/:ro
-      - ${DEVELOP_VOLUME_OPEN5GS:-${BASE}/var/empty:/var/empty}
     labels:
       o5gc.corenetwork-function: true
       o5gc.stack: ${O5GC_STACK}
@@ -415,13 +414,3 @@ services:
         condition: service_healthy
     profiles: [ "core" ]
     <<: *sbi-healthcheck
-
-  develop:
-    extends:
-      file: ${DOCKER}/o5gc/services.yaml
-      service: develop
-    image: o5gc/open5gs:develop
-    container_name: open5gs-develop
-    volumes:
-      - ${DOCKER}/open5gs/:/mnt/open5gs/
-    hostname: open5gs-develop

@@ -94,18 +94,7 @@ docker-build-all: clean build-cacher-restart docker-build-o5gc-base  ## Build al
 pull-all-external-images:
 	$(foreach img,$(filter-out o5gc/%,${IMAGES}),docker pull ${img};)
 
-DEVLOP_IMAGES = $(shell docker images o5gc/*:develop --format "{{.Repository}}")
-DEVELOP_VOLUMES = $(shell                                                     \
-    for img in ${DEVLOP_IMAGES}; do                                           \
-        id_latest=$$(docker images --format {{.ID}} $${img}:latest);          \
-        id_develop=$$(docker images --format {{.ID}} $${img}:develop);        \
-        prj=$${img/o5gc\//}; v=$${prj//-/_};                                  \
-        [ "$${id_latest}" == "$${id_develop}" ] &&                            \
-            echo DEVELOP_VOLUME_$${v^^}=develop:/o5gc/;                       \
-    done;)
-EXPORT_DEVELOP_VOLUMES := $(if ${DEVELOP_VOLUMES},export ${DEVELOP_VOLUMES},:)
-
-DOCKER_COMPOSE = $(EXPORT_DEVELOP_VOLUMES); $(EXPORT_ENV);                    \
+DOCKER_COMPOSE = $(EXPORT_ENV);                                               \
     export O5GC_STACK=$$(basename $${PWD});                                   \
     export MODULE=$$(realpath --relative-to=${BASE_DIR} $${PWD}|cut -d / -f2);\
     export ENV_FILE=${ENV_DIR}/$${MODULE}/$${O5GC_STACK}.env;                 \
@@ -123,21 +112,6 @@ DEFAULT_MODULES = base o5gc
 DEFAULT_MODULE_TARGET_FILES = $(foreach module,${DEFAULT_MODULES},modules/${module}/targets.mk)
 MODULE_TARGET_FILES = ${DEFAULT_MODULE_TARGET_FILES} $(sort $(filter-out ${DEFAULT_MODULE_TARGET_FILES},$(wildcard modules/*/targets.mk)))
 include ${MODULE_TARGET_FILES} tests/targets.mk
-
-.develop-%-build:
-	$(call docker-build,$*,,,develop)
-.develop-%-tag-latest:
-	docker tag o5gc/$*:develop o5gc/$*:latest
-	docker images o5gc/$*
-.develop-%-untag-latest:
-	@rm -f docker/$(subst -,/,$*)/.build
-	$(call docker-build,$*)
-.develop-%-start:
-	cd docker/$(subst -,/,$*);                                                \
-	$(DOCKER_COMPOSE) --profile=develop up --detach
-.develop-%-stop:
-	cd docker/$(subst -,/,$*);                                                \
-	$(DOCKER_COMPOSE) --profile=develop down
 
 var/tmp/softue.env: ${UEDB_ENV}
 	source ${UEDB_ENV}; echo UE_SOFT_MSIN=$${UE_SOFT_MSIN} > $@
@@ -220,8 +194,7 @@ clean:
 	rm -rf var/etc/* var/tmp/*
 
 system-install-all: systemd-install-unit system-install-docker                \
-    system-install-python3-virtualenv tests-install-venv scripts-install-venv \
-    system-install-nfs-server
+    system-install-python3-virtualenv tests-install-venv scripts-install-venv
 
 systemd-install-unit:
 	sudo ln -sfv ${PWD}/scripts/o5gc.service -t /etc/systemd/system
@@ -241,14 +214,6 @@ systemd-verfiy-unit:
 	ssh -t $* sudo /tmp/install-docker.sh all
 system-install-docker: ${O5GC_ENV}
 	$(MAKE) $(foreach host,${DOCKER_ALL_HOSTS},.$@-${host})
-
-NFS_EXPORT_COMMENT = \# o5gc development share
-NFS_EXPORT_ENTRY = /home 127.0.0.1(rw,async,no_subtree_check,crossmnt,all_squash,crossmnt,anonuid=$(shell id -u),anongid=$(shell id -g))
-system-install-nfs-server:
-	sudo apt install nfs-kernel-server
-	grep -Fxq "$(NFS_EXPORT_COMMENT)" /etc/exports ||                         \
-	    echo -e "\n$(NFS_EXPORT_COMMENT)\n$(NFS_EXPORT_ENTRY)\n" | sudo tee -a /etc/exports
-	sudo exportfs -ra
 
 system-install-python3-virtualenv:
 	sudo apt update

@@ -274,9 +274,3 @@ run-srsran-4g-cell_measurement: ${O5GC_ENV}  ##
 run-sigdigger run-swagger-ui: .xhost  ##
 	cd modules/o5gc/docker/misc;                                              \
 	$(DOCKER_COMPOSE) --profile=$(subst run-,,$@) up
-
-develop-srsran-4g-build develop-srsran-4g-start develop-srsran-4g-stop        \
-develop-srsran-4g-tag-latest develop-srsran-4g-untag-latest                   \
-develop-open5gs-build develop-open5gs-start develop-open5gs-stop              \
-develop-open5gs-tag-latest develop-open5gs-untag-latest:
-	$(MAKE) .$@

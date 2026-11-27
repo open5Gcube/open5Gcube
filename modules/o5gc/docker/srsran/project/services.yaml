@@ -9,7 +9,6 @@ services:
       - UHD_IMAGE_LOADER
     volumes:
       - .:/mnt/srsran/:ro
-      - ${DEVELOP_VOLUME_SRSRAN:-${BASE}/var/empty:/var/empty}
     profiles: [ srsran ]
 
   gnb:

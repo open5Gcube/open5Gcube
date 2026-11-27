@@ -6,7 +6,6 @@ services:
     env_file: [ "${ENV_FILE}" ]
     volumes:
       - .:/mnt/srsran/:ro
-      - ${DEVELOP_VOLUME_SRSRAN:-${BASE}/var/empty:/var/empty}
     labels:
       o5gc.stack: ${O5GC_STACK}
       o5gc.webui.priority: ${WEBUI_PRIO_RAN}
@@ -94,11 +93,3 @@ services:
       ran:
         ipv4_address: ${UE_RAN_IP_ADDR}
     profiles: [ "ue" ]
-
-  develop:
-    extends:
-      file: ${DOCKER}/o5gc/services.yaml
-      service: develop
-    image: o5gc/srsran-4g:develop
-    container_name: srsran-develop
-    hostname: srsran-develop

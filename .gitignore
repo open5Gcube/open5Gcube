@@ -1,5 +1,4 @@
 etc/uedb.d
-develop/
 tests/.venv.build
 tests/venv
 tests/results
