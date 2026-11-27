@@ -104,8 +104,7 @@ DOCKER_COMPOSE = $(EXPORT_ENV);                                               \
         --file ${ETC_DIR}/networks.yaml
 
 STACKS = $(shell find modules/*/stacks/ -name docker-compose.yaml -printf "%h ")
-profiles = $(foreach p,$(shell cd ${1}; $(DOCKER_COMPOSE) config --profiles),--profile ${p})
-IMAGES = $(eval IMAGES := $(sort $(foreach s,${STACKS},$(shell cd ${s}; $(DOCKER_COMPOSE) $(call profiles,${s}) config --images))))${IMAGES}
+IMAGES = $(eval IMAGES := $(sort $(foreach s,${STACKS},$(shell cd ${s}; $(DOCKER_COMPOSE) --profile '*' config --images))))${IMAGES}
 image_versions = $(sort $(foreach i,$(filter o5gc/$1:%,${IMAGES}),$(shell echo ${i} | sed "s|o5gc/$1:\(.*\)|\1|")))
 
 DEFAULT_MODULES = base o5gc
