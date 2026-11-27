@@ -238,7 +238,7 @@ lazydocker:
 
 lint:
 	$(MAKE) --keep-going shellcheck yamllint codespell hadolint               \
-	    dclint markdownlint actionlint space-end-check tests-lint
+	    dclint compose-config markdownlint actionlint space-end-check tests-lint
 
 SHELLCHECK_IMAGE = koalaman/shellcheck:stable
 YAMLLINT_IMAGE = cytopia/yamllint:latest
@@ -283,6 +283,13 @@ dclint:
 	@echo Running dclint
 	@docker run --rm --volume ${BASE_DIR}:/app                                \
 	  ${DCLINT_IMAGE} -c scripts/dclintrc ${DC_FILES}
+
+compose-config:
+	@echo Running docker compose config
+	@$(foreach s,${STACKS},                                                   \
+	    out=$$(cd ${s} && $(DOCKER_COMPOSE) --profile '*' config --quiet 2>&1) \
+	        && [ -z "$${out}" ] || { echo "$${out}" | sed "s|^|${s}: |"; failed=1; };) \
+	[ -z "$${failed}" ]
 
 MD_FILES += ${BASE_DIR}/README.md $(filter-out ${BASE_DIR}/Doc/README.md,$(wildcard ${BASE_DIR}/Doc/*.md))
 MD_IGNORE = ~MD001,~MD002,~MD022,~MD031,~MD032,~MD041
